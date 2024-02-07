@@ -1,0 +1,18 @@
+.footer {
+  display: flex;
+  padding: 1.5rem 0;
+
+  > :first-child {
+    font-family:'Times New Roman', Times, serif;
+    color: var(--black);
+
+    & div {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    & span {
+      font-size: .8rem;
+    }
+  }
+}

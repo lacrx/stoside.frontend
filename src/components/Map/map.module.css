@@ -1,0 +1,17 @@
+.map {
+  > figure {
+    height: 400px;
+    width: 100%;
+  }
+
+  > figcaption {
+    font-family: Helvetica, sans-serif;
+    font-size: .75rem;
+    letter-spacing: .3px;
+    color: var(--dark-grey);
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid slategrey;
+    padding: .5rem 0;
+  }
+}

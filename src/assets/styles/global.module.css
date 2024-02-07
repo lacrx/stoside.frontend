@@ -1,0 +1,109 @@
+:root {
+  --black: #0A2540;
+  --dark-grey: #242424;
+  --blue: #a2d6db;
+}
+
+:global(html) {
+  overflow-y: scroll;
+}
+
+:global(main) {
+  position: relative;
+  display: grid;
+  grid-template-rows: 4rem 1fr auto;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  max-width: 50rem;
+
+  > :nth-child(n) {
+    min-width: 100%;
+  }
+
+  > :nth-child(2) {
+    padding-top: 5rem;
+  }
+
+  > :last-child {
+    margin-top: 7rem;
+  }
+}
+
+:global(.closed) {
+  > :nth-child(n+3) {
+    display: none;
+
+    @media (min-width: 600px) {
+      display: block;
+    }
+  }
+}
+
+:global(h1) {
+  font-family: Helvetica, sans-serif;
+  font-weight: 800;
+  font-size: 3rem;
+  color: var(--black);
+}
+
+:global(h2) {
+  font-family: Helvetica, sans-serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.8rem;
+  color: var(--black);
+}
+
+:global(h3) {
+  font-family: Helvetica, sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: .3px;
+  color: var(--dark-grey);
+}
+
+:global(h4) {
+  font-family: Georgia, serif;
+  font-weight: 300;
+  font-size: 1.2rem;
+  line-height: 1.5rem;
+  letter-spacing: .3px;
+  color: var(--dark-grey);
+}
+
+:global(p) {
+  font-family: Georgia, serif;
+  font-weight: 300;
+  font-size: 1.2rem;
+  line-height: 2rem;
+  letter-spacing: .3px;
+  color: var(--dark-grey);
+
+  > img {
+    max-width: 100%;
+  }
+}
+
+:global(button) {
+  background-color: white;
+  border: 2px solid var(--dark-grey);
+  border-radius: 3px;
+}
+
+:global(.ui-button) {
+  background-color: #fff;
+  border: 0;
+  border-radius: 2px;
+  box-shadow: 0 1px 4px -1px rgba(0, 0, 0, 0.3);
+  margin: 10px;
+  padding: 0 0.5em;
+  font: 400 18px Roboto, Arial, sans-serif;
+  overflow: hidden;
+  height: 40px;
+  cursor: pointer;
+
+  &:hover {
+    background: rgb(235, 235, 235);
+  }
+}

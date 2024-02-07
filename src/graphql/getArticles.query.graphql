@@ -1,0 +1,26 @@
+query GetArticles($start: Int!, $limit: Int!) {
+  articles(pagination: { start: $start, limit: $limit }) {
+    data {
+      id
+      attributes {
+        author {
+          data {
+            attributes {
+              name
+            }
+          }
+        }
+        cover {
+          data {
+            attributes {
+              url
+            }
+          }
+        }
+        description
+        slug
+        title
+      }
+    }
+  }
+}

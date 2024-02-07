@@ -1,0 +1,19 @@
+.hero {
+  position: relative;
+
+  > :nth-child(n) {
+    max-width: 40rem;
+  }
+
+  > h4:nth-child(2), > a:nth-child(2) > h2 {
+    margin: 1.5rem 0;
+  }
+
+  & h2 {
+    background-color: var(--blue);
+  }
+
+  > h4 {
+    font-style: italic;
+  }
+}

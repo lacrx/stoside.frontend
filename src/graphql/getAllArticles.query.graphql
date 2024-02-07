@@ -1,0 +1,26 @@
+query GetAllArticles {
+  articles {
+    data {
+      id
+      attributes {
+        author {
+          data {
+            attributes {
+              name
+            }
+          }
+        }
+        cover {
+          data {
+            attributes {
+              url
+            }
+          }
+        }
+        description
+        slug
+        title
+      }
+    }
+  }
+}

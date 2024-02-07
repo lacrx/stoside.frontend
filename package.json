@@ -1,0 +1,49 @@
+{
+  "name": "stoside",
+  "description": "A website for Strong Towns Oceanside",
+  "author": "Thomas LaCroix",
+  "license": "MIT",
+  "scripts": {
+    "dev": "gatsby develop",
+    "build": "gatsby build",
+    "serve": "gatsby serve",
+    "clean": "gatsby clean",
+    "generate:css": "tcm -p 'src/**/*.module.css' ."
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@deck.gl/core": "^8.9.32",
+    "@deck.gl/google-maps": "^8.9.32",
+    "@deck.gl/layers": "^8.9.32",
+    "@googlemaps/js-api-loader": "^1.16.2",
+    "d3-scale": "^4.0.2",
+    "fs": "^0.0.1-security",
+    "gatsby": "^5.12.9",
+    "gatsby-plugin-image": "^3.12.3",
+    "gatsby-plugin-manifest": "^5.12.3",
+    "gatsby-plugin-sharp": "^5.12.3",
+    "gatsby-source-filesystem": "^5.12.1",
+    "gatsby-transformer-remark": "^6.12.3",
+    "gatsby-transformer-sharp": "^5.12.3",
+    "graphql-request": "^6.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/client-preset": "^4.1.0",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@graphql-codegen/typescript-graphql-request": "^6.0.1",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
+    "@graphql-codegen/typescript-react-apollo": "^4.1.0",
+    "@types/d3-scale": "^4.0.8",
+    "isomorphic-dompurify": "^1.9.0",
+    "marked": "^10.0.0",
+    "react-css-modules": "^4.7.11",
+    "tsconfig-paths-webpack-plugin": "^4.1.0",
+    "typed-css-modules": "^0.8.1",
+    "typescript": "^5.2.2"
+  }
+}
