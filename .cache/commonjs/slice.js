@@ -60,14 +60,29 @@ class SlicePropsError extends Error {
     let stack = ``;
     let message = ``;
     if (inBrowser) {
-      // They're just (kinda) kidding, I promise... You can still work here <3
-      //   https://www.gatsbyjs.com/careers/
-      const fullStack = _react.default.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactDebugCurrentFrame.getCurrentStack();
+      var _React$__SECRET_INTER, _React$__SECRET_INTER2;
+      let fullStack = ``;
+
+      // React 19+ uses captureOwnerStack, React 18 uses ReactDebugCurrentFrame.getCurrentStack
+      if (_react.default.captureOwnerStack) {
+        // React 19+ approach
+        const ownerStack = _react.default.captureOwnerStack();
+        const currentStack = new Error().stack || ``;
+        fullStack = ownerStack ? `${currentStack}\n${ownerStack}` : currentStack;
+      } else if ((_React$__SECRET_INTER = _react.default.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED) !== null && _React$__SECRET_INTER !== void 0 && (_React$__SECRET_INTER2 = _React$__SECRET_INTER.ReactDebugCurrentFrame) !== null && _React$__SECRET_INTER2 !== void 0 && _React$__SECRET_INTER2.getCurrentStack) {
+        // React 18 approach
+        fullStack = _react.default.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.ReactDebugCurrentFrame.getCurrentStack();
+      } else {
+        // Fallback if neither API is available
+        fullStack = new Error().stack || ``;
+      }
 
       // remove the first line of the stack trace
       const stackLines = fullStack.trim().split(`\n`).slice(1);
-      stackLines[0] = stackLines[0].trim();
-      stack = `\n` + stackLines.join(`\n`);
+      if (stackLines.length > 0) {
+        stackLines[0] = stackLines[0].trim();
+        stack = `\n` + stackLines.join(`\n`);
+      }
       message = `Slice "${sliceName}" was passed props that are not serializable (${errors}).`;
     } else {
       // we can't really grab any extra info outside of the browser, so just print what we can

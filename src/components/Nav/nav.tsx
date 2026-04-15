@@ -20,7 +20,7 @@ const X = () =>
   </svg>
 
 export default function Nav() {
-  const navRef = useRef<HTMLLIElement>();
+  const navRef = useRef<HTMLLIElement>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {

@@ -16,7 +16,7 @@ const link = (text: string) =>
   </Link>;
 const h3 = (text: string) => <h4>{ text }</h4>;
 
-const buddyStyle = { position: "absolute", bottom: "-6px", right: "-5px", };
+const buddyStyle = { position: "absolute" as const, bottom: "-6px", right: "-5px" };
 
 export default function Hero({ title, cta, description, style = { paddingBottom: "5rem" }, showBuddy = false }: HeroProps) {
   return (

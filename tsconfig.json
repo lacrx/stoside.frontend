@@ -17,9 +17,9 @@
       "@/styles/*": ["./src/assets/styles/*"],
       "@/static/*": ["./static/*"]
     },
-    "types": ["node"]
+    "types": ["node", "google.maps"]
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "**/*.spec.tsx", "**/*.spec.ts"],
   "include": [
     "./src/**/*",
     "./codegen.ts",

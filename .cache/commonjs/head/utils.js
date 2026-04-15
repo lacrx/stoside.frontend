@@ -119,17 +119,17 @@ function getValidHeadNodesAndAttributes(rootNode, htmlAndBodyAttributes = {
 }) {
   const seenIds = new Map();
   const validHeadNodes = [];
-
-  // Filter out non-element nodes before looping since we don't care about them
   for (const node of rootNode.childNodes) {
-    var _node$attributes, _node$attributes$id;
-    const nodeName = node.nodeName.toLowerCase();
-    const id = (_node$attributes = node.attributes) === null || _node$attributes === void 0 ? void 0 : (_node$attributes$id = _node$attributes.id) === null || _node$attributes$id === void 0 ? void 0 : _node$attributes$id.value;
+    var _node$attributes$getN, _node$attributes, _node$attributes$getN2, _node$attributes2, _node$attributes2$id;
+    // Filter out non-element nodes before looping since we don't care about them
     if (!isElementType(node)) continue;
+    const nodeName = (_node$attributes$getN = (_node$attributes = node.attributes) === null || _node$attributes === void 0 ? void 0 : (_node$attributes$getN2 = _node$attributes.getNamedItem(_constants.HTML_BODY_ORIGINAL_TAG_ATTRIBUTE_KEY)) === null || _node$attributes$getN2 === void 0 ? void 0 : _node$attributes$getN2.value) !== null && _node$attributes$getN !== void 0 ? _node$attributes$getN : node.nodeName.toLowerCase();
+    const id = (_node$attributes2 = node.attributes) === null || _node$attributes2 === void 0 ? void 0 : (_node$attributes2$id = _node$attributes2.id) === null || _node$attributes2$id === void 0 ? void 0 : _node$attributes2$id.value;
     if (isValidNodeName(nodeName)) {
       // <html> and <body> tags are treated differently, in that we don't render them, we only extract the attributes and apply them separetely
       if (nodeName === `html` || nodeName === `body`) {
         for (const attribute of node.attributes) {
+          if (attribute.name === _constants.HTML_BODY_ORIGINAL_TAG_ATTRIBUTE_KEY) continue;
           const isStyleAttribute = attribute.name === `style`;
 
           // Merge attributes for same nodeName from previous loop iteration
@@ -149,10 +149,14 @@ function getValidHeadNodesAndAttributes(rootNode, htmlAndBodyAttributes = {
       } else {
         let clonedNode = node.cloneNode(true);
         clonedNode.setAttribute(`data-gatsby-head`, true);
+        if (clonedNode.getAttribute(_constants.ITEM_PROP_WORKAROUND_KEY) === _constants.ITEM_PROP_WORKAROUND_VALUE) {
+          clonedNode.removeAttribute(_constants.ITEM_PROP_WORKAROUND_KEY);
+        }
 
-        // // This is hack to make script tags work
+        // This is a hack to make script tags work
+        // TODO(serhalp): Explain what this is solving
         if (clonedNode.nodeName.toLowerCase() === `script`) {
-          clonedNode = massageScript(clonedNode);
+          clonedNode = cloneNodeWithoutNS(clonedNode);
         }
         // Duplicate ids are not allowed in the head, so we need to dedupe them
         if (id) {
@@ -181,13 +185,19 @@ function getValidHeadNodesAndAttributes(rootNode, htmlAndBodyAttributes = {
     htmlAndBodyAttributes
   };
 }
-function massageScript(node) {
-  const script = document.createElement(`script`);
+
+/**
+ * Recreate an element in the HTML namespace.
+ *
+ * This is similar to `cloneNode()` but reinitializes immutable properties like the namespace.
+ */
+function cloneNodeWithoutNS(node) {
+  const clonedNode = document.createElement(node.nodeName);
   for (const attr of node.attributes) {
-    script.setAttribute(attr.name, attr.value);
+    clonedNode.setAttribute(attr.name, attr.value);
   }
-  script.innerHTML = node.innerHTML;
-  return script;
+  clonedNode.innerHTML = node.innerHTML;
+  return clonedNode;
 }
 function isValidNodeName(nodeName) {
   return _constants.VALID_NODE_NAMES.includes(nodeName);

@@ -32,15 +32,15 @@ function WrappedAccordionItem({
   open
 }) {
   var _res$sourcePosition;
-  const codeFrameInformation = getCodeFrameInformationFromError(error);
+  const codeFrameInformation = error.stack ? getCodeFrameInformationFromError(error) : null;
   const modulePath = codeFrameInformation === null || codeFrameInformation === void 0 ? void 0 : codeFrameInformation.moduleId;
   const name = codeFrameInformation === null || codeFrameInformation === void 0 ? void 0 : codeFrameInformation.functionName;
   // With the introduction of Metadata management the modulePath can have a resourceQuery that needs to be removed first
-  const filePath = modulePath.replace(/(\?|&)export=(default|head)$/, ``);
+  const filePath = modulePath === null || modulePath === void 0 ? void 0 : modulePath.replace(/(\?|&)export=(default|head)$/, ``);
   const res = (0, _hooks.useStackFrame)(codeFrameInformation);
   const line = (_res$sourcePosition = res.sourcePosition) === null || _res$sourcePosition === void 0 ? void 0 : _res$sourcePosition.line;
   const Title = () => {
-    if (!name) {
+    if (!name || !error.stack) {
       return /*#__PURE__*/React.createElement(React.Fragment, null, "Unknown Runtime Error");
     }
     return /*#__PURE__*/React.createElement(React.Fragment, null, "Error in function", ` `, /*#__PURE__*/React.createElement("span", {
@@ -54,14 +54,16 @@ function WrappedAccordionItem({
     title: /*#__PURE__*/React.createElement(Title, null)
   }, /*#__PURE__*/React.createElement("p", {
     "data-gatsby-overlay": "body__error-message"
-  }, error.message), /*#__PURE__*/React.createElement("div", {
+  }, error.message), error.stack ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     "data-gatsby-overlay": "codeframe__top"
   }, /*#__PURE__*/React.createElement("div", null, filePath, ":", line), /*#__PURE__*/React.createElement("button", {
     "data-gatsby-overlay": "body__open-in-editor",
     onClick: () => (0, _utils.openInEditor)(filePath, line)
   }, "Open in Editor")), /*#__PURE__*/React.createElement(_codeFrame.CodeFrame, {
     decoded: res.decoded
-  }));
+  })) : /*#__PURE__*/React.createElement("p", {
+    "data-font-weight": "bold"
+  }, "To identify the exact location of the error, please open the browser's developer tools console."));
 }
 function RuntimeErrors({
   errors,
@@ -71,11 +73,18 @@ function RuntimeErrors({
     const errorCache = new Set();
     const errorList = [];
     errors.forEach(error => {
-      // Second line contains the exact location
-      const secondLine = error.stack.split(`\n`)[1];
-      if (!errorCache.has(secondLine)) {
+      let cacheKey;
+      if (error.stack) {
+        var _error$stack;
+        // Second line contains the exact location
+        const secondLine = (_error$stack = error.stack) === null || _error$stack === void 0 ? void 0 : _error$stack.split(`\n`)[1];
+        cacheKey = secondLine;
+      } else {
+        cacheKey = error.toString();
+      }
+      if (!errorCache.has(cacheKey)) {
         errorList.push(error);
-        errorCache.add(secondLine);
+        errorCache.add(cacheKey);
       }
     });
     return errorList;

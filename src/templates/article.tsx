@@ -1,4 +1,5 @@
 import { GatsbyImage, getImage, IGatsbyImageData } from "gatsby-plugin-image";
+import { type PageProps } from "gatsby";
 import { Head as _Head } from "@/components/Head/head";
 import Layout from "@/components/Layout/layout";
 import Hero from "@/components/Hero/hero";
@@ -34,7 +35,7 @@ export default function Article({ pageContext: { title, description, image, cont
     <Layout>
       <Hero { ...heroProps } />
       <Content { ...contentProps } >
-        <GatsbyImage image={img} alt={title} />
+        <GatsbyImage image={img!} alt={title} />
         <slot dangerouslySetInnerHTML={{ __html: content }} />
       </Content>
     </Layout>

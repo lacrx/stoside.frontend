@@ -141,7 +141,7 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
     const content = sanitize(
       blocks
         .filter(block => Object.hasOwn(block, 'body'))
-        .map(({ body }) => marked.parse(body))
+        .map(({ body }) => marked.parse(body) as string)
         .join()
     );
 

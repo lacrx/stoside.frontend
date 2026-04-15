@@ -7,6 +7,7 @@ var _gatsby = require("gatsby");
 var _reachRouter = require("@gatsbyjs/reach-router");
 var _reactDomUtils = require("../react-dom-utils");
 var _fireCallbackInEffect = require("./components/fire-callback-in-effect");
+var _headComponents = require("./components/head-components");
 var _utils = require("./utils");
 var _apiRunnerBrowser = require("../api-runner-browser");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
@@ -27,7 +28,7 @@ const onHeadRendered = () => {
 
   /**
    * The rest of the code block below is a diffing mechanism to ensure that
-   * the head elements aren't duplicted on every re-render.
+   * the head elements aren't duplicated on every re-render.
    */
   const existingHeadElements = document.querySelectorAll(`[data-gatsby-head]`);
   if (existingHeadElements.length === 0) {
@@ -70,6 +71,36 @@ if (process.env.BUILD_STAGE === `develop`) {
     subtree: true
   });
 }
+
+// React 19 does not allow rendering a second `<html>` or `<body>` anywhere in the tree:
+// https://github.com/facebook/react/blob/50e7ec8a694072fd6fcd52182df8a75211bf084d/packages/react-dom-bindings/src/server/ReactFizzConfigDOM.js#L3739
+// Unfortunately, our Head API relies on users being able to render these elements, which we then
+// render in a hidden `<div>` to extract attributes to apply to the real `<html>` and `<body>`.
+// We explored several alternatives, but none were viable given React's constraints.
+// To work around this, we intercept attempts to render these elements inside of
+// Head and replace them with custom components that render as `<div>`s with a
+// `data-original-tag` attribute. We can then use this attribute later to apply
+// attributes to the real `<html>` and `<body>` elements.
+// Additionally other head elements are subject to React's new hoisting behavior,
+// which has some differences from how Gatsby Head API works, so we do append `itemProp`
+// which prevents React from hoisting those elements:
+// https://github.com/facebook/react/blob/50e7ec8a694072fd6fcd52182df8a75211bf084d/packages/react-dom-bindings/src/client/ReactFiberConfigDOM.js#L5824
+// we later will remove this attribute if it has our custom value before appending to real head.
+
+// De-risk monkey patch by only applying it when needed (React 19+, not React 18)
+const reactMajor = parseInt(_react.default.version.split(`.`)[0], 10);
+if (reactMajor !== 18 && !_react.default.createElement.headPatched) {
+  const originalCreateElement = _react.default.createElement;
+  const validHeadComponentReplacements = (0, _headComponents.getValidHeadComponentReplacements)(originalCreateElement, false);
+  _react.default.createElement = function patchedCreateElement(type, props, ...rest) {
+    const headReplacement = validHeadComponentReplacements.get(type);
+    if (headReplacement) {
+      type = headReplacement;
+    }
+    return originalCreateElement.call(_react.default, type, props, ...rest);
+  };
+  _react.default.createElement.headPatched = true;
+}
 function headHandlerForBrowser({
   pageComponent,
   staticQueryResults,
@@ -98,9 +129,11 @@ function headHandlerForBrowser({
       // In Prod we only call onHeadRendered in FireCallbackInEffect to render to head
       _react.default.createElement(_fireCallbackInEffect.FireCallbackInEffect, {
         callback: onHeadRendered
+      }, /*#__PURE__*/_react.default.createElement(_headComponents.IsHeadRenderContext.Provider, {
+        value: true
       }, /*#__PURE__*/_react.default.createElement(_gatsby.StaticQueryContext.Provider, {
         value: staticQueryResults
-      }, /*#__PURE__*/_react.default.createElement(_reachRouter.LocationProvider, null, WrapHeadElement))), hiddenRoot);
+      }, /*#__PURE__*/_react.default.createElement(_reachRouter.LocationProvider, null, WrapHeadElement)))), hiddenRoot);
     }
     return () => {
       (0, _utils.removePrevHeadElements)();
