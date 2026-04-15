@@ -19,28 +19,20 @@ export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
 
 const getAllStrapiArticles = `
   query GetAllStrapiArticles {
-    articles(sort: "publishedAt:desc") {
-      data {
-        id
-        attributes {
-          title
-          description
-          slug
-          cover {
-            data {
-              attributes {
-                url
-              }
-            }
-          }
-          blocks {
-            ...on ComponentSharedRichText {
-              body
-            }
-          }
-          publishedAt
+    articles(sort: ["publishedAt:desc"]) {
+      documentId
+      title
+      description
+      slug
+      cover {
+        url
+      }
+      blocks {
+        ...on ComponentSharedRichText {
+          body
         }
       }
+      publishedAt
     }
   }
 `;
@@ -81,29 +73,17 @@ type ComponentSharedRichText = {
 type UploadFile = {
   url: string
 };
-type UploadFileEntity = {
-  attributes: UploadFile
-};
-type UploadFileEntityResponse = {
-  data: UploadFileEntity
-};
 type Article = {
+  documentId: string
   title: string
   description: string
   slug: string
-  cover: UploadFileEntityResponse
+  cover: UploadFile
   blocks: [ComponentSharedRichText]
   publishedAt: Date
 };
-type ArticleEntity = {
-  id: Number
-  attributes: Article
-};
-type ArticleEntityResponseCollection = {
-  data: [ArticleEntity]
-};
 interface ArticleResponse {
-  articles: ArticleEntityResponseCollection
+  articles: Article[]
 };
 type GatsbyArticle = {
   title: string
@@ -125,19 +105,23 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
   createNodeId,
   getCache
 }) => {
-  const strapiGraphqlClient = new GraphQLClient("http://localhost:1337/graphql");
+  const strapiUrl = process.env.STRAPI_URL || "http://localhost:1337";
+  const strapiGraphqlClient = new GraphQLClient(`${strapiUrl}/graphql`);
   const articleResult = await strapiGraphqlClient.request<ArticleResponse>(getAllStrapiArticles);
-  const { articles: { data } } = articleResult;
+  const { articles } = articleResult;
 
-  const images = await Promise.all(data.map( async ({ attributes }) => {
+  const images = await Promise.all(articles.map( async (article) => {
+    const coverUrl = article?.cover?.url?.startsWith('http')
+      ? article.cover.url
+      : `${strapiUrl}${article?.cover?.url}`;
     return (await createRemoteFileNode({
-      url: `http://localhost:1337${attributes?.cover?.data?.attributes?.url}`,
+      url: coverUrl,
       createNode,
       createNodeId,
       getCache,
     })).id;
   }));
-  data.forEach( async ({ attributes: { title, description, slug, blocks, publishedAt }}, i) => {
+  articles.forEach( async ({ title, description, slug, blocks, publishedAt }, i) => {
     const content = sanitize(
       blocks
         .filter(block => Object.hasOwn(block, 'body'))
@@ -206,5 +190,10 @@ export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] 
   createTypes(`
     type GatsbyArticle implements Node {
       image: File @link(by: "id")
+      title: String!
+      description: String
+      slug: String
+      content: String
+      publishedAt: Date @dateformat
     }
   `);

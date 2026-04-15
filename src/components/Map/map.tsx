@@ -37,7 +37,7 @@ export const COLOR_SCALE = scaleThreshold<number, number[]>()
 .range(COLORS);
 
 setOptions({
-  key: "AIzaSyAj7VtuA1hFQnpt3zRFRClkLOtBmrvM77Q",
+  key: process.env.GATSBY_GOOGLE_MAPS_API_KEY || "",
   v: "weekly",
 });
 
@@ -45,6 +45,8 @@ export default function Map() {
   const { file: { publicURL } } = useStaticQuery(geojsonQuery);
 
   useEffect(() => {
+    let overlay: GoogleMapsOverlay;
+
     importLibrary("maps").then(async ({ Map }) => {
       const map = new Map(document.getElementById("map")!, {
         center: { lat: 33.21, lng: -117.32 },
@@ -52,7 +54,7 @@ export default function Map() {
         heading: 310,
         tilt: 47.5,
         gestureHandling: "cooperative",
-        mapId: "4d4c59d9795e9dae",
+        mapId: process.env.GATSBY_GOOGLE_MAPS_MAP_ID || "",
       });
 
       const { ControlPosition } = await importLibrary("core") as google.maps.CoreLibrary;
@@ -89,10 +91,17 @@ export default function Map() {
         }
       };
 
-      const overlay = new GoogleMapsOverlay({
-        layers: [ new GeoJsonLayer<{}>({
+      const data = await fetch(publicURL).then(response => response.json());
+
+      overlay = new GoogleMapsOverlay({
+        interleaved: true,
+        onError: (error: Error) => {
+          if (error.message?.includes('colorAttachments')) return;
+          console.error(error);
+        },
+        layers: [ new GeoJsonLayer({
           id: "geojson-layer",
-          data: await fetch(publicURL).then(response => response.json()),
+          data,
           stroked: false,
           filled: true,
           extruded: true,
@@ -107,9 +116,15 @@ export default function Map() {
         })]
       });
 
-      overlay.setMap(map);
+      google.maps.event.addListenerOnce(map, "idle", () => {
+        overlay.setMap(map);
+      });
     });
-  });
+
+    return () => {
+      if (overlay) overlay.setMap(null);
+    };
+  }, [publicURL]);
 
   return (
     <section className={ map }>

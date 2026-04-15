@@ -58,14 +58,14 @@ const contentProps = {
 
 export default function Home() {
   const { allGatsbyArticle: { nodes } } = useStaticQuery<GatsbyArticles>(query);
-  const { title, description, slug, image } = nodes[0];
+  const article = nodes[0];
 
-  const articleProps = {
-    link: `/articles/${slug}`,
-    title: title,
-    description: description,
-    image: image
-  };
+  const articleProps = article ? {
+    link: `/articles/${article.slug}`,
+    title: article.title,
+    description: article.description,
+    image: article.image
+  } : null;
 
   const learnProps = {
     link: "/learn",
@@ -79,7 +79,7 @@ export default function Home() {
       <Hero { ...heroProps } />
       <Content { ...contentProps } >
         <tbody>
-          <Card { ...articleProps } />
+          {articleProps && <Card { ...articleProps } />}
           <Card { ...learnProps } />
         </tbody>
       </Content>

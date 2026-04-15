@@ -6,7 +6,7 @@ type ProviderProps = {
   element: ReactNode;
 };
 
-const client = new GraphQLClient("http://localhost:1337/graphql");
+const client = new GraphQLClient(process.env.GATSBY_STRAPI_URL ? `${process.env.GATSBY_STRAPI_URL}/graphql` : "http://localhost:1337/graphql");
 export const GraphQLContext = createContext(client);
 
 export const wrapRootElement = ({ element }: ProviderProps) =>
