@@ -107,8 +107,15 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
 }) => {
   const strapiUrl = process.env.STRAPI_URL || "http://localhost:1337";
   const strapiGraphqlClient = new GraphQLClient(`${strapiUrl}/graphql`);
-  const articleResult = await strapiGraphqlClient.request<ArticleResponse>(getAllStrapiArticles);
-  const { articles } = articleResult;
+
+  let articles: Article[] = [];
+  try {
+    const articleResult = await strapiGraphqlClient.request<ArticleResponse>(getAllStrapiArticles);
+    articles = articleResult.articles;
+  } catch (err) {
+    console.warn(`[gatsby-node] Skipping Strapi articles: could not reach ${strapiUrl}. ${(err as Error).message}`);
+    return;
+  }
 
   const images = await Promise.all(articles.map( async (article) => {
     const coverUrl = article?.cover?.url?.startsWith('http')
