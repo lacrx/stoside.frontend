@@ -41,13 +41,8 @@ export default function Nav() {
     <ul className={ `${nav} ${open ? "open" : "closed"}` }>
       <li>
         <Link to="/">
-          <div>
-            STRONG
-            <br/>
-            TOWNS
-          </div>
-          <br/>
-          <img src={logo} width="80" alt="Strong Towns Oceanside Logo" />
+          <div>STRONG TOWNS</div>
+          <img src={logo} width="60" alt="Strong Towns Oceanside Logo" />
         </Link>
       </li>
       <li>
