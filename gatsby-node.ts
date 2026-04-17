@@ -37,6 +37,14 @@ const getAllStrapiArticles = `
   }
 `;
 
+const getStrapiSiteSetting = `
+  query GetStrapiSiteSetting {
+    siteSetting {
+      instagramUrl
+    }
+  }
+`;
+
 const getAllMeetupEvents = `
   query GetAllMeetupEvents {
     proNetworkByUrlname(urlname: "strong-towns-oceanside") {
@@ -97,6 +105,10 @@ interface GatsbyArticles {
   allGatsbyArticle: {
     nodes: [GatsbyArticle]
   }
+}
+
+interface SiteSettingResponse {
+  siteSetting: { instagramUrl: string | null } | null
 }
 
 type MeetupEventJsonLd = {
@@ -202,6 +214,24 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
     articles = articleResult.articles;
   } catch (err) {
     console.warn(`[gatsby-node] Skipping Strapi articles: could not reach ${strapiUrl}. ${(err as Error).message}`);
+  }
+
+  try {
+    const settingResult = await strapiGraphqlClient.request<SiteSettingResponse>(getStrapiSiteSetting);
+    const setting = settingResult.siteSetting;
+    const gatsbySiteSetting = {
+      instagramUrl: setting?.instagramUrl ?? null,
+    };
+    createNode({
+      ...gatsbySiteSetting,
+      id: createNodeId("site-setting"),
+      internal: {
+        type: "GatsbySiteSetting",
+        contentDigest: createContentDigest(gatsbySiteSetting),
+      },
+    });
+  } catch (err) {
+    console.warn(`[gatsby-node] Skipping Strapi site settings: ${(err as Error).message}`);
   }
 
   const images = articles.length === 0 ? [] : await Promise.all(articles.map( async (article) => {
@@ -341,5 +371,8 @@ export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] 
       location: String
       startDate: Date! @dateformat
       endDate: Date @dateformat
+    }
+    type GatsbySiteSetting implements Node {
+      instagramUrl: String
     }
   `);
