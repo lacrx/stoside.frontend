@@ -10,7 +10,7 @@ type CardProps = {
 }
 
 export default function Card({link, title, description, image}: CardProps) {
-  const img = typeof image === "string" ? <img src={image} width="100" alt={title} /> : <GatsbyImage image={getImage(image)!} alt={title} />;
+  const img = typeof image === "string" ? <img src={image} width="150" alt={title} /> : <GatsbyImage image={getImage(image)!} alt={title} />;
   return (
     <article className={ card }>
       <div>
