@@ -41,6 +41,7 @@ const getStrapiSiteSetting = `
   query GetStrapiSiteSetting {
     siteSetting {
       instagramUrl
+      meetupUrl
     }
   }
 `;
@@ -108,7 +109,10 @@ interface GatsbyArticles {
 }
 
 interface SiteSettingResponse {
-  siteSetting: { instagramUrl: string | null } | null
+  siteSetting: {
+    instagramUrl: string | null
+    meetupUrl: string | null
+  } | null
 }
 
 type MeetupEventJsonLd = {
@@ -239,6 +243,7 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
     const setting = settingResult.siteSetting;
     const gatsbySiteSetting = {
       instagramUrl: setting?.instagramUrl ?? null,
+      meetupUrl: setting?.meetupUrl ?? null,
     };
     createNode({
       ...gatsbySiteSetting,
@@ -394,5 +399,6 @@ export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] 
     }
     type GatsbySiteSetting implements Node {
       instagramUrl: String
+      meetupUrl: String
     }
   `);
