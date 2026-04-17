@@ -131,6 +131,24 @@ type MeetupEventJsonLd = {
 type MeetupEvent = MeetupEventJsonLd & { imageUrl?: string };
 
 const MEETUP_GROUP_URL = "https://www.meetup.com/north-county-urbanists/";
+const EVENT_TIMEZONE = "America/Los_Angeles";
+
+function formatEventDate(iso: string): string {
+  const d = new Date(iso);
+  const dateStr = new Intl.DateTimeFormat("en-US", {
+    timeZone: EVENT_TIMEZONE,
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  }).format(d);
+  const timeStr = new Intl.DateTimeFormat("en-US", {
+    timeZone: EVENT_TIMEZONE,
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(d);
+  return `${dateStr} at ${timeStr}`;
+}
 
 function buildEventImageMap(nextData: unknown): Record<string, string> {
   const photos: Record<string, string> = {};
@@ -303,6 +321,7 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
         url: event.url,
         location: locationParts.join(", "),
         startDate: event.startDate,
+        startDateDisplay: formatEventDate(event.startDate),
         endDate: event.endDate || null,
         image: imageNodeId,
       };
@@ -370,6 +389,7 @@ export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] 
       url: String!
       location: String
       startDate: Date! @dateformat
+      startDateDisplay: String!
       endDate: Date @dateformat
     }
     type GatsbySiteSetting implements Node {

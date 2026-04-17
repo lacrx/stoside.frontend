@@ -27,7 +27,7 @@ const query = graphql`
         description
         url
         location
-        startDate(formatString: "dddd, MMMM D [at] h:mm A")
+        startDate: startDateDisplay
         image {
           childImageSharp {
             gatsbyImageData(
