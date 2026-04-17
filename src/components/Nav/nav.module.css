@@ -50,11 +50,14 @@
 
     > a {
       padding: 1rem 0;
+
+      > h3 {
+        font-size: 1rem;
+      }
     }
   }
 
   > :last-child {
-    border-bottom: 1px solid var(--rule);
     padding-bottom: 0.75rem;
   }
 
@@ -70,11 +73,14 @@
 
       > a {
         padding: 0.5rem 0;
+
+        > h3 {
+          font-size: 0.75rem;
+        }
       }
     }
 
     > :last-child {
-      border-bottom: none;
       padding-bottom: 0;
     }
   }
