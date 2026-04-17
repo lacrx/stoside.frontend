@@ -46,7 +46,6 @@ const query = graphql`
 
 const heroProps = {
   title: "We've put pen to paper.",
-  showBuddy: true
 };
 
 const contentProps = {
