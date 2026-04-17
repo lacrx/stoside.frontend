@@ -9,7 +9,6 @@
   > :first-child {
     display: inline-block;
     font-family: var(--serif);
-    text-align: center;
     color: var(--black);
     margin-right: auto;
 
