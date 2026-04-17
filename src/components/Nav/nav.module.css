@@ -49,7 +49,7 @@
     text-align: center;
 
     > a {
-      padding: 0.5rem 0;
+      padding: 1rem 0;
     }
   }
 
@@ -67,6 +67,10 @@
       width: auto;
       padding-top: 0;
       padding-left: 2rem;
+
+      > a {
+        padding: 0.5rem 0;
+      }
     }
 
     > :last-child {
