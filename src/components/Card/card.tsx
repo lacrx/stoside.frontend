@@ -14,14 +14,16 @@ export default function Card({link, title, description, image}: CardProps) {
   return (
     <article className={ card }>
       <div>
-        <Link to={ link }>
-          <h2>{ title }</h2>
-        </Link>
-      </div>
-      <div>
-        <Link to={ link }>
-          <h4>{ description }</h4>
-        </Link>
+        <div>
+          <Link to={ link }>
+            <h2>{ title }</h2>
+          </Link>
+        </div>
+        <div>
+          <Link to={ link }>
+            <h4>{ description }</h4>
+          </Link>
+        </div>
       </div>
       <div>
         <Link to={ link }>
