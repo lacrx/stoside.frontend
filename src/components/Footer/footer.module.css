@@ -1,18 +1,24 @@
 .footer {
   display: flex;
-  padding: 1.5rem 0;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--rule);
 
   > :first-child {
-    font-family:'Times New Roman', Times, serif;
+    font-family: var(--serif);
     color: var(--black);
 
     & div {
-      font-size: 1rem;
-      font-weight: 600;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: .02em;
     }
+  }
 
-    & span {
-      font-size: .8rem;
-    }
+  > :last-child {
+    font-family: var(--sans);
+    font-size: 0.6875rem;
+    color: var(--light-grey);
   }
 }

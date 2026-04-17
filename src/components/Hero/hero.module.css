@@ -1,19 +1,27 @@
 .hero {
   position: relative;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 1rem;
 
   > :nth-child(n) {
     max-width: 40rem;
   }
 
-  > h4:nth-child(2), > a:nth-child(2) > h2 {
-    margin: 1.5rem 0;
-  }
-
-  & h2 {
-    background-color: var(--blue);
-  }
-
-  > h4 {
+  > h4:nth-child(2) {
+    margin-top: 0.75rem;
     font-style: italic;
+  }
+
+  > a:nth-child(n) {
+    margin-top: 0.75rem;
+
+    > h2 {
+      color: var(--grey);
+      font-weight: 400;
+      font-size: 0.875rem;
+      font-family: var(--sans);
+      text-decoration: underline;
+    }
   }
 }

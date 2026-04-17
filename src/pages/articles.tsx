@@ -50,7 +50,7 @@ const heroProps = {
 };
 
 const contentProps = {
-  type: "table"
+  type: "section"
 };
 
 export default function Articles() {
@@ -59,17 +59,15 @@ export default function Articles() {
     <Layout>
       <Hero { ...heroProps } />
       <Content { ...contentProps } >
-        <tbody>
-          {nodes.map(({ slug, title, description, image }, i) => {
-            const cardProps = {
-              link: slug,
-              title,
-              description,
-              image
-            };
-            return <Card key={i} {...cardProps} />;
-          })}
-        </tbody>
+        {nodes.map(({ slug, title, description, image }, i) => {
+          const cardProps = {
+            link: slug,
+            title,
+            description,
+            image
+          };
+          return <Card key={i} {...cardProps} />;
+        })}
       </Content>
     </Layout>
   );

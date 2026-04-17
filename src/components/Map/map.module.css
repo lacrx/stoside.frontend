@@ -5,13 +5,13 @@
   }
 
   > figcaption {
-    font-family: Helvetica, sans-serif;
+    font-family: var(--sans);
     font-size: .75rem;
     letter-spacing: .3px;
-    color: var(--dark-grey);
+    color: var(--light-grey);
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid slategrey;
+    border-bottom: 1px solid var(--rule);
     padding: .5rem 0;
   }
 }

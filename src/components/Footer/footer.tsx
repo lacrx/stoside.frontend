@@ -9,10 +9,11 @@ export default function Footer() {
         <li>
           <Link to="/">
             <div>STRONG TOWNS</div>
-            <img src={logo} width="80" alt="Strong Towns Oceanside Logo" />
+            <img src={logo} width="60" alt="Strong Towns Oceanside Logo" />
           </Link>
         </li>
       </ul>
+      <span>&copy; {new Date().getFullYear()} Strong Towns Oceanside</span>
     </footer>
   )
 }

@@ -1,14 +1,12 @@
 .content {
-  &:not(table) {
-    display: grid;
-    grid-row-gap: 1rem;
+  display: grid;
+  grid-row-gap: 1rem;
 
-    > div:first-of-type {
-      margin-bottom: 2rem;
-    }
+  > div:first-of-type {
+    margin-bottom: 1.5rem;
+  }
 
-    & slot > h2:not(:first-child), h3:not(:first-child), h4:not(:first-child) {
-      margin-top: 2rem;
-    }
+  & slot > h2:not(:first-child), h3:not(:first-child), h4:not(:first-child) {
+    margin-top: 1.5rem;
   }
 }

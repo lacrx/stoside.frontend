@@ -53,7 +53,7 @@ const heroProps = {
 };
 
 const contentProps = {
-  type: "table"
+  type: "section"
 };
 
 export default function Home() {
@@ -78,10 +78,8 @@ export default function Home() {
     <Layout>
       <Hero { ...heroProps } />
       <Content { ...contentProps } >
-        <tbody>
-          {articleProps && <Card { ...articleProps } />}
-          <Card { ...learnProps } />
-        </tbody>
+        {articleProps && <Card { ...articleProps } />}
+        <Card { ...learnProps } />
       </Content>
     </Layout>
   )
