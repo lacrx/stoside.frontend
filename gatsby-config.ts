@@ -54,15 +54,21 @@ const config: GatsbyConfig = {
             // unvisited pages still hit the network.
             maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
             globPatterns: ["**/offline-plugin-app-shell-fallback/*.html"],
+            // On update, new SW takes over immediately without waiting for
+            // all tabs to close; old cache entries that no longer match
+            // the current build are not served on the first visit.
+            skipWaiting: true,
+            clientsClaim: true,
             runtimeCaching: [
-              // Gatsby's webpack chunks (JS, CSS, HTML etc under the
-              // public/ root). Hashed filenames = safe to cache forever.
+              // Hashed Gatsby JS / CSS bundles. Filenames include content
+              // hashes so CacheFirst is safe; new deploys land under new
+              // names and replace the old ones automatically.
               {
-                urlPattern: /\.(?:js|css|html)$/,
+                urlPattern: /\.(?:js|css)$/,
                 handler: "CacheFirst",
               },
-              // Gatsby's content-hashed static assets: posters, images,
-              // copied GeoJSON. Immutable by definition; serve from cache.
+              // Gatsby's content-hashed static assets (posters, images,
+              // copied GeoJSON). Immutable by definition.
               {
                 urlPattern: /\/static\/.*/,
                 handler: "CacheFirst",
@@ -72,16 +78,27 @@ const config: GatsbyConfig = {
                 urlPattern: /^https:\/\/(demo-bucket\.protomaps\.com|protomaps\.github\.io)\//,
                 handler: "CacheFirst",
               },
-              // Any other image/font the site loads (favicon, pelican, etc).
+              // Other image / font assets (favicon, pelican, etc).
               {
-                urlPattern: /\.(png|jpg|jpeg|svg|webp|gif|woff2?)$/,
+                urlPattern: /\.(png|jpg|jpeg|svg|webp|avif|gif|woff2?)$/,
                 handler: "CacheFirst",
               },
-              // Per-page JSON. Stale-while-revalidate so content updates
-              // show up on the next visit without requiring a SW refresh.
+              // HTML routing targets. Content changes in place across
+              // deploys (same URL, new static-query hashes baked in), so
+              // NetworkFirst is the only safe handler — falling back to
+              // cache only if the user is genuinely offline. Fixes the
+              // "result of this StaticQuery could not be fetched" error
+              // that happens when new JS meets old cached HTML.
+              {
+                urlPattern: /\.html$/,
+                handler: "NetworkFirst",
+              },
+              // Per-page JSON. Same reasoning as HTML: URL is fixed but
+              // the payload changes per build, and new JS expects new
+              // data shapes.
               {
                 urlPattern: /\/page-data\/.*\.json$/,
-                handler: "StaleWhileRevalidate",
+                handler: "NetworkFirst",
               },
             ],
           },
