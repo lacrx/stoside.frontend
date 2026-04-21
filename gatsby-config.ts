@@ -43,6 +43,11 @@ const config: GatsbyConfig = {
         // defaults for cacheName/TTL (browser quota handles eviction).
         resolve: "gatsby-plugin-offline",
         options: {
+          // Flush runtime caches on every SW update. Keeps the user from
+          // being served cached JS chunks that reference deleted asset
+          // URLs after a deploy that renames / drops files (classic case:
+          // poster.png -> poster.jpg). Precache cache is untouched.
+          appendScript: `${__dirname}/src/sw-cleanup.js`,
           workboxConfig: {
             // Ruthless first-load policy: precache ONLY the offline app
             // shell fallback so the "you're offline" page still works.
