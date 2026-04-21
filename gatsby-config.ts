@@ -16,13 +16,6 @@ const config: GatsbyConfig = {
       {
         resolve: "gatsby-source-filesystem",
         options: {
-          name: "data",
-          path: `${__dirname}/src/assets/data/`,
-        },
-      },
-      {
-        resolve: "gatsby-source-filesystem",
-        options: {
           name: "visualizations",
           path: `${__dirname}/src/assets/visualizations/`,
         },
