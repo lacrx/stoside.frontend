@@ -274,6 +274,12 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
     const safetyTimer = window.setTimeout(markReady, 30000);
     const clearSafety = () => window.clearTimeout(safetyTimer);
 
+    // When the user navigates away before the 60 MB GeoJSON finishes
+    // loading, abort the in-flight fetch. Keeps the user from waiting on
+    // main-thread work for a page they no longer care about, and avoids
+    // wasted cellular data.
+    const abortController = new AbortController();
+
     map.on("load", () => {
       if (hasTiles) {
         const tilesUrl = artifact.featuresTilesFile!.publicURL!;
@@ -323,6 +329,14 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
                 [...colorScale(f.properties?.[color.field] ?? 0), 220] as [number, number, number, number],
               getElevation: (f: Feature) =>
                 (f.properties?.[elevation.field] ?? 0) / divisor,
+              // Fetch + parse off the main thread so nav clicks during
+              // load aren't blocked by JSON.parse on the 60 MB GeoJSON.
+              // The AbortSignal lets us cancel on unmount so navigating
+              // away kills the in-flight request.
+              loadOptions: {
+                fetch: { signal: abortController.signal },
+                worker: true,
+              },
               onDataLoad: () => {
                 clearSafety();
                 markReady();
@@ -336,6 +350,7 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
     });
 
     return () => {
+      abortController.abort();
       clearSafety();
       overlayRef.current = null;
       setReady(false);
