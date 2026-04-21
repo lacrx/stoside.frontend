@@ -157,6 +157,15 @@ function buildOne({ vizId, geojsonPath, outPath, bounds, minZoom, maxZoom, layer
   }
 
   db.close();
+  // better-sqlite3 in WAL mode leaves parcels.mbtiles-shm / -wal behind
+  // on hard crashes. Gatsby's File @link(by: "name") matches File.name
+  // (the stem before the last dot), and those sidecars share the
+  // "parcels" stem with parcels.pmtiles -- ambiguous, sometimes wins.
+  // Clean them up so the schema always resolves to the PMTiles file.
+  for (const ext of ["-shm", "-wal"]) {
+    const sidecar = `${mbtilesPath}${ext}`;
+    if (fs.existsSync(sidecar)) fs.unlinkSync(sidecar);
+  }
   console.log(`  [tiles] ${tileCount} tiles, ${(totalBytes / 1024).toFixed(1)} KB total`);
 
   console.log(`  [convert] pmtiles.exe convert -> ${path.relative(frontendRoot, outPath)}`);
