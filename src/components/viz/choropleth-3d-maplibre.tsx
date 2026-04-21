@@ -5,7 +5,6 @@ import { MapboxOverlay } from "@deck.gl/mapbox";
 import { GeoJsonLayer } from "@deck.gl/layers";
 import { scaleThreshold } from "d3-scale";
 import type { Feature } from "geojson";
-import layersForTheme from "protomaps-themes-base";
 import "maplibre-gl/dist/maplibre-gl.css";
 import * as styles from "./choropleth-3d-maplibre.module.css";
 
@@ -148,35 +147,84 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
     const initialZoom = (camera.zoom ?? 11) + zoomOffset;
 
     // MapLibre resolves the basemap against our self-hosted PMTiles via
-    // the pmtiles:// protocol. If the file is missing (e.g. first boot
-    // before the extract has been uploaded), MapLibre logs 404s and the
-    // extrusions still render on the patched-to-white background layer.
+    // the pmtiles:// protocol. The tiles use the OpenMapTiles schema
+    // (source-layers like water, transportation, building) produced by
+    // planetiler. If the file is missing (e.g. first boot before the
+    // extract has been uploaded), MapLibre logs 404s and the extrusions
+    // still render on the white background layer below.
     const absoluteBasemapUrl =
       typeof window !== "undefined" && BASEMAP_PMTILES_URL.startsWith("/")
         ? `${window.location.origin}${BASEMAP_PMTILES_URL}`
         : BASEMAP_PMTILES_URL;
 
-    const themeLayers = layersForTheme("protomaps", "light", "en").map(layer =>
-      layer.type === "background"
-        ? { ...layer, paint: { ...(layer.paint ?? {}), "background-color": "#ffffff" } }
-        : layer
-    );
-
     const map = new maplibregl.Map({
       container: containerRef.current,
+      // Minimal 538-adjacent style: white background, muted water, a pair
+      // of road weights, subtle buildings. No text labels (no glyphs URL
+      // dependency, no fonts to ship). Labels can be layered in later if
+      // they become editorially useful.
       style: {
         version: 8,
-        glyphs: "https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf",
-        sprite: "https://protomaps.github.io/basemaps-assets/sprites/v4/light",
         sources: {
-          protomaps: {
+          omt: {
             type: "vector",
             url: `pmtiles://${absoluteBasemapUrl}`,
             attribution:
-              '<a href="https://protomaps.com">Protomaps</a> &copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
+              '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors',
           },
         },
-        layers: themeLayers,
+        layers: [
+          {
+            id: "background",
+            type: "background",
+            paint: { "background-color": "#ffffff" },
+          },
+          {
+            id: "landcover-park",
+            type: "fill",
+            source: "omt",
+            "source-layer": "park",
+            paint: { "fill-color": "#e8efe0", "fill-opacity": 0.55 },
+          },
+          {
+            id: "water",
+            type: "fill",
+            source: "omt",
+            "source-layer": "water",
+            paint: { "fill-color": "#d3e2ec" },
+          },
+          {
+            id: "road-minor",
+            type: "line",
+            source: "omt",
+            "source-layer": "transportation",
+            filter: ["!", ["in", ["get", "class"], ["literal", ["motorway", "trunk", "primary", "secondary"]]]],
+            minzoom: 12,
+            paint: {
+              "line-color": "#e8e8e8",
+              "line-width": ["interpolate", ["linear"], ["zoom"], 12, 0.5, 16, 2],
+            },
+          },
+          {
+            id: "road-major",
+            type: "line",
+            source: "omt",
+            "source-layer": "transportation",
+            filter: ["in", ["get", "class"], ["literal", ["motorway", "trunk", "primary", "secondary"]]],
+            paint: {
+              "line-color": "#d6d6d6",
+              "line-width": ["interpolate", ["linear"], ["zoom"], 10, 0.8, 14, 2.5, 16, 4],
+            },
+          },
+          {
+            id: "building",
+            type: "fill",
+            source: "omt",
+            "source-layer": "building",
+            minzoom: 14,
+            paint: { "fill-color": "#efefef", "fill-opacity": 0.6 },
+          },
+        ],
       },
       center: [lng, lat],
       zoom: initialZoom,
