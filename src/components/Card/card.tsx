@@ -14,7 +14,9 @@ type CardProps = {
 }
 
 export default function Card({link, title, description, image, fallbackImage, authorName, publishedAt}: CardProps) {
-  const img = typeof image === "string" ? <img src={image} width="150" alt={title} /> : <GatsbyImage image={getImage(image)!} alt={title} />;
+  const img = typeof image === "string"
+    ? <img src={image} width="150" height="150" style={{ objectFit: "cover" }} alt={title} />
+    : <GatsbyImage image={getImage(image)!} alt={title} />;
   const slotStyle = fallbackImage
     ? {
         backgroundImage: `url(${fallbackImage})`,
