@@ -34,6 +34,18 @@
   overflow: hidden;
 }
 
+/* Artifact-declared heights are tuned for desktop. On narrow
+   viewports the camera renders the same content at a higher zoom-out
+   (viewportWidth-driven zoom offset in the renderer), which leaves
+   noticeable blank space above and below the extrusions. Shrink the
+   stage with !important so the inline `height: Npx` from the block
+   component is overridden. */
+@media (max-width: 768px) {
+  .vizStage {
+    height: 440px !important;
+  }
+}
+
 .vizStage > * {
   position: absolute;
   inset: 0;
