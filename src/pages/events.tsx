@@ -1,4 +1,5 @@
 import { graphql, useStaticQuery } from "gatsby";
+import { IGatsbyImageData } from "gatsby-plugin-image";
 import Layout from '@/components/Layout/layout';
 import Hero from '@/components/Hero/hero';
 import Content from "@/components/Content/content";
@@ -11,6 +12,7 @@ type GatsbyEvent = {
   url: string
   location: string
   startDate: string
+  image: { childImageSharp: { gatsbyImageData: IGatsbyImageData } } | null
 };
 interface GatsbyEvents {
   allGatsbyEvent: {
@@ -34,6 +36,7 @@ const query = graphql`
               width: 150
               height: 150
               placeholder: BLURRED
+              formats: [AUTO, WEBP, AVIF]
               transformOptions: { fit: COVER, cropFocus: ATTENTION }
             )
           }

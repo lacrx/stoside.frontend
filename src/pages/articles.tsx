@@ -33,6 +33,7 @@ const query = graphql`
               width: 100
               height: 100
               placeholder: BLURRED
+              formats: [AUTO, WEBP, AVIF]
             )
           }
         }
