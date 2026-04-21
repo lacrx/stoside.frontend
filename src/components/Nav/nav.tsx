@@ -56,11 +56,6 @@ export default function Nav() {
         </Link>
       </li>
       <li>
-        <Link to="/learn">
-          <h3>Learn</h3>
-        </Link>
-      </li>
-      <li>
         <Link to="/events">
           <h3>Events</h3>
         </Link>

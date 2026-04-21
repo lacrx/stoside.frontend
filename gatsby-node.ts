@@ -1,3 +1,4 @@
+import fs from "fs";
 import path from "path";
 import { marked } from "marked";
 import { sanitize } from "isomorphic-dompurify";
@@ -27,9 +28,19 @@ const getAllStrapiArticles = `
       cover {
         url
       }
+      author {
+        name
+      }
       blocks {
+        __typename
         ...on ComponentSharedRichText {
           body
+        }
+        ...on ComponentSharedVisualization {
+          vizId
+          caption
+          height
+          align
         }
       }
       publishedAt
@@ -76,9 +87,10 @@ const getAllMeetupEvents = `
   }
 `;
 
-type ComponentSharedRichText = {
-  body: string
-};
+type StrapiBlock =
+  | { __typename: "ComponentSharedRichText"; body: string }
+  | { __typename: "ComponentSharedVisualization"; vizId: string; caption: string | null; height: number | null; align: string | null };
+
 type UploadFile = {
   url: string
 };
@@ -88,18 +100,28 @@ type Article = {
   description: string
   slug: string
   cover: UploadFile
-  blocks: [ComponentSharedRichText]
+  author: { name: string } | null
+  blocks: StrapiBlock[]
   publishedAt: Date
 };
 interface ArticleResponse {
   articles: Article[]
 };
+type ArticleBlock = {
+  kind: "rich-text" | "visualization"
+  html?: string
+  vizId?: string
+  caption?: string | null
+  height?: number | null
+  align?: string | null
+};
 type GatsbyArticle = {
   title: string
   description: string
   slug: string
-  image: string
-  content: string
+  image: string | undefined
+  authorName: string | null
+  blocks: ArticleBlock[]
   publishedAt: Date
 };
 interface GatsbyArticles {
@@ -258,9 +280,10 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
   }
 
   const images = articles.length === 0 ? [] : await Promise.all(articles.map( async (article) => {
-    const coverUrl = article?.cover?.url?.startsWith('http')
+    if (!article?.cover?.url) return undefined;
+    const coverUrl = article.cover.url.startsWith('http')
       ? article.cover.url
-      : `${strapiUrl}${article?.cover?.url}`;
+      : `${strapiUrl}${article.cover.url}`;
     return (await createRemoteFileNode({
       url: coverUrl,
       createNode,
@@ -268,24 +291,32 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
       getCache,
     })).id;
   }));
-  articles.forEach( async ({ title, description, slug, blocks, publishedAt }, i) => {
-    const content = sanitize(
-      blocks
-        .filter(block => Object.hasOwn(block, 'body'))
-        .map(({ body }) => marked.parse(body) as string)
-        .join()
-    );
+  articles.forEach(({ title, description, slug, blocks, author, publishedAt }, i) => {
+    const structuredBlocks: ArticleBlock[] = blocks.map(block => {
+      if (block.__typename === "ComponentSharedRichText") {
+        return {
+          kind: "rich-text",
+          html: sanitize(marked.parse(block.body) as string)
+        };
+      }
+      return {
+        kind: "visualization",
+        vizId: block.vizId,
+        caption: block.caption,
+        height: block.height,
+        align: block.align
+      };
+    });
 
     const gatsbyArticle: GatsbyArticle = {
       title,
       description,
       slug,
       image: images[i],
-      content,
+      authorName: author?.name ?? null,
+      blocks: structuredBlocks,
       publishedAt
     };
-
-    sanitize("<div>test</div>")
 
     createNode({
       ...gatsbyArticle,
@@ -296,6 +327,27 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
       }
     });
   });
+
+  const visualizationsDir = path.resolve(__dirname, "src/assets/visualizations");
+  if (fs.existsSync(visualizationsDir)) {
+    for (const vizDir of fs.readdirSync(visualizationsDir)) {
+      const artifactPath = path.join(visualizationsDir, vizDir, "artifact.json");
+      if (!fs.existsSync(artifactPath)) continue;
+      try {
+        const artifact = JSON.parse(fs.readFileSync(artifactPath, "utf-8"));
+        createNode({
+          ...artifact,
+          id: createNodeId(`viz-${artifact.id}`),
+          internal: {
+            type: "GatsbyVisualization",
+            contentDigest: createContentDigest(artifact)
+          }
+        });
+      } catch (err) {
+        console.warn(`[gatsby-node] Skipping visualization ${vizDir}: ${(err as Error).message}`);
+      }
+    }
+  }
 
   try {
     const meetupEvents = await fetchUpcomingMeetupEvents(5);
@@ -362,7 +414,16 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions: { create
               )
             }
           }
-          content
+          blocks {
+            kind
+            html
+            vizId
+            caption
+            height
+            align
+          }
+          authorName
+          publishedAt
         }
       }
     }
@@ -379,13 +440,56 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions: { create
 
 export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] = ({ actions: { createTypes } }) =>
   createTypes(`
+    type GatsbyArticleBlock {
+      kind: String!
+      html: String
+      vizId: String
+      caption: String
+      height: Int
+      align: String
+    }
     type GatsbyArticle implements Node {
       image: File @link(by: "id")
       title: String!
       description: String
       slug: String
-      content: String
+      blocks: [GatsbyArticleBlock!]!
+      authorName: String
       publishedAt: Date @dateformat
+    }
+    type GatsbyVisualization implements Node {
+      vizId: String!
+      type: String!
+      title: String
+      source: String
+      featuresFile: File @link(by: "name", from: "features")
+      featuresTilesFile: File @link(by: "name", from: "featuresTiles")
+      posterFile: File @link(by: "name", from: "posterFrame")
+      tilesLayer: String
+      camera: GatsbyVizCamera
+      color: GatsbyVizColor
+      elevation: GatsbyVizElevation
+      fallback2d: GatsbyVizFallback2d
+    }
+    type GatsbyVizCamera {
+      center: [Float!]!
+      zoom: Float
+      pitch: Float
+      bearing: Float
+    }
+    type GatsbyVizColor {
+      field: String!
+      domain: [Float!]!
+      range: [String!]!
+    }
+    type GatsbyVizElevation {
+      field: String!
+      divisor: Float
+    }
+    type GatsbyVizFallback2d {
+      pitch: Float
+      extruded: Boolean
+      maxViewportWidth: Int
     }
     type GatsbyEvent implements Node {
       image: File @link(by: "id")

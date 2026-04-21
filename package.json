@@ -8,7 +8,9 @@
     "build": "gatsby build",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "generate:css": "tcm -p 'src/**/*.module.css' ."
+    "generate:css": "tcm -p 'src/**/*.module.css' .",
+    "build:viz-tiles": "node scripts/build-viz-tiles.mjs",
+    "build:viz-poster": "node scripts/build-viz-poster.mjs"
   },
   "engines": {
     "node": ">=22.0.0"
@@ -17,8 +19,12 @@
     "@deck.gl/core": "^9.3.0",
     "@deck.gl/google-maps": "^9.3.0",
     "@deck.gl/layers": "^9.3.0",
+    "@deck.gl/mapbox": "^9.3.0",
     "@googlemaps/js-api-loader": "^2.0.2",
     "d3-scale": "^4.0.2",
+    "maplibre-gl": "^5.0.0",
+    "pmtiles": "^4.0.0",
+    "protomaps-themes-base": "^4.5.0",
     "fs": "^0.0.1-security",
     "gatsby": "^5.16.1",
     "gatsby-plugin-image": "^3.16.0",

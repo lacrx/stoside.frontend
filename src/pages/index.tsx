@@ -4,7 +4,7 @@ import Layout from "@/components/Layout/layout"
 import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
 import Card from "@/components/Card/card";
-import learn from "@/images/learn.png";
+import learnFallback from "@/images/learn.png";
 
 type ComponentSharedRichText = {
   body: string
@@ -15,7 +15,8 @@ type GatsbyArticle = {
   slug: string
   image: IGatsbyImageData | string
   blocks: [ComponentSharedRichText]
-  publishedAt: Date
+  authorName: string | null
+  publishedAt: string | null
 };
 interface GatsbyArticles {
   allGatsbyArticle: {
@@ -39,6 +40,8 @@ const query = graphql`
             )
           }
         }
+        authorName
+        publishedAt
       }
       max(field: {publishedAt: SELECT})
     }
@@ -64,22 +67,17 @@ export default function Home() {
     link: `/articles/${article.slug}`,
     title: article.title,
     description: article.description,
-    image: article.image
+    image: article.image ?? learnFallback,
+    fallbackImage: learnFallback,
+    authorName: article.authorName,
+    publishedAt: article.publishedAt
   } : null;
-
-  const learnProps = {
-    link: "/learn",
-    title: "We're dedicated to data.",
-    description: "Dowtown is subsidizing our suburbs. We've made a Google Map to show exactly how.",
-    image: learn
-  }
 
   return (
     <Layout>
       <Hero { ...heroProps } />
       <Content { ...contentProps } >
         {articleProps && <Card { ...articleProps } />}
-        <Card { ...learnProps } />
       </Content>
     </Layout>
   )

@@ -4,27 +4,25 @@ import Layout from "@/components/Layout/layout";
 import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
 import Card from "@/components/Card/card";
+import learnFallback from "@/images/learn.png";
 
-type ComponentSharedRichText = {
-  body: string
-};
 type GatsbyArticle = {
   title: string
   description: string
   slug: string
-  image: IGatsbyImageData
-  blocks: ComponentSharedRichText
-  publishedAt: Date
+  image: IGatsbyImageData | null
+  authorName: string | null
+  publishedAt: string | null
 };
 interface GatsbyArticles {
   allGatsbyArticle: {
-    nodes: [GatsbyArticle]
+    nodes: GatsbyArticle[]
   }
 }
 
 const query = graphql`
   query AllGatsbyArticle {
-    allGatsbyArticle {
+    allGatsbyArticle(sort: { publishedAt: DESC }) {
       nodes {
         title
         description
@@ -32,14 +30,15 @@ const query = graphql`
         image {
           childImageSharp {
             gatsbyImageData(
-              width: 150
-              height: 150
+              width: 100
+              height: 100
               placeholder: BLURRED
             )
           }
         }
+        authorName
+        publishedAt
       }
-      max(field: {publishedAt: SELECT})
     }
   }
 `;
@@ -58,15 +57,18 @@ export default function Articles() {
     <Layout>
       <Hero { ...heroProps } />
       <Content { ...contentProps } >
-        {nodes.map(({ slug, title, description, image }, i) => {
-          const cardProps = {
-            link: slug,
-            title,
-            description,
-            image
-          };
-          return <Card key={i} {...cardProps} />;
-        })}
+        {nodes.map(({ slug, title, description, image, authorName, publishedAt }, i) => (
+          <Card
+            key={i}
+            link={`/articles/${slug}`}
+            title={title}
+            description={description}
+            image={image ?? learnFallback}
+            fallbackImage={learnFallback}
+            authorName={authorName}
+            publishedAt={publishedAt}
+          />
+        ))}
       </Content>
     </Layout>
   );

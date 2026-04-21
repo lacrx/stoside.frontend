@@ -4,14 +4,17 @@ import { Head as _Head } from "@/components/Head/head";
 import Layout from "@/components/Layout/layout";
 import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
+import ArticleBlocks, { type ArticleBlock } from "@/components/ArticleBlocks/article-blocks";
+import Byline from "@/components/Byline/byline";
 
 type GatsbyArticle = {
   title: string
   description: string
   slug: string
   image: IGatsbyImageData
-  content: string
-  publishedAt: Date
+  blocks: ArticleBlock[]
+  authorName: string | null
+  publishedAt: string | Date | null
 };
 interface ArticlePageProps extends PageProps {
   pageContext: GatsbyArticle
@@ -21,7 +24,7 @@ const contentProps = {
   type: "section"
 }
 
-export default function Article({ pageContext: { title, description, image, content }}: ArticlePageProps) {
+export default function Article({ pageContext: { title, description, image, blocks, authorName, publishedAt }}: ArticlePageProps) {
   const heroProps = {
     title,
     description,
@@ -35,8 +38,9 @@ export default function Article({ pageContext: { title, description, image, cont
     <Layout>
       <Hero { ...heroProps } />
       <Content { ...contentProps } >
-        <GatsbyImage image={img!} alt={title} />
-        <slot dangerouslySetInnerHTML={{ __html: content }} />
+        <Byline author={authorName} publishedAt={publishedAt} />
+        {img && <GatsbyImage image={img} alt={title} />}
+        <ArticleBlocks blocks={blocks} />
       </Content>
     </Layout>
   );

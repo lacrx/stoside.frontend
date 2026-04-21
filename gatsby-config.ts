@@ -21,6 +21,13 @@ const config: GatsbyConfig = {
         },
       },
       {
+        resolve: "gatsby-source-filesystem",
+        options: {
+          name: "visualizations",
+          path: `${__dirname}/src/assets/visualizations/`,
+        },
+      },
+      {
         resolve: "gatsby-plugin-manifest",
         options: {
           icon: `${__dirname}/src/assets/images/favicon.png`,
