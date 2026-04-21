@@ -172,6 +172,7 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
       maxPitch: 85,
       antialias: true,
       attributionControl: { compact: true },
+      cooperativeGestures: true,
       scrollZoom: false,
       doubleClickZoom: false,
       boxZoom: false,
