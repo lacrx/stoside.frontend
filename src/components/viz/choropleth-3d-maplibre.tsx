@@ -165,6 +165,15 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
       // they become editorially useful.
       style: {
         version: 8,
+        // Soften MapLibre's default directional light so fill-extrusion
+        // vertical faces don't render darker than the top face. Keeps
+        // the choropleth palette reading as flat colour.
+        light: {
+          anchor: "viewport",
+          color: "#ffffff",
+          intensity: 0.6,
+          position: [1.15, 210, 30],
+        },
         sources: {
           omt: {
             type: "vector",
@@ -313,10 +322,11 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
           paint: {
             "fill-extrusion-color": buildStepColorExpression(color.field, color.domain, color.range) as any,
             "fill-extrusion-height": ["/", ["get", elevation.field], elevation.divisor ?? 1] as any,
-            // 0.75 matches the saturation the poster thumbnails were
-            // captured at. Bumping higher makes bars block too much of
-            // the basemap that the user actually wants to show through.
-            "fill-extrusion-opacity": 0.75,
+            // High opacity + light ambient (below, on the style) keeps
+            // extrusion colours crisp against the basemap instead of
+            // letting the pale-tan / pale-green basemap bleed through
+            // vertical faces and mute the palette.
+            "fill-extrusion-opacity": 0.95,
           },
         });
 
