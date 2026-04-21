@@ -44,11 +44,23 @@ const config: GatsbyConfig = {
         resolve: "gatsby-plugin-offline",
         options: {
           workboxConfig: {
-            // Hard cap — precache manifest never includes files this size,
-            // so the 60 MB analysis.geojson is safely excluded.
+            // Ruthless first-load policy: precache ONLY the offline app
+            // shell fallback so the "you're offline" page still works.
+            // Every other asset (JS chunks, CSS, HTML, images) is
+            // runtime-cached on first use — no post-load background
+            // fetches burning bandwidth or CPU for pages the user may
+            // never visit. Tradeoff: on a return visit, only the pages
+            // the user has actually visited are instant-from-cache;
+            // unvisited pages still hit the network.
             maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,
-            globPatterns: ["**/*.{js,css,html,woff2}"],
+            globPatterns: ["**/offline-plugin-app-shell-fallback/*.html"],
             runtimeCaching: [
+              // Gatsby's webpack chunks (JS, CSS, HTML etc under the
+              // public/ root). Hashed filenames = safe to cache forever.
+              {
+                urlPattern: /\.(?:js|css|html)$/,
+                handler: "CacheFirst",
+              },
               // Gatsby's content-hashed static assets: posters, images,
               // copied GeoJSON. Immutable by definition; serve from cache.
               {
