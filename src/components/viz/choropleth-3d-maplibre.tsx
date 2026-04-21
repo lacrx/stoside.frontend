@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import { Protocol } from "pmtiles";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { GeoJsonLayer } from "@deck.gl/layers";
 import { scaleThreshold } from "d3-scale";
 import type { Feature } from "geojson";
+import layersForTheme from "protomaps-themes-base";
 import "maplibre-gl/dist/maplibre-gl.css";
 import * as styles from "./choropleth-3d-maplibre.module.css";
 
@@ -20,6 +21,13 @@ type Artifact = {
 };
 
 type Props = { artifact: Artifact };
+
+// Self-hosted Protomaps PMTiles extract for the Oceanside area. Served
+// from the same origin as the frontend (CloudFront), so no CORS handshake
+// and the service worker caches it via the /tiles/* CacheFirst rule.
+// See frontend/static/tiles/README.md for how to regenerate.
+const BASEMAP_PMTILES_URL =
+  process.env.GATSBY_BASEMAP_PMTILES_URL || "/tiles/oceanside.pmtiles";
 
 function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
@@ -139,28 +147,43 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
       0;
     const initialZoom = (camera.zoom ?? 11) + zoomOffset;
 
+    // MapLibre resolves the basemap against our self-hosted PMTiles via
+    // the pmtiles:// protocol. If the file is missing (e.g. first boot
+    // before the extract has been uploaded), MapLibre logs 404s and the
+    // extrusions still render on the patched-to-white background layer.
+    const absoluteBasemapUrl =
+      typeof window !== "undefined" && BASEMAP_PMTILES_URL.startsWith("/")
+        ? `${window.location.origin}${BASEMAP_PMTILES_URL}`
+        : BASEMAP_PMTILES_URL;
+
+    const themeLayers = layersForTheme("protomaps", "light", "en").map(layer =>
+      layer.type === "background"
+        ? { ...layer, paint: { ...(layer.paint ?? {}), "background-color": "#ffffff" } }
+        : layer
+    );
+
     const map = new maplibregl.Map({
       container: containerRef.current,
-      // Blank white basemap. The Protomaps demo bucket turned off CORS for
-      // our origin, which caused range-request failures and recurring
-      // WebGL-context-lost errors. For this viz the extrusions are the
-      // content anyway, so rendering them on a plain white background is
-      // closer to the 538 aesthetic the site is going for. Swap in a
-      // self-hosted or CORS-friendly tile source later if labels / water
-      // become editorially important.
       style: {
         version: 8,
-        sources: {},
-        layers: [
-          { id: "bg", type: "background", paint: { "background-color": "#ffffff" } },
-        ],
+        glyphs: "https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf",
+        sprite: "https://protomaps.github.io/basemaps-assets/sprites/v4/light",
+        sources: {
+          protomaps: {
+            type: "vector",
+            url: `pmtiles://${absoluteBasemapUrl}`,
+            attribution:
+              '<a href="https://protomaps.com">Protomaps</a> &copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
+          },
+        },
+        layers: themeLayers,
       },
       center: [lng, lat],
       zoom: initialZoom,
       pitch: effectivePitch,
       bearing: camera.bearing ?? 0,
       maxPitch: 85,
-      antialias: true,
+      canvasContextAttributes: { antialias: true },
       attributionControl: { compact: true },
       cooperativeGestures: true,
       scrollZoom: false,

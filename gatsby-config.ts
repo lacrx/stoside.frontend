@@ -73,6 +73,14 @@ const config: GatsbyConfig = {
                 urlPattern: /\/static\/.*/,
                 handler: "CacheFirst",
               },
+              // Self-hosted basemap PMTiles under /tiles/. Served at long
+              // TTL from CloudFront; the file is replaced in place on
+              // deploy so CacheFirst + a hard refresh when the extract
+              // changes is the right tradeoff.
+              {
+                urlPattern: /\/tiles\/.*\.pmtiles$/,
+                handler: "CacheFirst",
+              },
               // Protomaps basemap (PMTiles archive + fonts/sprites).
               {
                 urlPattern: /^https:\/\/(demo-bucket\.protomaps\.com|protomaps\.github\.io)\//,
