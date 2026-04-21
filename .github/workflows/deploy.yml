@@ -49,17 +49,21 @@ jobs:
           aws s3 sync public/ s3://${{ secrets.FRONTEND_S3_BUCKET }} --delete \
             --cache-control "public, max-age=31536000, immutable"
 
-          # Second pass: override the files whose contents change without a
-          # new hash (HTML routing targets, the SW entry, page-data) so
-          # content updates propagate on the next visit rather than being
-          # served from stale browser cache for up to a year.
-          aws s3 sync public/ s3://${{ secrets.FRONTEND_S3_BUCKET }} \
+          # Second pass: force-replace metadata on files whose URL is stable
+          # but content changes per deploy (HTML routing targets, sw.js,
+          # page-data, manifest). Uses `aws s3 cp --recursive` because
+          # `aws s3 sync --metadata-directive` is silently ignored by the
+          # CLI (documented gotcha) and the first pass's long-cache header
+          # would otherwise stick. --metadata-directive REPLACE on cp forces
+          # the header rewrite.
+          aws s3 cp public/ s3://${{ secrets.FRONTEND_S3_BUCKET }}/ \
+            --recursive \
             --exclude "*" \
             --include "*.html" \
             --include "sw.js" \
             --include "*.webmanifest" \
-            --include "page-data/*" \
-            --include "page-data/**/*" \
+            --include "page-data/*.json" \
+            --include "page-data/**/*.json" \
             --metadata-directive REPLACE \
             --cache-control "public, max-age=0, must-revalidate"
 
