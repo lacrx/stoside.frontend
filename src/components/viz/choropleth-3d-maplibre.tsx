@@ -280,6 +280,10 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
     // wasted cellular data.
     const abortController = new AbortController();
 
+    // Handle for the requestIdleCallback that defers heavy deck.gl work;
+    // cancelled on unmount so navigating away never triggers buffer build.
+    let idleHandle: number | undefined;
+
     map.on("load", () => {
       if (hasTiles) {
         const tilesUrl = artifact.featuresTilesFile!.publicURL!;
@@ -314,7 +318,16 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
           .range(color.range.map(hexToRgb));
         const divisor = elevation.divisor ?? 1;
 
-        const overlay = new MapboxOverlay({
+        // deck.gl's GeoJsonLayer runs accessor functions on the main
+        // thread when it builds WebGL attribute buffers from the parsed
+        // GeoJSON. For 40k+ parcels that's ~1-2 seconds of synchronous
+        // work during which mousemove / click events queue. Defer the
+        // overlay creation until requestIdleCallback fires so the user
+        // has a clear interaction window (hover feedback, nav clicks)
+        // before the heavy buffer build kicks in. Cleanup cancels the
+        // pending callback if the user navigates away first.
+        const buildOverlay = () => {
+          const overlay = new MapboxOverlay({
           interleaved: true,
           layers: [
             new GeoJsonLayer({
@@ -343,14 +356,30 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
               },
             }),
           ],
-        });
-        overlayRef.current = overlay;
-        map.addControl(overlay as unknown as maplibregl.IControl);
+          });
+          overlayRef.current = overlay;
+          if (mapRef.current) {
+            mapRef.current.addControl(overlay as unknown as maplibregl.IControl);
+          }
+        };
+
+        if (typeof requestIdleCallback === "function") {
+          idleHandle = requestIdleCallback(buildOverlay, { timeout: 2000 });
+        } else {
+          idleHandle = window.setTimeout(buildOverlay, 300);
+        }
       }
     });
 
     return () => {
       abortController.abort();
+      if (idleHandle !== undefined) {
+        if (typeof cancelIdleCallback === "function") {
+          cancelIdleCallback(idleHandle);
+        } else {
+          window.clearTimeout(idleHandle);
+        }
+      }
       clearSafety();
       overlayRef.current = null;
       setReady(false);
