@@ -139,6 +139,16 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
         : layer
     );
 
+    // Viewport-aware zoom: on narrower viewports the baked-in zoom crops
+    // the choropleth out of frame. Shaving zoom lets the full dataset fit.
+    const viewportWidth = window.innerWidth;
+    const zoomOffset =
+      viewportWidth < 480 ? -1.8 :
+      viewportWidth < 768 ? -1.2 :
+      viewportWidth < 1024 ? -0.5 :
+      0;
+    const initialZoom = (camera.zoom ?? 11) + zoomOffset;
+
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: {
