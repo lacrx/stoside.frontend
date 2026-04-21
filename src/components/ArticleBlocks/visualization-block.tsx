@@ -106,6 +106,9 @@ export default function VisualizationBlock({ vizId, caption, height, align }: Vi
         <Suspense fallback={<div className={styles.vizPosterFill} />}>
           <Renderer artifact={artifact} height={height} />
         </Suspense>
+        <div className={styles.vizLoader} aria-hidden="true">
+          <span>&bull;</span><span>&bull;</span><span>&bull;</span>
+        </div>
       </div>
       {(caption || artifact.source) && (
         <figcaption className={styles.vizCaption}>

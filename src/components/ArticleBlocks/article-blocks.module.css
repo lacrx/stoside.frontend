@@ -53,6 +53,41 @@
   z-index: 1;
 }
 
+.vizLoader {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 4px;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  z-index: 3;
+  transition: opacity 300ms ease-out;
+}
+
+.vizLoader span {
+  opacity: 0.25;
+  animation: vizLoaderEllipsis 1200ms ease-in-out infinite;
+}
+
+.vizLoader span:nth-child(2) { animation-delay: 160ms; }
+.vizLoader span:nth-child(3) { animation-delay: 320ms; }
+
+@keyframes vizLoaderEllipsis {
+  0%, 70%, 100% { opacity: 0.25; }
+  35% { opacity: 1; }
+}
+
+.vizStage:has([data-viz-ready="true"]) .vizLoader {
+  opacity: 0;
+}
+
 .vizCaption {
   margin-top: 0.75rem;
   font-size: 0.9rem;

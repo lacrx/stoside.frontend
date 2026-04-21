@@ -288,6 +288,7 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
       ref={containerRef}
       className={`${styles.mapRoot}${ready ? ` ${styles.ready}` : ""}`}
       aria-label={artifact.vizId}
+      data-viz-ready={ready ? "true" : undefined}
     />
   );
 }
