@@ -7,12 +7,12 @@
   overflow: hidden;
   background: #ffffff;
   opacity: 0;
-  cursor: pointer;
+  cursor: default;
   transition: opacity 400ms ease-out;
 }
 
 .mapRoot:not(.ready) canvas {
-  cursor: pointer !important;
+  cursor: default !important;
 }
 
 .mapRoot.ready {
