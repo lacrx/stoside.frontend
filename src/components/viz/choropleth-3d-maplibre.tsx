@@ -232,7 +232,11 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
       bearing: camera.bearing ?? 0,
       maxPitch: 85,
       canvasContextAttributes: { antialias: true },
-      attributionControl: { compact: true },
+      // MapLibre's built-in attribution control sits on the canvas with
+      // a "i" toggle. We render our own muted line below the map instead
+      // (see JSX return), which keeps the ODbL / OMT attribution
+      // visible but much less visually loud.
+      attributionControl: false,
       cooperativeGestures: true,
       scrollZoom: false,
       doubleClickZoom: false,
@@ -394,6 +398,20 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
       className={`${styles.mapRoot}${ready ? ` ${styles.ready}` : ""}`}
       aria-label={artifact.vizId}
       data-viz-ready={ready ? "true" : undefined}
-    />
+    >
+      <small className={styles.attribution}>
+        <a href="https://openmaptiles.org/" target="_blank" rel="noreferrer">
+          OpenMapTiles
+        </a>
+        {" / "}
+        <a
+          href="https://www.openstreetmap.org/copyright"
+          target="_blank"
+          rel="noreferrer"
+        >
+          OpenStreetMap
+        </a>
+      </small>
+    </div>
   );
 }
