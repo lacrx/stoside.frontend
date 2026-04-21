@@ -5,7 +5,6 @@ import { MapboxOverlay } from "@deck.gl/mapbox";
 import { GeoJsonLayer } from "@deck.gl/layers";
 import { scaleThreshold } from "d3-scale";
 import type { Feature } from "geojson";
-import layersForTheme from "protomaps-themes-base";
 import "maplibre-gl/dist/maplibre-gl.css";
 import * as styles from "./choropleth-3d-maplibre.module.css";
 
@@ -21,9 +20,6 @@ type Artifact = {
 };
 
 type Props = { artifact: Artifact };
-
-const DEFAULT_PMTILES_URL =
-  process.env.GATSBY_PMTILES_URL || "https://demo-bucket.protomaps.com/v4.pmtiles";
 
 function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
@@ -133,12 +129,6 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
     const { camera, color, elevation } = artifact;
     const [lng, lat] = camera.center;
 
-    const themeLayers = layersForTheme("protomaps", "light", "en").map(layer =>
-      layer.type === "background"
-        ? { ...layer, paint: { ...(layer.paint ?? {}), "background-color": "#ffffff" } }
-        : layer
-    );
-
     // Viewport-aware zoom: on narrower viewports the baked-in zoom crops
     // the choropleth out of frame. Shaving zoom lets the full dataset fit.
     const viewportWidth = window.innerWidth;
@@ -151,19 +141,19 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
 
     const map = new maplibregl.Map({
       container: containerRef.current,
+      // Blank white basemap. The Protomaps demo bucket turned off CORS for
+      // our origin, which caused range-request failures and recurring
+      // WebGL-context-lost errors. For this viz the extrusions are the
+      // content anyway, so rendering them on a plain white background is
+      // closer to the 538 aesthetic the site is going for. Swap in a
+      // self-hosted or CORS-friendly tile source later if labels / water
+      // become editorially important.
       style: {
         version: 8,
-        glyphs: "https://protomaps.github.io/basemaps-assets/fonts/{fontstack}/{range}.pbf",
-        sprite: "https://protomaps.github.io/basemaps-assets/sprites/v4/light",
-        sources: {
-          protomaps: {
-            type: "vector",
-            url: `pmtiles://${DEFAULT_PMTILES_URL}`,
-            attribution:
-              '<a href="https://protomaps.com">Protomaps</a> &copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
-          },
-        },
-        layers: themeLayers,
+        sources: {},
+        layers: [
+          { id: "bg", type: "background", paint: { "background-color": "#ffffff" } },
+        ],
       },
       center: [lng, lat],
       zoom: initialZoom,
