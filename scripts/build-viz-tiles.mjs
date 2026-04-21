@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Converts each viz's source GeoJSON into a co-located .pmtiles file using
-// tippecanoe. Safe to run even if tippecanoe is missing — in that case the
+// tippecanoe. Safe to run even if tippecanoe is missing; in that case the
 // renderer silently falls back to raw-GeoJSON mode.
 //
 // Install tippecanoe:
@@ -71,7 +71,7 @@ function main() {
     return;
   }
   if (!haveTippecanoe()) {
-    console.warn("tippecanoe not found on PATH — skipping tile build.");
+    console.warn("tippecanoe not found on PATH, skipping tile build.");
     console.warn("Renderer will use raw GeoJSON until tippecanoe is installed. See script header for install hints.");
     return;
   }

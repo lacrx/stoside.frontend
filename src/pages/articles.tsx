@@ -4,7 +4,7 @@ import Layout from "@/components/Layout/layout";
 import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
 import Card from "@/components/Card/card";
-import learnFallback from "@/images/learn.png";
+import articleCoverFallback from "@/images/oceanside-wealth-poster-desktop.jpg";
 
 type GatsbyArticle = {
   title: string
@@ -63,8 +63,8 @@ export default function Articles() {
             link={`/articles/${slug}`}
             title={title}
             description={description}
-            image={image ?? learnFallback}
-            fallbackImage={learnFallback}
+            image={image ?? articleCoverFallback}
+            fallbackImage={articleCoverFallback}
             authorName={authorName}
             publishedAt={publishedAt}
           />

@@ -17,7 +17,7 @@
 //
 //      Launches Chromium via puppeteer, opens /viz-preview/, hides controls,
 //      waits for the `.ready` class on the map, screenshots the map region,
-//      writes the poster. Reproducible — regenerate any time the viz changes.
+//      writes the poster. Reproducible, regenerate any time the viz changes.
 //
 // Flags:
 //   --image PATH        source image to process (mode 1)
@@ -133,7 +133,7 @@ async function modeCapture({ vizId, host, selector, out, width, height, path: ur
       vizId
     );
 
-    // Generous settle time — headless WebGL rendering can lag, and we
+    // Generous settle time, since headless WebGL rendering can lag and we
     // want the extrusion geometry fully painted before we screenshot.
     await new Promise((r) => setTimeout(r, 2500));
 

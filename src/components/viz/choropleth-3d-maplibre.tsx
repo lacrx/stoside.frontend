@@ -198,7 +198,7 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
     const markReady = () => {
       // Deferred gesture wiring: enable pinch-zoom + two-finger rotate only
       // after the map is visually ready. Other zoom interactions (scroll,
-      // double-click, box-zoom) stay off — zoom via the +/- buttons or
+      // double-click, box-zoom) stay off. Zoom via the +/- buttons or
       // pinch only, matching the Google-Maps mobile interaction model.
       if (mapRef.current) {
         mapRef.current.touchZoomRotate.enable();

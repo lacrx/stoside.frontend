@@ -38,7 +38,7 @@ const config: GatsbyConfig = {
         // small app shell (JS/CSS/HTML/fonts); everything else flows
         // through runtime caches below so the initial install doesn't
         // compete with the foreground page render. Note: the plugin's
-        // schema is strict — only urlPattern + handler + networkTimeoutSeconds
+        // schema is strict (only urlPattern + handler + networkTimeoutSeconds),
         // are allowed per runtime-cache entry, so we rely on Workbox's
         // defaults for cacheName/TTL (browser quota handles eviction).
         resolve: "gatsby-plugin-offline",
@@ -47,9 +47,9 @@ const config: GatsbyConfig = {
             // Ruthless first-load policy: precache ONLY the offline app
             // shell fallback so the "you're offline" page still works.
             // Every other asset (JS chunks, CSS, HTML, images) is
-            // runtime-cached on first use — no post-load background
-            // fetches burning bandwidth or CPU for pages the user may
-            // never visit. Tradeoff: on a return visit, only the pages
+            // runtime-cached on first use, so no post-load background
+            // fetches burn bandwidth or CPU for pages the user may never
+            // visit. Tradeoff: on a return visit, only the pages
             // the user has actually visited are instant-from-cache;
             // unvisited pages still hit the network.
             maximumFileSizeToCacheInBytes: 2 * 1024 * 1024,

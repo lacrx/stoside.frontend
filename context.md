@@ -1,4 +1,4 @@
-# Strong Towns Oceanside — Frontend App Context
+# Strong Towns Oceanside, Frontend App Context
 
 > Reference document for AWS architecture planning.
 
@@ -9,7 +9,7 @@
 | Attribute | Value |
 |-----------|-------|
 | **Framework** | Gatsby v5.16.1 (React 18, TypeScript 5.9) |
-| **Output** | Static site (SSG) — pre-built HTML/CSS/JS in `/public` |
+| **Output** | Static site (SSG), pre-built HTML/CSS/JS in `/public` |
 | **Node requirement** | >=22.0.0 |
 | **Build command** | `gatsby build` |
 | **Dev command** | `gatsby develop` |
@@ -22,7 +22,7 @@
 | `/articles` | Static | Grid of all articles sourced from Strapi |
 | `/articles/{slug}` | Dynamic (gatsby-node) | Individual article: hero, cover image, sanitized HTML body |
 | `/learn` | Static | Description + interactive deck.gl / Google Maps VPA map |
-| `/events` | Static | Placeholder — Meetup API integration in-progress |
+| `/events` | Static | Placeholder, Meetup API integration in-progress |
 | `/about` | Static | Placeholder about page |
 | `/404` | Static | Not-found page |
 
@@ -31,7 +31,7 @@
 ### 1. Strapi CMS (primary)
 
 - **Protocol:** GraphQL (`graphql-request` client)
-- **Current endpoint:** `http://localhost:1337/graphql` (hardcoded — needs env var)
+- **Current endpoint:** `http://localhost:1337/graphql` (hardcoded, needs env var)
 - **Build-time only:** Data is fetched in `gatsby-node.ts` `sourceNodes` hook, turned into Gatsby nodes, and baked into static HTML at build time. No runtime CMS calls.
 - **Content processed:** Markdown → HTML via `marked`, sanitized with `isomorphic-dompurify`.
 
@@ -54,7 +54,7 @@ Article {
 
 ### 2. GeoJSON (static file)
 
-- `src/assets/data/analysis.geojson` — Parcel-level VPA data for Oceanside (source: Regrid 2023).
+- `src/assets/data/analysis.geojson`, Parcel-level VPA data for Oceanside (source: Regrid 2023).
 - Loaded at build time via `gatsby-source-filesystem`.
 - Rendered on `/learn` with deck.gl `GeoJsonLayer` (3D extruded polygons, 13-color d3 threshold scale).
 
@@ -88,7 +88,7 @@ Layout
 ├── {children}   (page content)
 │   ├── Hero     (reusable page header: title, description, optional CTA, optional pelican mascot)
 │   ├── Card     (article/promo card: title, description, image, link)
-│   ├── Content  (wrapper — renders as <section> or <table>)
+│   ├── Content  (wrapper, renders as <section> or <table>)
 │   └── Map      (deck.gl + Google Maps interactive VPA map)
 └── Footer
 ```
@@ -109,7 +109,7 @@ Strapi CMS ──GraphQL──▶ gatsby-node.ts sourceNodes
                               gatsby build → /public (static files)
 ```
 
-## Configuration — Environment Variables
+## Configuration, Environment Variables
 
 All previously hardcoded values have been extracted to environment variables:
 
@@ -123,7 +123,7 @@ All previously hardcoded values have been extracted to environment variables:
 ## AWS Architecture Considerations
 
 ### Static Frontend Hosting
-- **S3 + CloudFront** is the natural fit — serve `/public` as a static website (`stoside.org` / `www.stoside.org`).
+- **S3 + CloudFront** is the natural fit, serve `/public` as a static website (`stoside.org` / `www.stoside.org`).
 - Hash-based cache busting for JS/CSS assets; short TTL for HTML files.
 - Route all paths to `index.html` for client-side Gatsby routing (or configure CloudFront custom error responses for 404 → `/404.html`).
 

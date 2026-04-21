@@ -4,7 +4,7 @@ import Layout from "@/components/Layout/layout"
 import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
 import Card from "@/components/Card/card";
-import learnFallback from "@/images/learn.png";
+import articleCoverFallback from "@/images/oceanside-wealth-poster-desktop.jpg";
 
 type ComponentSharedRichText = {
   body: string
@@ -67,8 +67,8 @@ export default function Home() {
     link: `/articles/${article.slug}`,
     title: article.title,
     description: article.description,
-    image: article.image ?? learnFallback,
-    fallbackImage: learnFallback,
+    image: article.image ?? articleCoverFallback,
+    fallbackImage: articleCoverFallback,
     authorName: article.authorName,
     publishedAt: article.publishedAt
   } : null;

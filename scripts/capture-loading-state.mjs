@@ -2,7 +2,7 @@
 // Debug utility: screenshot the viz block mid-load so you can inspect
 // the loading indicator / poster-frame composition. Swallows the
 // analysis.geojson fetch so the map stays in its pending state forever;
-// the poster and loader continue to render normally. Dev-only — not
+// the poster and loader continue to render normally. Dev-only, not
 // invoked by any CI workflow.
 //
 // Usage (requires dev server on :8000):
@@ -26,7 +26,7 @@ try {
   await page.setRequestInterception(true);
   page.on("request", (req) => {
     if (req.url().includes("analysis") && req.url().endsWith(".geojson")) {
-      // Just never call req.continue/respond — leaves it pending.
+      // Just never call req.continue/respond, leaves it pending.
       return;
     }
     req.continue();
