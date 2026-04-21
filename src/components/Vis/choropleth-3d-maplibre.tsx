@@ -140,9 +140,9 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
     // the choropleth out of frame. Shaving zoom lets the full dataset fit.
     const viewportWidth = window.innerWidth;
     const zoomOffset =
-      viewportWidth < 480 ? -0.6 :
-      viewportWidth < 768 ? -0.5 :
-      viewportWidth < 1024 ? -0.2 :
+      viewportWidth < 480 ? -0.8 :
+      viewportWidth < 768 ? -0.6 :
+      viewportWidth < 1024 ? -0.3 :
       0;
     const initialZoom = (camera.zoom ?? 11) + zoomOffset;
 
