@@ -17,7 +17,7 @@ type Artifact = {
   camera: { center: number[]; zoom: number | null; pitch: number | null; bearing: number | null } | null;
   color: { field: string; domain: number[]; range: string[] } | null;
   elevation: { field: string; divisor: number | null } | null;
-  fallback2d: { pitch: number | null; extruded: boolean | null; maxViewportWidth: number | null } | null;
+  fallback2d: { maxViewportWidth: number | null } | null;
 };
 
 type Props = { artifact: Artifact };
@@ -111,18 +111,18 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
   const overlayRef = useRef<MapboxOverlay | null>(null);
   const [ready, setReady] = useState(false);
 
-  const fallbackBp = artifact.fallback2d?.maxViewportWidth ?? 640;
+  const fallbackBp = artifact.fallback2d?.maxViewportWidth ?? 360;
   const isNarrow = useIsNarrowViewport(artifact.fallback2d ? fallbackBp : null);
-  const useFallback = Boolean(artifact.fallback2d && isNarrow);
-  const extruded = useFallback ? (artifact.fallback2d?.extruded ?? false) : true;
+  // Fallback mode = don't mount the interactive map. The poster underneath
+  // (rendered by VisualizationBlock) remains visible. Binary choice, no
+  // flat-polygon middle state.
+  const usePosterOnly = Boolean(artifact.fallback2d && isNarrow);
 
-  const effectivePitch = useMemo(() => {
-    if (useFallback) return artifact.fallback2d?.pitch ?? 0;
-    return artifact.camera?.pitch ?? 45;
-  }, [useFallback, artifact.camera, artifact.fallback2d]);
+  const effectivePitch = artifact.camera?.pitch ?? 45;
 
   useEffect(() => {
     if (!containerRef.current) return;
+    if (usePosterOnly) return;
     if (!artifact.camera || !artifact.color || !artifact.elevation) return;
     const hasTiles = Boolean(artifact.featuresTilesFile?.publicURL);
     const hasGeojson = Boolean(artifact.featuresFile?.publicURL);
@@ -210,9 +210,7 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
           "source-layer": sourceLayer,
           paint: {
             "fill-extrusion-color": buildStepColorExpression(color.field, color.domain, color.range) as any,
-            "fill-extrusion-height": extruded
-              ? (["/", ["get", elevation.field], elevation.divisor ?? 1] as any)
-              : 0,
+            "fill-extrusion-height": ["/", ["get", elevation.field], elevation.divisor ?? 1] as any,
             "fill-extrusion-opacity": 0.75,
           },
         });
@@ -239,7 +237,7 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
               data: artifact.featuresFile!.publicURL!,
               stroked: false,
               filled: true,
-              extruded,
+              extruded: true,
               opacity: 0.75,
               pickable: true,
               getFillColor: (f: Feature) =>
@@ -265,7 +263,7 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
       map.remove();
       mapRef.current = null;
     };
-  }, [artifact, extruded, effectivePitch]);
+  }, [artifact, effectivePitch, usePosterOnly]);
 
   return (
     <div

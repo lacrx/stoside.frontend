@@ -487,8 +487,6 @@ export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] 
       divisor: Float
     }
     type GatsbyVizFallback2d {
-      pitch: Float
-      extruded: Boolean
       maxViewportWidth: Int
     }
     type GatsbyEvent implements Node {

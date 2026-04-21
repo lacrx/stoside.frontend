@@ -29,7 +29,7 @@ export type GatsbyVisualization = {
   camera: { center: number[]; zoom: number | null; pitch: number | null; bearing: number | null } | null;
   color: { field: string; domain: number[]; range: string[] } | null;
   elevation: { field: string; divisor: number | null } | null;
-  fallback2d: { pitch: number | null; extruded: boolean | null; maxViewportWidth: number | null } | null;
+  fallback2d: { maxViewportWidth: number | null } | null;
 };
 
 type Query = {
@@ -52,7 +52,7 @@ export default function VisualizationBlock({ vizId, caption, height, align }: Vi
           camera { center zoom pitch bearing }
           color { field domain range }
           elevation { field divisor }
-          fallback2d { pitch extruded maxViewportWidth }
+          fallback2d { maxViewportWidth }
         }
       }
     }

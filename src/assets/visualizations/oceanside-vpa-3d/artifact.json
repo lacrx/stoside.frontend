@@ -37,8 +37,6 @@
     "divisor": 10000
   },
   "fallback2d": {
-    "pitch": 0,
-    "extruded": false,
-    "maxViewportWidth": 640
+    "maxViewportWidth": 360
   }
 }
