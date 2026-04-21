@@ -156,7 +156,7 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
         layers: themeLayers,
       },
       center: [lng, lat],
-      zoom: camera.zoom ?? 11,
+      zoom: initialZoom,
       pitch: effectivePitch,
       bearing: camera.bearing ?? 0,
       maxPitch: 85,
