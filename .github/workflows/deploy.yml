@@ -43,7 +43,26 @@ jobs:
 
       - name: Deploy to S3 and invalidate CloudFront
         run: |
-          aws s3 sync public/ s3://${{ secrets.FRONTEND_S3_BUCKET }} --delete
+          # First pass: upload every file with long immutable cache. Safe for
+          # Gatsby's content-hashed assets under /static/ and for the big
+          # stuff (GeoJSON, posters, JS chunks) that never change in-place.
+          aws s3 sync public/ s3://${{ secrets.FRONTEND_S3_BUCKET }} --delete \
+            --cache-control "public, max-age=31536000, immutable"
+
+          # Second pass: override the files whose contents change without a
+          # new hash (HTML routing targets, the SW entry, page-data) so
+          # content updates propagate on the next visit rather than being
+          # served from stale browser cache for up to a year.
+          aws s3 sync public/ s3://${{ secrets.FRONTEND_S3_BUCKET }} \
+            --exclude "*" \
+            --include "*.html" \
+            --include "sw.js" \
+            --include "*.webmanifest" \
+            --include "page-data/*" \
+            --include "page-data/**/*" \
+            --metadata-directive REPLACE \
+            --cache-control "public, max-age=0, must-revalidate"
+
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
             --paths "/*"
