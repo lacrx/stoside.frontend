@@ -25,6 +25,7 @@ export type GatsbyVisualization = {
   featuresFile: { publicURL: string | null } | null;
   featuresTilesFile: { publicURL: string | null } | null;
   posterFile: { publicURL: string | null } | null;
+  posterFileMobile: { publicURL: string | null } | null;
   tilesLayer: string | null;
   camera: { center: number[]; zoom: number | null; pitch: number | null; bearing: number | null } | null;
   color: { field: string; domain: number[]; range: string[] } | null;
@@ -48,6 +49,7 @@ export default function VisualizationBlock({ vizId, caption, height, align }: Vi
           featuresFile { publicURL }
           featuresTilesFile { publicURL }
           posterFile { publicURL }
+          posterFileMobile { publicURL }
           tilesLayer
           camera { center zoom pitch bearing }
           color { field domain range }
@@ -82,18 +84,24 @@ export default function VisualizationBlock({ vizId, caption, height, align }: Vi
   }
 
   const posterUrl = artifact.posterFile?.publicURL ?? null;
+  const posterUrlMobile = artifact.posterFileMobile?.publicURL ?? null;
 
   return (
     <figure className={`${styles.vizFigure} ${alignClass}`}>
       <div className={styles.vizStage} style={{ height }}>
         {posterUrl && (
-          <img
-            src={posterUrl}
-            alt={artifact.title ?? artifact.vizId}
-            className={styles.vizPoster}
-            loading="lazy"
-            decoding="async"
-          />
+          <picture className={styles.vizPoster}>
+            {posterUrlMobile && (
+              <source media="(max-width: 768px)" srcSet={posterUrlMobile} />
+            )}
+            <img
+              src={posterUrl}
+              alt={artifact.title ?? artifact.vizId}
+              className={styles.vizPoster}
+              loading="lazy"
+              decoding="async"
+            />
+          </picture>
         )}
         <Suspense fallback={<div className={styles.vizPosterFill} />}>
           <Renderer artifact={artifact} height={height} />

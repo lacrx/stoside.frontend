@@ -87,7 +87,7 @@ async function modeFromImage({ image, out, width, maskRight }) {
   console.log(`[poster] wrote ${path.relative(frontendRoot, dst)} @ ${outWidth}px wide`);
 }
 
-async function modeCapture({ vizId, host, selector, out, width }) {
+async function modeCapture({ vizId, host, selector, out, width, height, path: urlPath }) {
   let puppeteer;
   try {
     puppeteer = (await import("puppeteer")).default;
@@ -99,39 +99,47 @@ async function modeCapture({ vizId, host, selector, out, width }) {
     process.exit(2);
   }
 
-  const url = `${host.replace(/\/$/, "")}/viz-preview/`;
+  const pathPart = urlPath ?? "/viz-preview/";
+  const url = `${host.replace(/\/$/, "")}${pathPart.startsWith("/") ? pathPart : "/" + pathPart}`;
   const dstBase = vizId + "-poster.png";
   const dst = out
     ? path.resolve(frontendRoot, out)
     : path.resolve(frontendRoot, "src/assets/images", dstBase);
 
   console.log(`[poster] capturing ${vizId} via ${url}`);
-  const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({ headless: "new", args: ["--use-gl=angle", "--enable-webgl"] });
   try {
     const page = await browser.newPage();
-    await page.setViewport({ width: Number(width) || 1280, height: 900, deviceScaleFactor: 2 });
+    await page.setViewport({
+      width: Number(width) || 1280,
+      height: Number(height) || 900,
+      deviceScaleFactor: 2,
+    });
     await page.goto(url, { waitUntil: "networkidle2", timeout: 60_000 });
 
     // Hide every map control group so the capture is clean.
     await page.addStyleTag({ content: ".maplibregl-ctrl { display: none !important; }" });
 
-    // Wait until the renderer has flipped to its ready state.
+    // Wait until the renderer has flipped to its ready state AND the
+    // opacity transition has finished (so the canvas is fully opaque).
     await page.waitForSelector(`[aria-label="${vizId}"]`, { timeout: 30_000 });
     await page.waitForFunction(
       (id) => {
         const el = document.querySelector(`[aria-label="${id}"]`);
-        return !!el && el.className.includes("ready");
+        if (!el || !el.className.includes("ready")) return false;
+        return getComputedStyle(el).opacity === "1";
       },
-      { timeout: 30_000 },
+      { timeout: 45_000, polling: 200 },
       vizId
     );
 
-    // One extra frame to guarantee paint.
-    await new Promise((r) => setTimeout(r, 400));
+    // Generous settle time — headless WebGL rendering can lag, and we
+    // want the extrusion geometry fully painted before we screenshot.
+    await new Promise((r) => setTimeout(r, 2500));
 
     const handle = await page.$(selector || `[aria-label="${vizId}"]`);
     if (!handle) throw new Error(`No element matched selector`);
-    await handle.screenshot({ path: dst, type: "png", omitBackground: true });
+    await handle.screenshot({ path: dst, type: "png" });
     console.log(`[poster] wrote ${path.relative(frontendRoot, dst)}`);
   } finally {
     await browser.close();
@@ -148,6 +156,8 @@ async function main() {
       selector: args.selector ? String(args.selector) : undefined,
       out: args.out ? String(args.out) : undefined,
       width: args.width,
+      height: args.height,
+      path: args.path ? String(args.path) : undefined,
     });
     return;
   }

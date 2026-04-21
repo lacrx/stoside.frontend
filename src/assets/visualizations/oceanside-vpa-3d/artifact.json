@@ -6,7 +6,8 @@
   "features": "analysis",
   "featuresTiles": "parcels",
   "tilesLayer": "parcels",
-  "posterFrame": "oceanside-wealth-poster",
+  "posterFrame": "oceanside-wealth-poster-desktop",
+  "posterFrameMobile": "oceanside-wealth-poster-mobile",
   "camera": {
     "center": [-117.34013, 33.2257],
     "zoom": 10.8,
