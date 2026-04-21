@@ -35,8 +35,5 @@
   "elevation": {
     "field": "vpa",
     "divisor": 10000
-  },
-  "fallback2d": {
-    "maxViewportWidth": 360
   }
 }

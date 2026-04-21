@@ -192,7 +192,7 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
 
     // Safety net: if data never loads (network error, bad URL, etc.) we
     // still want the map visible eventually instead of an eternal poster.
-    const safetyTimer = window.setTimeout(markReady, 6000);
+    const safetyTimer = window.setTimeout(markReady, 30000);
     const clearSafety = () => window.clearTimeout(safetyTimer);
 
     map.on("load", () => {
