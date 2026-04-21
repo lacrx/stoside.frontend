@@ -3,7 +3,7 @@ import { graphql, useStaticQuery } from "gatsby";
 import * as styles from "./article-blocks.module.css";
 
 const Choropleth3DMaplibre = lazy(
-  () => import("@/components/viz/choropleth-3d-maplibre")
+  () => import("@/components/Vis/choropleth-3d-maplibre")
 );
 
 const RENDERERS: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
