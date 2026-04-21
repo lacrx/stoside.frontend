@@ -67,10 +67,20 @@ function buildOne({ vizId, geojsonPath, outPath, bounds, minZoom, maxZoom, layer
   console.log(`  [index] ${data.features.length} features, zoom ${minZoom}-${maxZoom}`);
   const tileIndex = geojsonvt(data, {
     maxZoom,
-    indexMaxZoom: Math.min(5, maxZoom),
-    tolerance: 3,
+    // Build the index all the way up to maxZoom so features are never
+    // dropped at low zoom; low-zoom tiles stay visually consistent with
+    // zoomed-in tiles.
+    indexMaxZoom: maxZoom,
+    // Keep parcels geometrically faithful -- tolerance 0.5 is gentle
+    // simplification that still shears sub-pixel vertices but keeps the
+    // shape of every parcel recognisable at zoom 10.
+    tolerance: 0.5,
     extent: 4096,
     buffer: 64,
+    // 500k points per tile lets us keep all ~60k parcels in the broadest
+    // low-zoom tile without geojson-vt dropping features to fit its
+    // default 100k-point budget.
+    indexMaxPoints: 500_000,
     generateId: true,
   });
 

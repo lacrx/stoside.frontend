@@ -304,7 +304,7 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
           paint: {
             "fill-extrusion-color": buildStepColorExpression(color.field, color.domain, color.range) as any,
             "fill-extrusion-height": ["/", ["get", elevation.field], elevation.divisor ?? 1] as any,
-            "fill-extrusion-opacity": 0.75,
+            "fill-extrusion-opacity": 0.88,
           },
         });
 
