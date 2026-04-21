@@ -42,7 +42,7 @@
    component is overridden. */
 @media (max-width: 768px) {
   .vizStage {
-    height: 440px !important;
+    height: 300px !important;
   }
 }
 
