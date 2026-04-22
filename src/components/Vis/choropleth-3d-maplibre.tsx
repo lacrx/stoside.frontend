@@ -240,6 +240,12 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
       pitch: effectivePitch,
       bearing: camera.bearing ?? 0,
       maxPitch: 85,
+      // Parcel vector tiles are generated for zoom 10-15. Below zoom 10
+      // the fill-extrusion layer has no data and the choropleth
+      // disappears. Clamp the user's zoom controls so they can't pan
+      // the map out of the data.
+      minZoom: 10,
+      maxZoom: 18,
       canvasContextAttributes: { antialias: true },
       // MapLibre's built-in attribution control sits on the canvas with
       // a "i" toggle. We render our own muted line below the map instead
