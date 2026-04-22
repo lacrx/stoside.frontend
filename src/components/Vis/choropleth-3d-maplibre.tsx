@@ -53,6 +53,16 @@ function ensurePmtilesProtocol() {
   pmtilesProtocolRegistered = true;
 }
 
+// Lucide-style stroke SVGs, 20x20 viewport with 2px stroke. Kept as raw
+// markup so the camera control can drop them into buttons without extra
+// React / bundler machinery. currentColor so they inherit button color.
+const ICON_SVG = {
+  rotateCcw: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`,
+  rotateCw: `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>`,
+  chevronUp: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>`,
+  chevronDown: `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`,
+};
+
 function createCameraControl(step = 20): maplibregl.IControl {
   let container: HTMLDivElement | null = null;
   return {
@@ -60,29 +70,29 @@ function createCameraControl(step = 20): maplibregl.IControl {
       container = document.createElement("div");
       container.className = "maplibregl-ctrl maplibregl-ctrl-group viz-camera-ctrl-h";
 
-      const addButton = (label: string, glyph: string, onClick: () => void) => {
+      const addButton = (label: string, iconSvg: string, onClick: () => void) => {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.title = label;
         btn.setAttribute("aria-label", label);
-        btn.style.fontSize = "20px";
-        btn.style.fontWeight = "700";
-        btn.style.lineHeight = "1";
-        btn.textContent = glyph;
+        btn.style.display = "inline-flex";
+        btn.style.alignItems = "center";
+        btn.style.justifyContent = "center";
+        btn.innerHTML = iconSvg;
         btn.addEventListener("click", onClick);
         container!.appendChild(btn);
       };
 
-      addButton("Rotate counter-clockwise", "↺", () =>
+      addButton("Rotate counter-clockwise", ICON_SVG.rotateCcw, () =>
         map.easeTo({ bearing: map.getBearing() - step })
       );
-      addButton("Rotate clockwise", "↻", () =>
+      addButton("Rotate clockwise", ICON_SVG.rotateCw, () =>
         map.easeTo({ bearing: map.getBearing() + step })
       );
-      addButton("Less tilt (top-down view)", "▲", () =>
+      addButton("Less tilt (top-down view)", ICON_SVG.chevronUp, () =>
         map.easeTo({ pitch: Math.max(0, map.getPitch() - step) })
       );
-      addButton("More tilt (side view)", "▼", () =>
+      addButton("More tilt (side view)", ICON_SVG.chevronDown, () =>
         map.easeTo({ pitch: Math.min(85, map.getPitch() + step) })
       );
 

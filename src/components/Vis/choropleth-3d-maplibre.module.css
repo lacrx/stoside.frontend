@@ -68,3 +68,12 @@
   border-radius: 0 4px 4px 0 !important;
   border-right: 0;
 }
+
+/* Lighten all map-control button icons uniformly. Opacity on the
+   icon element (SVG for camera controls, .maplibregl-ctrl-icon span
+   for MapLibre's built-in +/- zoom buttons) desaturates both
+   stroke and background-image paths without touching the button
+   border/background. */
+.mapRoot :global(.maplibregl-ctrl button > *) {
+  opacity: 0.8;
+}
