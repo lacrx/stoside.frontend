@@ -29,7 +29,6 @@ export default function Article({ pageContext: { title, description, image, bloc
     title,
     description,
     style: { paddingBottom: 0 },
-    showBuddy: true
   }
 
   const img = getImage(image);
