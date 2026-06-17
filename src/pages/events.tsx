@@ -37,7 +37,7 @@ const query = graphql`
               height: 150
               placeholder: BLURRED
               formats: [AUTO, WEBP, AVIF]
-              transformOptions: { fit: COVER, cropFocus: ATTENTION }
+              transformOptions: { fit: COVER }
             )
           }
         }
