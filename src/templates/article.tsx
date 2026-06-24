@@ -29,6 +29,7 @@ export default function Article({ pageContext: { title, description, image, bloc
   const heroProps = {
     title,
     description,
+    centered: true,
     style: { paddingBottom: 0 },
   }
 

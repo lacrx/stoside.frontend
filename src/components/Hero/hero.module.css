@@ -24,3 +24,26 @@
     }
   }
 }
+
+.hero.centered {
+  text-align: center;
+  border-bottom: none;
+  padding-bottom: 0;
+
+  > :nth-child(n) {
+    max-width: none;
+  }
+
+  > h1 {
+    font-size: 2.25rem;
+    line-height: 2.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  > h4:nth-child(2) {
+    font-size: 1.0625rem;
+    line-height: 1.5rem;
+    max-width: 36rem;
+    margin: 0 auto;
+  }
+}

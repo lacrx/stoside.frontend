@@ -1,5 +1,5 @@
 import { graphql, Link, useStaticQuery } from "gatsby";
-import { hero } from './hero.module.css';
+import { hero, centered as centeredCls } from './hero.module.css';
 import pelican from "@/images/pelican.svg";
 
 type HeroProps = {
@@ -8,6 +8,7 @@ type HeroProps = {
   description?: string;
   style?: object
   showBuddy?: boolean
+  centered?: boolean
 };
 
 type SiteSettingQuery = {
@@ -37,14 +38,14 @@ const h3 = (text: string) => <h4>{ text }</h4>;
 
 const buddyStyle = { position: "absolute" as const, bottom: "-6px", right: "-5px" };
 
-export default function Hero({ title, cta, description, style = { paddingBottom: "5rem" }, showBuddy = false }: HeroProps) {
+export default function Hero({ title, cta, description, style = { paddingBottom: "5rem" }, showBuddy = false, centered = false }: HeroProps) {
   const { allGatsbySiteSetting } = useStaticQuery<SiteSettingQuery>(siteSettingQuery);
   const settings = allGatsbySiteSetting.nodes[0];
   const instagramUrl = settings?.instagramUrl || DEFAULT_INSTAGRAM_URL;
   const meetupUrl = settings?.meetupUrl || DEFAULT_MEETUP_URL;
 
   return (
-    <header className={ hero } style={ style }>
+    <header className={`${hero}${centered ? ` ${centeredCls}` : ''}`} style={ style }>
       <h1>{ title }</h1>
       { description && h3(description) }
       { cta && (
