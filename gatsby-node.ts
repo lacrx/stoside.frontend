@@ -28,7 +28,7 @@ const getAllStrapiArticles = `
       cover {
         url
       }
-      author {
+      authors {
         name
       }
       blocks {
@@ -100,7 +100,7 @@ type Article = {
   description: string
   slug: string
   cover: UploadFile
-  author: { name: string } | null
+  authors: { name: string }[]
   blocks: StrapiBlock[]
   publishedAt: Date
 };
@@ -291,7 +291,7 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
       getCache,
     })).id;
   }));
-  articles.forEach(({ title, description, slug, blocks, author, publishedAt }, i) => {
+  articles.forEach(({ title, description, slug, blocks, authors, publishedAt }, i) => {
     const structuredBlocks: ArticleBlock[] = blocks.map(block => {
       if (block.__typename === "ComponentSharedRichText") {
         return {
@@ -313,7 +313,7 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
       description,
       slug,
       image: images[i],
-      authorName: author?.name ?? null,
+      authorName: authors?.length ? authors.map(a => a.name).join(' & ') : null,
       blocks: structuredBlocks,
       publishedAt
     };
