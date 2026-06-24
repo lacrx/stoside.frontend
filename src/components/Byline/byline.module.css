@@ -1,7 +1,7 @@
 .byline {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: baseline;
   gap: 0.35rem;
   color: #555;
