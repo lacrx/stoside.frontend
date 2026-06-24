@@ -14,17 +14,18 @@
     margin-bottom: 0.75rem;
   }
 
-  > h4:nth-child(2) {
+  > p:nth-child(2) {
     margin-top: 0.75rem;
     font-style: italic;
     font-size: 1.0625rem;
     line-height: 1.5rem;
+    color: var(--grey);
   }
 
   > a:nth-child(n) {
     margin-top: 0.75rem;
 
-    > h2 {
+    > p {
       color: var(--grey);
       font-weight: 400;
       font-size: 0.875rem;
@@ -43,7 +44,7 @@
     max-width: none;
   }
 
-  > h4:nth-child(2) {
+  > p:nth-child(2) {
     max-width: 36rem;
     margin: 0 auto;
   }

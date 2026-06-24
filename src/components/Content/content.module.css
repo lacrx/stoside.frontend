@@ -11,11 +11,11 @@
   border-top: 1px solid var(--rule);
 }
 
-.content + .content:has(> :global(h3)) {
+.content + .content:has(> :global(h2)) {
   border-top: none;
 }
 
-.content > :global(h3) {
+.content > :global(h2) {
   position: absolute;
   top: 0;
   left: 0;
@@ -27,9 +27,14 @@
   background: white;
   margin: 0;
   z-index: 1;
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: .05em;
+  color: var(--grey);
 }
 
-.content > :global(h3)::after {
+.content > :global(h2)::after {
   content: '';
   flex: 1;
   border-top: 1px solid var(--rule);

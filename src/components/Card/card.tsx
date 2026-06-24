@@ -35,7 +35,7 @@ export default function Card({link, title, description, image, fallbackImage, au
         </div>
         <div>
           <Link to={ link }>
-            <h4>{ description }</h4>
+            <p>{ description }</p>
           </Link>
         </div>
         <Byline author={authorName} publishedAt={publishedAt} compact />

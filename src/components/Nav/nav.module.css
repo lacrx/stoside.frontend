@@ -45,7 +45,11 @@
     > a {
       padding: 1rem 0;
 
-      > h3 {
+      > span {
+        font-family: var(--sans);
+        font-weight: 600;
+        letter-spacing: .05em;
+        color: var(--grey);
         font-size: 1rem;
       }
     }
@@ -68,7 +72,7 @@
       > a {
         padding: 0.5rem 0;
 
-        > h3 {
+        > span {
           font-size: 0.75rem;
         }
       }

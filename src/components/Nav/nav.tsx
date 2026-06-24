@@ -52,17 +52,17 @@ export default function Nav() {
       </li>
       <li>
         <Link to="/articles">
-          <h3>Articles</h3>
+          <span>Articles</span>
         </Link>
       </li>
       <li>
         <Link to="/events">
-          <h3>Events</h3>
+          <span>Events</span>
         </Link>
       </li>
       <li ref={navRef}>
         <Link to="/about">
-          <h3>About</h3>
+          <span>About</span>
         </Link>
       </li>
     </ul>

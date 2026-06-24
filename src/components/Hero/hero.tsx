@@ -35,7 +35,7 @@ const siteSettingQuery = graphql`
   }
 `;
 
-const h3 = (text: string) => <h4>{ text }</h4>;
+const subtitle = (text: string) => <p>{ text }</p>;
 
 const buddyStyle = { position: "absolute" as const, bottom: "-15px", right: "-5px" };
 
@@ -48,10 +48,10 @@ export default function Hero({ title, cta, description, style = { paddingBottom:
   return (
     <header className={`${hero}${centered ? ` ${centeredCls}` : ''}`} style={ style }>
       <h1>{ title }</h1>
-      { description && h3(description) }
+      { description && subtitle(description) }
       { cta && (
         <a href={ DISCORD_URL } target="_blank" rel="noopener noreferrer">
-          <h2>{ cta }</h2>
+          <p>{ cta }</p>
         </a>
       ) }
       { showBuddy && <Link to={ instagramUrl } style={ buddyStyle } ><img src={pelican} width="60" alt="Strong Towns Oceanside Instagram" /></Link> }

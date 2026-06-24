@@ -32,7 +32,7 @@ export default function EventList({ events }: EventListProps) {
                   <h2>{ e.title }</h2>
                 </div>
                 <div>
-                  <h4>{ e.startDate }{e.location && <span className={locationCls}>{e.location}</span>}</h4>
+                  <p>{ e.startDate }{e.location && <span className={locationCls}>{e.location}</span>}</p>
                 </div>
               </div>
               {img && (

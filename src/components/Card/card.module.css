@@ -18,6 +18,12 @@
 
     > :nth-child(2) {
       margin-top: 0.25rem;
+
+      p {
+        font-size: 0.9375rem;
+        line-height: 1.375rem;
+        margin: 0;
+      }
     }
   }
 

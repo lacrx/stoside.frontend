@@ -114,12 +114,12 @@ export default function Home() {
     <Layout>
       <Hero { ...heroProps } />
       <Content { ...contentProps } >
-        <h3>Newest Article</h3>
+        <h2>Newest Article</h2>
         {articleProps && <Card { ...articleProps } />}
       </Content>
       {events.length > 0 && (
         <Content { ...contentProps }>
-          <h3>Next Event</h3>
+          <h2>Next Event</h2>
           <EventList events={events} />
         </Content>
       )}
