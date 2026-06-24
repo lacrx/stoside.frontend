@@ -41,8 +41,7 @@
   display: block;
   width: 100%;
   max-width: 600px;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  height: auto;
   margin: 1.5em 0;
 }
 
