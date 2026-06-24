@@ -85,9 +85,9 @@ const query = graphql`
 `;
 
 const heroProps = {
-  title: "Building resilience. One step at a time.",
+  title: "Building resilience, one step at a time",
   description: "We're a scrappy group of Oceansiders doing the next-smallest thing today to make Oceanside better. Do you want to build an Oceanside future generations will be proud to live in?",
-  cta: "Be our neighbor.",
+  cta: "Be our neighbor",
   showBuddy: true
 };
 

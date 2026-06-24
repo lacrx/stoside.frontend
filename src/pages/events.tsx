@@ -47,7 +47,7 @@ const query = graphql`
 `;
 
 const heroProps = {
-  title: "Upcoming events.",
+  title: "Upcoming events",
 };
 
 const contentProps = {
