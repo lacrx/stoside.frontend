@@ -54,7 +54,7 @@ export default function Hero({ title, cta, description, style = { paddingBottom:
           <p>{ cta }</p>
         </a>
       ) }
-      { showBuddy && <Link to={ instagramUrl } style={ buddyStyle } ><img src={pelican} width="60" alt="Strong Towns Oceanside Instagram" /></Link> }
+      { showBuddy && <Link to={ instagramUrl } style={ buddyStyle } ><img src={pelican} width="60" height="60" alt="Strong Towns Oceanside Instagram" /></Link> }
     </header>
   )
 }
