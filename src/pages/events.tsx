@@ -56,13 +56,17 @@ const contentProps = {
 
 export default function Events() {
   const { allGatsbyEvent: { nodes } } = useStaticQuery<GatsbyEvents>(query);
+  const hasEvents = nodes.length > 0;
 
   return (
     <Layout>
-      <Hero { ...heroProps } />
-      <Content { ...contentProps } >
-        <EventList events={ nodes } />
-      </Content>
+      <Hero { ...heroProps } style={hasEvents ? undefined : { borderBottom: "none" }} />
+      {hasEvents && (
+        <Content { ...contentProps } >
+          <EventList events={ nodes } />
+        </Content>
+      )}
+      {!hasEvents && <Content { ...contentProps }><p>No upcoming events. Check back soon.</p></Content>}
     </Layout>
   );
 };
