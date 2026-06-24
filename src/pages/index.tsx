@@ -4,6 +4,7 @@ import Layout from "@/components/Layout/layout"
 import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
 import Card from "@/components/Card/card";
+import EventList from "@/components/EventList/eventList";
 import articleCoverFallback from "@/images/oceanside-wealth-poster-desktop.jpg";
 
 type ComponentSharedRichText = {
@@ -18,14 +19,26 @@ type GatsbyArticle = {
   authorName: string | null
   publishedAt: string | null
 };
-interface GatsbyArticles {
+type GatsbyEvent = {
+  id: string
+  title: string
+  description: string
+  url: string
+  location: string
+  startDate: string
+  image: { childImageSharp: { gatsbyImageData: IGatsbyImageData } } | null
+};
+interface HomePageData {
   allGatsbyArticle: {
     nodes: [GatsbyArticle]
+  }
+  allGatsbyEvent: {
+    nodes: GatsbyEvent[]
   }
 }
 
 const query = graphql`
-  query FirstGatsbyArticle {
+  query HomePageData {
     allGatsbyArticle(limit: 1) {
       nodes {
         title
@@ -47,6 +60,27 @@ const query = graphql`
       }
       max(field: {publishedAt: SELECT})
     }
+    allGatsbyEvent(sort: { startDate: ASC }, limit: 1) {
+      nodes {
+        id
+        title
+        description
+        url
+        location
+        startDate: startDateDisplay
+        image {
+          childImageSharp {
+            gatsbyImageData(
+              width: 150
+              height: 150
+              placeholder: BLURRED
+              formats: [AUTO, WEBP, AVIF]
+              transformOptions: { fit: COVER }
+            )
+          }
+        }
+      }
+    }
   }
 `;
 
@@ -62,8 +96,9 @@ const contentProps = {
 };
 
 export default function Home() {
-  const { allGatsbyArticle: { nodes } } = useStaticQuery<GatsbyArticles>(query);
-  const article = nodes[0];
+  const { allGatsbyArticle, allGatsbyEvent } = useStaticQuery<HomePageData>(query);
+  const article = allGatsbyArticle.nodes[0];
+  const events = allGatsbyEvent.nodes;
 
   const articleProps = article ? {
     link: `/articles/${article.slug}`,
@@ -81,6 +116,12 @@ export default function Home() {
       <Content { ...contentProps } >
         {articleProps && <Card { ...articleProps } />}
       </Content>
+      {events.length > 0 && (
+        <Content { ...contentProps }>
+          <h3>Next Event</h3>
+          <EventList events={events} />
+        </Content>
+      )}
     </Layout>
   )
 };
