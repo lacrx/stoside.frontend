@@ -22,4 +22,8 @@
     display: flex;
     justify-content: flex-end;
   }
+
+  :global(a:hover) > h2 {
+    text-decoration: underline;
+  }
 }

@@ -1,13 +1,21 @@
 .content {
   display: grid;
-  padding-top: 1.5rem;
+  padding-top: 0.75rem;
+}
 
-  :global(a:hover) {
-    text-decoration: underline;
-  }
+.content:last-of-type {
+  padding-bottom: 2.5rem;
 }
 
 .content + .content {
   border-top: 1px solid var(--rule);
-  padding-top: 0.75rem;
+}
+
+.content > :global(p) {
+  margin: 1.25em 0;
+  line-height: 1.75;
+}
+
+.content > :global(p) :global(a:hover) {
+  text-decoration: underline;
 }

@@ -15,6 +15,10 @@
     display: flex;
     align-items: flex-start;
     gap: 1.25rem;
+
+    &:hover h2 {
+      text-decoration: underline;
+    }
   }
 
   > a > :first-child {
