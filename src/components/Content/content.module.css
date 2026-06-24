@@ -1,14 +1,5 @@
 .content {
   display: grid;
-  grid-row-gap: 1rem;
-
-  > div:first-of-type {
-    margin-bottom: 1.5rem;
-  }
-
-  & slot > h2:not(:first-child), h3:not(:first-child), h4:not(:first-child) {
-    margin-top: 1.5rem;
-  }
 
   :global(a:link), :global(a:visited) {
     text-decoration: underline;
@@ -17,5 +8,5 @@
 
 .content + .content {
   border-top: 1px solid var(--rule);
-  padding-top: 1rem;
+  padding-top: 0.75rem;
 }
