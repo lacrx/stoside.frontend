@@ -4,7 +4,6 @@ import Content from '@/components/Content/content';
 
 const heroProps = {
   title: "About Us",
-  centered: true,
 };
 
 export default function About() {
