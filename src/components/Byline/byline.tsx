@@ -29,8 +29,7 @@ export default function Byline({ author, publishedAt, compact = false }: BylineP
           By {author}
         </span>
       )}
-      {author && date && <span className={styles.sep}>&middot;</span>}
-      {date && <time dateTime={date.iso}>{date.label}</time>}
+      {date && <time className={author ? styles.withSep : undefined} dateTime={date.iso}>{date.label}</time>}
     </div>
   );
 }
