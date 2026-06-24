@@ -32,7 +32,8 @@ export default function About() {
         </p>
         <p>
           <a href="https://discord.com/invite/sraXTxwC3P">Join our Discord!</a>
-          <br />
+        </p>
+        <p>
           <a href="https://www.meetup.com/north-county-urbanists/">Check out our Meetup page</a>
         </p>
       </Content>
