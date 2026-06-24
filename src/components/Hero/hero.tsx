@@ -22,6 +22,7 @@ type SiteSettingQuery = {
 
 const DEFAULT_INSTAGRAM_URL = "https://www.instagram.com/strongtowns.oceanside/";
 const DEFAULT_MEETUP_URL = "https://www.meetup.com/north-county-urbanists/";
+const DISCORD_URL = "https://discord.com/invite/sraXTxwC3P";
 
 const siteSettingQuery = graphql`
   query HeroSiteSetting {
@@ -49,9 +50,9 @@ export default function Hero({ title, cta, description, style = { paddingBottom:
       <h1>{ title }</h1>
       { description && h3(description) }
       { cta && (
-        <Link to={ meetupUrl }>
+        <a href={ DISCORD_URL } target="_blank" rel="noopener noreferrer">
           <h2>{ cta }</h2>
-        </Link>
+        </a>
       ) }
       { showBuddy && <Link to={ instagramUrl } style={ buddyStyle } ><img src={pelican} width="60" alt="Strong Towns Oceanside Instagram" /></Link> }
     </header>
