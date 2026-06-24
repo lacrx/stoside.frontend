@@ -7,6 +7,20 @@ import { createRemoteFileNode } from "gatsby-source-filesystem";
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin";
 import { GraphQLClient } from "graphql-request";
 
+const SUBSTACK_CDN_RE = /(<img\s[^>]*src=")(https:\/\/substackcdn\.com\/image\/fetch\/[^/]+\/)(https%3A[^"]+)("[^>]*>)/g;
+function addResponsiveSrcset(html: string): string {
+  const CDN = 'https://substackcdn.com/image/fetch/';
+  const OPTS = ',c_limit,f_auto,q_auto:good,fl_progressive:steep/';
+  return html.replace(SUBSTACK_CDN_RE, (_match, pre, _cdnUrl, encodedSrc, post) => {
+    const s300 = `${CDN}w_300${OPTS}${encodedSrc}`;
+    const s600 = `${CDN}w_600${OPTS}${encodedSrc}`;
+    const s1200 = `${CDN}w_1200${OPTS}${encodedSrc}`;
+    const srcset = `${s300} 300w, ${s600} 600w, ${s1200} 1200w`;
+    const sizes = '(max-width: 600px) 100vw, 600px';
+    return `${pre}${s600}${post.replace('>', ` srcset="${srcset}" sizes="${sizes}" loading="lazy">`)}`;
+  });
+}
+
 
 export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
   actions,
@@ -296,7 +310,7 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
       if (block.__typename === "ComponentSharedRichText") {
         return {
           kind: "rich-text",
-          html: sanitize(marked.parse(block.body) as string)
+          html: addResponsiveSrcset(sanitize(marked.parse(block.body) as string))
         };
       }
       return {
@@ -409,9 +423,12 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions: { create
           image {
             childImageSharp {
               gatsbyImageData(
-                width: 1200
+                width: 1050
+                height: 600
+                layout: CONSTRAINED
                 placeholder: BLURRED
                 formats: [AUTO, WEBP, AVIF]
+                transformOptions: { fit: COVER, cropFocus: CENTER }
               )
             }
           }
