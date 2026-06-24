@@ -409,7 +409,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions: { create
           image {
             childImageSharp {
               gatsbyImageData(
-                width: 700
+                width: 1200
                 placeholder: BLURRED
                 formats: [AUTO, WEBP, AVIF]
               )

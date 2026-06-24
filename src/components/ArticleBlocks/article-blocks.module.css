@@ -1,16 +1,53 @@
+.cover {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
 .richText :global(h2),
 .richText :global(h3) {
-  margin-top: 1.5em;
+  margin-top: 1.75em;
+  margin-bottom: 0.25em;
+}
+
+.richText :global(h3) {
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+  color: var(--black);
+  letter-spacing: normal;
 }
 
 .richText :global(p) {
   margin: 1em 0;
-  line-height: 1.65;
+  line-height: 1.75;
+}
+
+.richText :global(ul),
+.richText :global(ol) {
+  font-family: var(--serif);
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--grey);
+  margin: 1em 0;
+  padding-left: 1.5em;
+}
+
+.richText :global(li) {
+  margin: 0.4em 0;
 }
 
 .richText :global(img) {
-  max-width: 100%;
+  display: block;
+  width: 100%;
   height: auto;
+  margin: 1.5em 0;
+}
+
+.richText :global(em) {
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  color: var(--light-grey);
 }
 
 .vizFigure {

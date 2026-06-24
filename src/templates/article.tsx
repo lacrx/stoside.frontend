@@ -6,6 +6,7 @@ import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
 import ArticleBlocks, { type ArticleBlock } from "@/components/ArticleBlocks/article-blocks";
 import Byline from "@/components/Byline/byline";
+import { cover } from "@/components/ArticleBlocks/article-blocks.module.css";
 
 type GatsbyArticle = {
   title: string
@@ -38,7 +39,7 @@ export default function Article({ pageContext: { title, description, image, bloc
       <Hero { ...heroProps } />
       <Content { ...contentProps } >
         <Byline author={authorName} publishedAt={publishedAt} />
-        {img && <GatsbyImage image={img} alt={title} />}
+        {img && <GatsbyImage image={img} alt={title} className={cover} />}
         <ArticleBlocks blocks={blocks} />
       </Content>
     </Layout>
