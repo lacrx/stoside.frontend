@@ -16,7 +16,7 @@
     align-items: flex-start;
     gap: 1.25rem;
 
-    &:hover h2 {
+    h2 {
       text-decoration: underline;
     }
   }

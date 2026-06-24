@@ -23,7 +23,7 @@
     justify-content: flex-end;
   }
 
-  :global(a:hover) > h2 {
+  :global(a) > h2 {
     text-decoration: underline;
   }
 }
