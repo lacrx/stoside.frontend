@@ -9,4 +9,8 @@
   & slot > h2:not(:first-child), h3:not(:first-child), h4:not(:first-child) {
     margin-top: 1.5rem;
   }
+
+  :global(a:link), :global(a:visited) {
+    text-decoration: underline;
+  }
 }
