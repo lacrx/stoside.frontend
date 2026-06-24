@@ -35,3 +35,17 @@
     justify-content: flex-end;
   }
 }
+
+.location::before {
+  content: " · ";
+}
+
+@media (max-width: 480px) {
+  .location {
+    display: block;
+  }
+
+  .location::before {
+    content: none;
+  }
+}

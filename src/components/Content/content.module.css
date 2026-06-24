@@ -16,6 +16,6 @@
   line-height: 1.75;
 }
 
-.content > :global(p) :global(a:hover) {
+.content > :global(p) :global(a) {
   text-decoration: underline;
 }

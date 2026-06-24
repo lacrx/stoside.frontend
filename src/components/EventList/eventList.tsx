@@ -1,5 +1,5 @@
 import { GatsbyImage, getImage, IGatsbyImageData } from "gatsby-plugin-image";
-import { eventList, event } from "./eventList.module.css";
+import { eventList, event, location as locationCls } from "./eventList.module.css";
 
 type EventItem = {
   id: string
@@ -32,7 +32,7 @@ export default function EventList({ events }: EventListProps) {
                   <h2>{ e.title }</h2>
                 </div>
                 <div>
-                  <h4>{ e.startDate }{e.location && ` · ${e.location}`}</h4>
+                  <h4>{ e.startDate }{e.location && <span className={locationCls}>{e.location}</span>}</h4>
                 </div>
               </div>
               {img && (

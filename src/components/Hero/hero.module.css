@@ -28,9 +28,6 @@
       font-weight: 400;
       font-size: 0.875rem;
       font-family: var(--sans);
-    }
-
-    &:hover > h2 {
       text-decoration: underline;
     }
   }
