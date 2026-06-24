@@ -1,5 +1,6 @@
 .content {
   display: grid;
+  padding-top: 1.5rem;
 
   :global(a:hover) {
     text-decoration: underline;
