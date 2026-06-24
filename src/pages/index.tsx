@@ -114,6 +114,7 @@ export default function Home() {
     <Layout>
       <Hero { ...heroProps } />
       <Content { ...contentProps } >
+        <h3>Newest Article</h3>
         {articleProps && <Card { ...articleProps } />}
       </Content>
       {events.length > 0 && (

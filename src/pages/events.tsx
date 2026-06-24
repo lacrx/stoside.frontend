@@ -48,7 +48,6 @@ const query = graphql`
 
 const heroProps = {
   title: "Upcoming events.",
-  description: "Meet your neighbors. Build the city we want to see.",
 };
 
 const contentProps = {

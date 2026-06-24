@@ -32,13 +32,8 @@ export default function EventList({ events }: EventListProps) {
                   <h2>{ e.title }</h2>
                 </div>
                 <div>
-                  <h3>{ e.startDate }</h3>
+                  <h4>{ e.startDate }{e.location && ` · ${e.location}`}</h4>
                 </div>
-                {e.location && (
-                  <div>
-                    <h4>{ e.location }</h4>
-                  </div>
-                )}
               </div>
               {img && (
                 <div>

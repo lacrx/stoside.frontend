@@ -23,14 +23,6 @@
     > :nth-child(2) {
       margin-top: 0.25rem;
     }
-
-    > :nth-child(3) {
-      margin-top: 0.125rem;
-    }
-
-    h4 {
-      font-style: italic;
-    }
   }
 
   > a > :last-child {

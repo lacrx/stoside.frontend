@@ -14,3 +14,8 @@
     text-decoration: underline;
   }
 }
+
+.content + .content {
+  border-top: 1px solid var(--rule);
+  padding-top: 1rem;
+}
