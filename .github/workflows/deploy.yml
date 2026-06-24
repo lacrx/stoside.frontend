@@ -3,6 +3,8 @@ name: Deploy Frontend
 on:
   push:
     branches: [main, master]
+  repository_dispatch:
+    types: [cms-deploy]
   schedule:
     # Daily at 09:00 UTC (~1-2am Pacific) to pick up new Meetup events.
     - cron: '0 9 * * *'
@@ -28,6 +30,20 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Verify Strapi is reachable
+        run: |
+          for i in $(seq 1 6); do
+            if curl -sf "$STRAPI_URL/api/articles" > /dev/null 2>&1; then
+              echo "Strapi is reachable"
+              exit 0
+            fi
+            echo "Attempt $i/6 — waiting 10s..."
+            sleep 10
+          done
+          echo "::warning::Strapi unreachable at $STRAPI_URL — building without articles"
+        env:
+          STRAPI_URL: ${{ vars.STRAPI_URL }}
 
       - name: Build Gatsby site
         run: npm run build
