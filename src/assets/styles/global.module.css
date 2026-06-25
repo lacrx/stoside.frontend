@@ -23,10 +23,6 @@
   > :nth-child(n) {
     width: 100%;
   }
-
-  > :last-child {
-    margin-top: auto;
-  }
 }
 
 :global(.closed) {
@@ -54,7 +50,6 @@
   line-height: 1.375rem;
   color: var(--black);
 }
-
 
 
 :global(p) {
