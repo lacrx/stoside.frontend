@@ -46,7 +46,7 @@ const query = graphql`
 `;
 
 const heroProps = {
-  title: "We've put pen to paper.",
+  title: "We've put pen to paper",
 };
 
 const contentProps = {

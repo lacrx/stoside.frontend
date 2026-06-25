@@ -37,7 +37,7 @@ const siteSettingQuery = graphql`
 
 const subtitle = (text: string) => <p>{ text }</p>;
 
-const buddyStyle = { position: "absolute" as const, bottom: "-3px", right: "-5px" };
+const buddyStyle = { position: "absolute" as const, bottom: "-6px", right: "-5px", zIndex: 2 };
 
 export default function Hero({ title, cta, description, style = { paddingBottom: "5rem" }, showBuddy = false, centered = false }: HeroProps) {
   const { allGatsbySiteSetting } = useStaticQuery<SiteSettingQuery>(siteSettingQuery);
