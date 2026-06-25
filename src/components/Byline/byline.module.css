@@ -13,9 +13,10 @@
 
 .byline.compact {
   justify-content: flex-start;
+  flex-direction: column;
   font-size: 0.75rem;
   margin: 0.35rem 0 0;
-  gap: 0.3rem;
+  gap: 0.1rem;
   color: #6b6b6b;
 }
 
@@ -34,6 +35,10 @@
 .withSep::before {
   content: " · ";
   color: #9a9a9a;
+}
+
+.compact .withSep::before {
+  content: none;
 }
 
 @media (max-width: 480px) {
