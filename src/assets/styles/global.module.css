@@ -23,6 +23,10 @@
   > :nth-child(n) {
     width: 100%;
   }
+
+  > :last-child {
+    margin-top: auto;
+  }
 }
 
 :global(.closed) {
