@@ -26,21 +26,23 @@ export default function EventList({ events }: EventListProps) {
         const img = e.image?.childImageSharp ? getImage(e.image.childImageSharp.gatsbyImageData) : null;
         return (
           <li key={ e.id } className={ event }>
-            <a href={ e.url } target="_blank" rel="noopener noreferrer">
+            <div>
               <div>
-                <div>
+                <a href={ e.url } target="_blank" rel="noopener noreferrer">
                   <h2>{ e.title }</h2>
-                </div>
-                <div>
-                  <p>{ e.startDate }{e.location && <span className={locationCls}>{e.location}</span>}</p>
-                </div>
+                </a>
               </div>
-              {img && (
-                <div>
+              <div>
+                <p>{ e.startDate }{e.location && <span className={locationCls}>{e.location}</span>}</p>
+              </div>
+            </div>
+            {img && (
+              <div>
+                <a href={ e.url } target="_blank" rel="noopener noreferrer">
                   <GatsbyImage image={ img } alt={ e.title } />
-                </div>
-              )}
-            </a>
+                </a>
+              </div>
+            )}
           </li>
         );
       })}

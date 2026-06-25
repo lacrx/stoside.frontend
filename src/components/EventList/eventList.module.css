@@ -16,17 +16,15 @@
     padding-bottom: 0;
   }
 
-  > a {
-    display: flex;
-    align-items: flex-start;
-    gap: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
 
-    h2 {
-      text-decoration: underline;
-    }
+  h2 {
+    text-decoration: underline;
   }
 
-  > a > :first-child {
+  > :first-child {
     flex: 1;
 
     > :nth-child(2) {
@@ -40,7 +38,7 @@
     }
   }
 
-  > a > :last-child {
+  > :last-child {
     flex: 0 0 9.375rem;
     display: flex;
     justify-content: flex-end;
