@@ -6,7 +6,7 @@ import { GeoJsonLayer } from "@deck.gl/layers";
 import { scaleThreshold } from "d3-scale";
 import type { Feature } from "geojson";
 import "maplibre-gl/dist/maplibre-gl.css";
-import * as styles from "./choropleth-3d-maplibre.module.css";
+import { mapRoot, ready as readyCls, attribution } from "./choropleth-3d-maplibre.module.css";
 
 type Artifact = {
   vizId: string;
@@ -433,11 +433,11 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
   return (
     <div
       ref={containerRef}
-      className={`${styles.mapRoot}${ready ? ` ${styles.ready}` : ""}`}
+      className={`${mapRoot}${ready ? ` ${readyCls}` : ""}`}
       aria-label={artifact.vizId}
       data-viz-ready={ready ? "true" : undefined}
     >
-      <small className={styles.attribution}>
+      <small className={attribution}>
         <a href="https://openmaptiles.org/" target="_blank" rel="noreferrer">
           OpenMapTiles
         </a>

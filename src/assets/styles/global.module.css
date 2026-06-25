@@ -55,21 +55,7 @@
   color: var(--black);
 }
 
-:global(h3) {
-  font-family: var(--sans);
-  font-weight: 600;
-  font-size: 0.75rem;
-  letter-spacing: .05em;
-  color: var(--grey);
-}
 
-:global(h4) {
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: 0.9375rem;
-  line-height: 1.375rem;
-  color: var(--grey);
-}
 
 :global(p) {
   font-family: var(--serif);

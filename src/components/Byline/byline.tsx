@@ -1,4 +1,4 @@
-import * as styles from "./byline.module.css";
+import { byline, compact as compactCls, author as authorCls, withSep } from "./byline.module.css";
 
 type BylineProps = {
   author?: string | null;
@@ -23,13 +23,13 @@ export default function Byline({ author, publishedAt, compact = false }: BylineP
   if (!author && !date) return null;
 
   return (
-    <div className={`${styles.byline}${compact ? ` ${styles.compact}` : ""}`}>
+    <div className={`${byline}${compact ? ` ${compactCls}` : ""}`}>
       {author && (
-        <span className={styles.author}>
+        <span className={authorCls}>
           By {author}
         </span>
       )}
-      {date && <time className={author ? styles.withSep : undefined} dateTime={date.iso}>{date.label}</time>}
+      {date && <time className={author ? withSep : undefined} dateTime={date.iso}>{date.label}</time>}
     </div>
   );
 }

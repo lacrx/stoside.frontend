@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import VisualizationBlock from "./visualization-block";
-import * as styles from "./article-blocks.module.css";
+import { richText } from "./article-blocks.module.css";
 
 export type ArticleBlock = {
   kind: "rich-text" | "visualization";
@@ -23,7 +23,7 @@ export default function ArticleBlocks({ blocks }: ArticleBlocksProps) {
           return (
             <div
               key={i}
-              className={styles.richText}
+              className={richText}
               dangerouslySetInnerHTML={{ __html: block.html }}
             />
           );
