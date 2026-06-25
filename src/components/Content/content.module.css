@@ -5,6 +5,10 @@
 
 .content:last-of-type {
   padding-bottom: 1.5rem;
+
+  > :last-child {
+    margin-bottom: 0;
+  }
 }
 
 .content + .content {
