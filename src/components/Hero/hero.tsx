@@ -1,4 +1,4 @@
-import { graphql, Link, useStaticQuery } from "gatsby";
+import { graphql, useStaticQuery } from "gatsby";
 import { hero, centered as centeredCls } from './hero.module.css';
 import pelican from "@/images/pelican.svg";
 
@@ -54,7 +54,7 @@ export default function Hero({ title, cta, description, style = { paddingBottom:
           <p>{ cta }</p>
         </a>
       ) }
-      { showBuddy && <Link to={ instagramUrl } style={ buddyStyle } ><img src={pelican} width="60" height="60" alt="Strong Towns Oceanside Instagram" /></Link> }
+      { showBuddy && <a href={ instagramUrl } target="_blank" rel="noopener noreferrer" style={ buddyStyle } ><img src={pelican} width="60" height="60" alt="Strong Towns Oceanside Instagram" /></a> }
     </header>
   )
 }

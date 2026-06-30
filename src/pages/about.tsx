@@ -15,7 +15,7 @@ export default function About() {
         <p>
           We are a network of groups devoted to making North County an affordable,
           equitable, thriving community. Look through our{" "}
-          <a href="https://www.meetup.com/north-county-urbanists/">events</a>. We
+          <a href="https://www.meetup.com/north-county-urbanists/" target="_blank" rel="noopener noreferrer">events</a>. We
           have active groups for Oceanside, Encinitas, Poway and Temecula so far.
           All are welcome.
         </p>
@@ -31,10 +31,10 @@ export default function About() {
           Urbanists social media, let us know!
         </p>
         <p>
-          <a href="https://discord.com/invite/sraXTxwC3P">Join our Discord!</a>
+          <a href="https://discord.com/invite/sraXTxwC3P" target="_blank" rel="noopener noreferrer">Join our Discord!</a>
         </p>
         <p>
-          <a href="https://www.meetup.com/north-county-urbanists/">Check out our Meetup page</a>
+          <a href="https://www.meetup.com/north-county-urbanists/" target="_blank" rel="noopener noreferrer">Check out our Meetup page</a>
         </p>
       </Content>
     </Layout>

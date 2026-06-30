@@ -438,14 +438,14 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
       data-viz-ready={ready ? "true" : undefined}
     >
       <small className={attribution}>
-        <a href="https://openmaptiles.org/" target="_blank" rel="noreferrer">
+        <a href="https://openmaptiles.org/" target="_blank" rel="noopener noreferrer">
           OpenMapTiles
         </a>
         {" / "}
         <a
           href="https://www.openstreetmap.org/copyright"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
         >
           OpenStreetMap
         </a>

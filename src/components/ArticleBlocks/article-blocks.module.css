@@ -33,6 +33,14 @@
   padding-left: 1.5em;
 }
 
+.richText :global(ul) {
+  list-style: disc;
+}
+
+.richText :global(ol) {
+  list-style: decimal;
+}
+
 .richText :global(li) {
   margin: 0.4em 0;
 }
