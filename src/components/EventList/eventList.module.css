@@ -1,6 +1,8 @@
 .eventList {
   display: flex;
   flex-direction: column;
+  padding-left: 0 !important;
+  list-style: none !important;
 }
 
 .event {
@@ -45,16 +47,6 @@
   }
 }
 
-.location::before {
-  content: " · ";
-}
-
-@media (max-width: 480px) {
-  .location {
-    display: block;
-  }
-
-  .location::before {
-    content: none;
-  }
+.location {
+  display: block;
 }
