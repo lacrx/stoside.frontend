@@ -1,6 +1,6 @@
 import { graphql, useStaticQuery } from "gatsby";
 import { hero, centered as centeredCls } from './hero.module.css';
-import pelican from "@/images/pelican.svg";
+import pelican from "@/images/pelican.png";
 
 type HeroProps = {
   title: string;
