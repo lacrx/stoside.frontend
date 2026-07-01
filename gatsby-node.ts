@@ -173,21 +173,30 @@ type MeetupEvent = MeetupEventJsonLd & { imageUrl?: string };
 const MEETUP_GROUP_URL = "https://www.meetup.com/north-county-urbanists/";
 const EVENT_TIMEZONE = "America/Los_Angeles";
 
+function ordinal(n: number): string {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 function formatEventDate(iso: string): string {
   const d = new Date(iso);
-  const dateStr = new Intl.DateTimeFormat("en-US", {
+  const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: EVENT_TIMEZONE,
     weekday: "long",
     month: "long",
     day: "numeric",
-  }).format(d);
+  }).formatToParts(d);
+  const weekday = parts.find(p => p.type === "weekday")!.value;
+  const month = parts.find(p => p.type === "month")!.value;
+  const day = Number(parts.find(p => p.type === "day")!.value);
   const timeStr = new Intl.DateTimeFormat("en-US", {
     timeZone: EVENT_TIMEZONE,
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
   }).format(d);
-  return `${dateStr} at ${timeStr}`;
+  return `${weekday}, ${month} ${ordinal(day)} at ${timeStr}`;
 }
 
 function buildEventImageMap(nextData: unknown): Record<string, string> {

@@ -26,6 +26,7 @@ type GatsbyEvent = {
   url: string
   location: string
   startDate: string
+  startDateDisplay: string
   image: { childImageSharp: { gatsbyImageData: IGatsbyImageData } } | null
 };
 interface HomePageData {
@@ -67,7 +68,8 @@ const query = graphql`
         description
         url
         location
-        startDate: startDateDisplay
+        startDate
+        startDateDisplay
         image {
           childImageSharp {
             gatsbyImageData(
