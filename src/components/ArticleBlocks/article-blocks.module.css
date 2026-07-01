@@ -66,6 +66,15 @@
   font-style: italic;
 }
 
+.richText :global(a) {
+  color: var(--grey);
+  text-decoration: underline;
+}
+
+.richText :global(a:hover) {
+  color: var(--black);
+}
+
 .richText:last-child {
   padding-bottom: 0;
 
