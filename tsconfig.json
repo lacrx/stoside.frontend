@@ -17,12 +17,11 @@
       "@/styles/*": ["./src/assets/styles/*"],
       "@/static/*": ["./static/*"]
     },
-    "types": ["node", "google.maps"]
+    "types": ["node"]
   },
   "exclude": ["node_modules", "**/*.spec.tsx", "**/*.spec.ts"],
   "include": [
     "./src/**/*",
-    "./codegen.ts",
     "./gatsby-config.ts",
     "./gatsby-node.ts",
   ]

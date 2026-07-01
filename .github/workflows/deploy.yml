@@ -19,7 +19,53 @@ permissions:
   contents: read
 
 jobs:
+  check-events:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.diff.outputs.changed }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Check if Meetup events changed
+        id: diff
+        run: |
+          MEETUP_URL="https://www.meetup.com/north-county-urbanists/"
+          HASH_KEY="meetup-events-hash.txt"
+          BUCKET="${{ secrets.FRONTEND_S3_BUCKET }}"
+
+          # Fetch current LD+JSON events from Meetup page
+          CURRENT_HASH=$(curl -sf -A "Mozilla/5.0 (compatible; StosideBot/1.0)" "$MEETUP_URL" \
+            | grep -oP '(?<=type="application/ld\+json">).*?(?=</script>)' \
+            | sha256sum | cut -d' ' -f1)
+
+          # Fetch previous hash from S3 (empty string if not found)
+          PREVIOUS_HASH=$(aws s3 cp "s3://$BUCKET/$HASH_KEY" - 2>/dev/null || echo "")
+
+          if [ "$CURRENT_HASH" = "$PREVIOUS_HASH" ]; then
+            echo "Events unchanged — skipping build"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Events changed — triggering build"
+            echo "$CURRENT_HASH" | aws s3 cp - "s3://$BUCKET/$HASH_KEY"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
   deploy:
+    # Run on non-schedule triggers unconditionally. On schedule, only if
+    # check-events detected a change. The `always()` is needed because
+    # when check-events is skipped (non-schedule), `needs` would otherwise
+    # block this job from running.
+    if: >-
+      always() && (
+        github.event_name != 'schedule' ||
+        needs.check-events.outputs.changed == 'true'
+      )
+    needs: [check-events]
     runs-on: ubuntu-latest
 
     steps:
@@ -63,19 +109,9 @@ jobs:
 
       - name: Deploy to S3 and invalidate CloudFront
         run: |
-          # First pass: upload every file with long immutable cache. Safe for
-          # Gatsby's content-hashed assets under /static/ and for the big
-          # stuff (GeoJSON, posters, JS chunks) that never change in-place.
           aws s3 sync public/ s3://${{ secrets.FRONTEND_S3_BUCKET }} --delete \
             --cache-control "public, max-age=31536000, immutable"
 
-          # Second pass: force-replace metadata on files whose URL is stable
-          # but content changes per deploy (HTML routing targets, sw.js,
-          # page-data, manifest). Uses `aws s3 cp --recursive` because
-          # `aws s3 sync --metadata-directive` is silently ignored by the
-          # CLI (documented gotcha) and the first pass's long-cache header
-          # would otherwise stick. --metadata-directive REPLACE on cp forces
-          # the header rewrite.
           aws s3 cp public/ s3://${{ secrets.FRONTEND_S3_BUCKET }}/ \
             --recursive \
             --exclude "*" \
@@ -89,4 +125,4 @@ jobs:
 
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
+            --paths "/*.html" "/page-data/*" "/sw.js" "/*.webmanifest"
