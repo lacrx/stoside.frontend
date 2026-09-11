@@ -26,6 +26,7 @@ declare const styles: {
   readonly inputRow: string;
   readonly textInput: string;
   readonly textarea: string;
+  readonly btnClear: string;
   readonly btnPin: string;
   readonly geoStatus: string;
   readonly geoOk: string;

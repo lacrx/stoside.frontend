@@ -221,6 +221,16 @@
   flex: 1;
 }
 
+.btnClear {
+  padding: 0 0.75rem;
+  background: none;
+  border: 1px solid var(--rule);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: var(--grey);
+  cursor: pointer;
+}
+
 .textInput,
 .textarea {
   width: 100%;

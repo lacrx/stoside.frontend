@@ -328,7 +328,10 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeLines 
             <h3>Location</h3>
             <p className={s.hint}>Type a location, tap the map, or use GPS.</p>
             <span className={s.fieldLabelFirst}>Cross street / address / stop</span>
-            <input className={s.textInput} type="text" value={form.location} onChange={handleLocationChange} placeholder="Mission Ave & Cleveland St" />
+            <div className={s.inputRow}>
+              <input className={s.textInput} type="text" value={form.location} onChange={handleLocationChange} placeholder="Mission Ave & Cleveland St" />
+              {form.location && <button type="button" className={s.btnClear} onClick={() => setForm(prev => ({ ...prev, location: "", lat: null, lng: null }))}>✕</button>}
+            </div>
             <div className={`${s.geoStatus} ${geoStatus.cls}`}>{geoStatus.text}</div>
             <PinMap
               ref={pinMapRef}
