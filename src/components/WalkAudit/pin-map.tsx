@@ -238,7 +238,7 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
   useEffect(() => {
     if (!mapRef.current || !polylinesRef.current.length || !routeSegments) return;
     const activeIdx = segments.findIndex(seg => seg.name === activeSegment);
-    polylinesRef.current.forEach(pl => pl.setStyle({ opacity: 0.3, weight: 3 }));
+    polylinesRef.current.forEach(pl => pl.setStyle({ opacity: 0.7, weight: 4 }));
 
     let highlightIdx = 0;
     for (const rs of routeSegments) {
