@@ -62,7 +62,7 @@ export default function Events() {
 
   return (
     <Layout>
-      <Hero { ...heroProps } style={hasEvents ? undefined : { borderBottom: "none" }} />
+      <Hero { ...heroProps } />
       {hasEvents && (
         <Content { ...contentProps } >
           <EventList events={ nodes } />

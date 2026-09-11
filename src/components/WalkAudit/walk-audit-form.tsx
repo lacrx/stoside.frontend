@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect, type ChangeEvent } from "react";
 import * as s from "./walk-audit.module.css";
+import PinMap from "./pin-map";
 
 type Segment = { name: string };
 
@@ -345,12 +346,17 @@ export default function WalkAuditForm({ auditSlug, title, date, description, seg
         <>
           <div className={s.card} ref={formTopRef}>
             <h3>Location</h3>
-            <p className={s.hint}>Where are you right now?</p>
-            <span className={s.fieldLabelFirst}>Cross street / address / stop</span>
-            <div className={s.inputRow}>
-              <input className={s.textInput} type="text" value={form.location} onChange={e => setForm(prev => ({ ...prev, location: e.target.value }))} placeholder="Mission Ave & Cleveland St" />
-              <button className={s.btnPin} type="button" onClick={handlePin}>&#x1f4cd; Pin</button>
-            </div>
+            <p className={s.hint}>Tap the map to drop a pin, or use GPS.</p>
+            <PinMap
+              lat={form.lat}
+              lng={form.lng}
+              onPin={(lat, lng, label) => {
+                setForm(prev => ({ ...prev, lat, lng, location: label || prev.location }));
+                setGeoStatus({ text: `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}`, cls: s.geoOk });
+              }}
+            />
+            <span className={s.fieldLabel}>Label (optional)</span>
+            <input className={s.textInput} type="text" value={form.location} onChange={e => setForm(prev => ({ ...prev, location: e.target.value }))} placeholder="Mission Ave & Cleveland St" />
             <div className={`${s.geoStatus} ${geoStatus.cls}`}>{geoStatus.text}</div>
           </div>
 

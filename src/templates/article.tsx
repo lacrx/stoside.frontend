@@ -29,7 +29,6 @@ export default function Article({ pageContext: { title, description, image, bloc
   const heroProps = {
     title,
     description,
-    style: { paddingBottom: 0, borderBottom: "none" },
   }
 
   const img = getImage(image);

@@ -6,7 +6,6 @@ type HeroProps = {
   title: string;
   cta?: string;
   description?: string;
-  style?: object
   showBuddy?: boolean
   centered?: boolean
 };
@@ -39,14 +38,14 @@ const subtitle = (text: string) => <p>{ text }</p>;
 
 const buddyStyle = { position: "absolute" as const, bottom: "-6px", right: "-5px", zIndex: 2 };
 
-export default function Hero({ title, cta, description, style = { paddingBottom: "5rem" }, showBuddy = false, centered = false }: HeroProps) {
+export default function Hero({ title, cta, description, showBuddy = false, centered = false }: HeroProps) {
   const { allGatsbySiteSetting } = useStaticQuery<SiteSettingQuery>(siteSettingQuery);
   const settings = allGatsbySiteSetting.nodes[0];
   const instagramUrl = settings?.instagramUrl || DEFAULT_INSTAGRAM_URL;
   const meetupUrl = settings?.meetupUrl || DEFAULT_MEETUP_URL;
 
   return (
-    <header className={`${hero}${centered ? ` ${centeredCls}` : ''}`} style={ style }>
+    <header className={`${hero}${centered ? ` ${centeredCls}` : ''}`}>
       <h1>{ title }</h1>
       { description && subtitle(description) }
       { cta && (

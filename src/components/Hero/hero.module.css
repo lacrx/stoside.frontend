@@ -1,7 +1,7 @@
 .hero {
   position: relative;
   padding-top: 2rem;
-  padding-bottom: 1rem;
+  padding-bottom: 5rem;
   border-bottom: 1px solid var(--rule);
 
   > :nth-child(n) {

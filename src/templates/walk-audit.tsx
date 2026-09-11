@@ -34,7 +34,6 @@ export default function WalkAudit({ pageContext }: WalkAuditPageProps) {
       <Hero
         title={`Walk Audit: ${title}`}
         description={`${formatDate(date)}${description ? ` · ${description}` : ""}`}
-        style={{ paddingBottom: "1.5rem" }}
       />
       <Content type="section">
         <div className={results}>
