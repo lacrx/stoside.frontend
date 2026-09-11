@@ -80,7 +80,7 @@ export default function Nav() {
       <li>
         {isAdmin ? (
           <span className={loggedIn}>
-            {userName} <button className={loginBtn} onClick={logout}>Log out</button>
+            {userName} <button className={loginBtn} onClick={logout}>Sign out</button>
           </span>
         ) : showLogin ? (
           <form className={loginForm} onSubmit={async (e) => {
@@ -93,12 +93,12 @@ export default function Nav() {
           }}>
             <input className={loginInput} type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
             <input className={loginInput} type="password" placeholder="Password" value={pass} onChange={e => setPass(e.target.value)} required />
-            <button className={loginSubmit} type="submit" disabled={loading}>{loading ? "..." : "Log in"}</button>
+            <button className={loginSubmit} type="submit" disabled={loading}>{loading ? "..." : "Sign in"}</button>
             <button className={loginBtn} type="button" onClick={() => { setShowLogin(false); setError(""); }}>Cancel</button>
             {error && <span className={loginErrorCls}>{error}</span>}
           </form>
         ) : (
-          <button className={loginBtn} onClick={() => setShowLogin(true)}>Log in</button>
+          <button className={loginBtn} onClick={() => setShowLogin(true)}>Sign in</button>
         )}
       </li>
     </ul>
