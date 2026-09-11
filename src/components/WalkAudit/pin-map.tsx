@@ -235,11 +235,28 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
     }
   }, [activeSegment]);
 
-  const handleGPS = () => {
+  const handleGPS = async () => {
     if (!navigator.geolocation) {
       setGpsError("Location not supported on this browser");
       return;
     }
+
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+    if (navigator.permissions) {
+      try {
+        const status = await navigator.permissions.query({ name: "geolocation" as PermissionName });
+        if (status.state === "denied") {
+          setGpsError(
+            isIOS
+              ? "Location blocked. Open iPhone Settings > Safari > Location, then set to \"Ask\" or \"Allow\"."
+              : "Location blocked. Enable location in your browser settings for this site."
+          );
+          return;
+        }
+      } catch {}
+    }
+
     setLocating(true);
     setGpsError(null);
     navigator.geolocation.getCurrentPosition(
@@ -262,7 +279,11 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
       (err) => {
         setLocating(false);
         if (err.code === 1) {
-          setGpsError("Location access denied. Check Settings > Safari > Location Services.");
+          setGpsError(
+            isIOS
+              ? "Location blocked. Open iPhone Settings > Safari > Location, then set to \"Ask\" or \"Allow\"."
+              : "Location blocked. Enable location in your browser settings for this site."
+          );
         } else if (err.code === 2) {
           setGpsError("Could not determine location. Try again outside.");
         } else {
