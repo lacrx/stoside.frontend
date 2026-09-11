@@ -39,6 +39,9 @@ declare const styles: {
   readonly pills: string;
   readonly pill: string;
   readonly pillSelected: string;
+  readonly pillGreen: string;
+  readonly pillYellow: string;
+  readonly pillRed: string;
   readonly flagRow: string;
   readonly photoPreview: string;
   readonly photoPreviewVisible: string;

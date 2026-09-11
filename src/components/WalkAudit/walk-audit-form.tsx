@@ -345,11 +345,22 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
               <div key={field as string}>
                 <span className={i === 0 ? s.fieldLabelFirst : s.fieldLabel}>{label}</span>
                 <div className={s.pills}>
-                  {options.map(opt => (
-                    <button key={opt.value} type="button" className={form[field] === opt.value ? s.pillSelected : s.pill} onClick={() => handlePill(field, opt.value)}>
-                      {opt.label}
-                    </button>
-                  ))}
+                  {options.map(opt => {
+                    const selected = form[field] === opt.value;
+                    let cls = s.pill;
+                    if (selected) {
+                      const v = opt.value;
+                      if (v === "good" || v === "safe" || v === "low") cls = s.pillGreen;
+                      else if (v === "fair" || v === "concerns" || v === "moderate") cls = s.pillYellow;
+                      else if (v === "poor" || v === "high" || v === "unsafe" || v === "none") cls = s.pillRed;
+                      else cls = s.pillSelected;
+                    }
+                    return (
+                      <button key={opt.value} type="button" className={cls} onClick={() => handlePill(field, opt.value)}>
+                        {opt.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}
