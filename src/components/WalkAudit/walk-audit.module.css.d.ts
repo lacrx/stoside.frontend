@@ -7,6 +7,10 @@ declare const styles: {
   readonly dot: string;
   readonly dotConnected: string;
   readonly segment: string;
+  readonly segmentPicker: string;
+  readonly segmentBtn: string;
+  readonly segmentBtnActive: string;
+  readonly segmentDot: string;
   readonly mapDetails: string;
   readonly routeLink: string;
   readonly mapToggle: string;

@@ -1,16 +1,30 @@
 import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import * as s from "./walk-audit.module.css";
 
+type Segment = { name: string };
+type RouteSegment = { name: string; lines: number[][][] };
+
 type PinMapProps = {
   lat: number | null;
   lng: number | null;
-  routeLines: number[][] | null;
+  routeSegments: RouteSegment[] | null;
+  segments: Segment[];
+  activeSegment: string;
   onPin: (lat: number, lng: number, label: string | null) => void;
 };
 
 export type PinMapHandle = {
   setPin: (lat: number, lng: number) => void;
 };
+
+export const SEGMENT_COLORS = [
+  "#e8613a", // coral (STO accent)
+  "#1267FF", // blue
+  "#2d8a4e", // green
+  "#9b59b6", // purple
+  "#e6a817", // amber
+  "#00838f", // teal
+];
 
 const OCEANSIDE: [number, number] = [33.1959, -117.3795];
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
@@ -77,23 +91,20 @@ export async function forwardGeocode(query: string): Promise<{ lat: number; lng:
   }
 }
 
-function parseRouteLines(raw: number[][] | null): [number, number][][] {
-  if (!raw || !raw.length) return [];
-  if (Array.isArray(raw[0]) && Array.isArray(raw[0][0])) {
-    return (raw as unknown as number[][][]).map(line =>
-      line.map(([lat, lng]) => [lat, lng] as [number, number])
-    );
-  }
-  if (raw.length >= 2 && typeof raw[0][0] === "number" && typeof raw[0][1] === "number") {
-    return [raw.map(([lat, lng]) => [lat, lng] as [number, number])];
-  }
-  return [];
+function matchSegmentIndex(routeName: string, segments: Segment[]): number {
+  const num = routeName.match(/^(\d+)/)?.[1];
+  if (!num) return -1;
+  return segments.findIndex(seg => seg.name.startsWith(num));
 }
 
-const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap({ lat, lng, routeLines, onPin }, ref) {
+const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
+  { lat, lng, routeSegments, segments, activeSegment, onPin },
+  ref
+) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
+  const polylinesRef = useRef<any[]>([]);
   const [ready, setReady] = useState(false);
   const [locating, setLocating] = useState(false);
 
@@ -120,12 +131,11 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap({ lat, lng,
   useEffect(() => {
     if (!ready || !containerRef.current || mapRef.current) return;
     const L = (window as any).L;
-    const lines = parseRouteLines(routeLines);
-    const hasRoute = lines.length > 0;
+    const hasRoute = routeSegments && routeSegments.length > 0;
 
     const center: [number, number] = lat != null && lng != null
       ? [lat, lng]
-      : hasRoute ? lines[0][0] : OCEANSIDE;
+      : hasRoute ? (routeSegments![0].lines[0]?.[0] as [number, number]) || OCEANSIDE : OCEANSIDE;
 
     const map = L.map(containerRef.current, {
       center,
@@ -140,9 +150,15 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap({ lat, lng,
 
     if (hasRoute) {
       const allPoints: [number, number][] = [];
-      for (const line of lines) {
-        L.polyline(line, { color: "#e8613a", weight: 4, opacity: 0.8 }).addTo(map);
-        allPoints.push(...line);
+      for (const rs of routeSegments!) {
+        const segIdx = matchSegmentIndex(rs.name, segments);
+        const color = segIdx >= 0 ? SEGMENT_COLORS[segIdx % SEGMENT_COLORS.length] : "#888";
+        for (const line of rs.lines) {
+          const coords = line as [number, number][];
+          const pl = L.polyline(coords, { color, weight: 5, opacity: 0.85 }).addTo(map);
+          polylinesRef.current.push(pl);
+          allPoints.push(...coords);
+        }
       }
       if (lat == null || lng == null) {
         map.fitBounds(L.latLngBounds(allPoints), { padding: [30, 30] });
@@ -168,8 +184,28 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap({ lat, lng,
       map.remove();
       mapRef.current = null;
       markerRef.current = null;
+      polylinesRef.current = [];
     };
   }, [ready]);
+
+  useEffect(() => {
+    if (!mapRef.current || !polylinesRef.current.length || !routeSegments) return;
+    const activeIdx = segments.findIndex(seg => seg.name === activeSegment);
+    polylinesRef.current.forEach(pl => pl.setStyle({ opacity: 0.3, weight: 3 }));
+
+    let highlightIdx = 0;
+    for (const rs of routeSegments) {
+      const segIdx = matchSegmentIndex(rs.name, segments);
+      for (let i = 0; i < rs.lines.length; i++) {
+        if (highlightIdx < polylinesRef.current.length) {
+          if (segIdx === activeIdx) {
+            polylinesRef.current[highlightIdx].setStyle({ opacity: 1, weight: 6 });
+          }
+          highlightIdx++;
+        }
+      }
+    }
+  }, [activeSegment]);
 
   const handleGPS = () => {
     if (!navigator.geolocation) return;

@@ -4,6 +4,8 @@ import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
 import WalkAuditForm from "@/components/WalkAudit/walk-audit-form";
 
+type RouteSegment = { name: string; lines: number[][][] };
+
 type WalkAudit = {
   title: string;
   slug: string;
@@ -12,7 +14,7 @@ type WalkAudit = {
   description: string | null;
   mapUrl: string | null;
   segments: Array<{ name: string }>;
-  routeLines: number[][] | null;
+  routeSegments: RouteSegment[] | null;
 };
 
 interface WalkAuditQuery {
@@ -34,7 +36,7 @@ const query = graphql`
         segments {
           name
         }
-        routeLines
+        routeSegments
       }
     }
   }
@@ -66,7 +68,7 @@ export default function Walk() {
           auditSlug={audit.slug}
           segments={audit.segments}
           mapUrl={audit.mapUrl}
-          routeLines={audit.routeLines}
+          routeSegments={audit.routeSegments}
         />
       </Content>
     </Layout>

@@ -66,6 +66,42 @@
   font-size: 1rem;
 }
 
+.segmentPicker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
+}
+
+.segmentBtn,
+.segmentBtnActive {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: white;
+  border: 2px solid var(--rule);
+  border-radius: 0.375rem;
+  font-family: var(--sans);
+  font-size: 0.875rem;
+  color: var(--grey);
+  cursor: pointer;
+  text-align: left;
+}
+
+.segmentBtnActive {
+  color: var(--black);
+  font-weight: 600;
+}
+
+.segmentDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 .mapDetails {
   margin-bottom: 0.75rem;
 }

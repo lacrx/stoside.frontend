@@ -170,6 +170,7 @@ interface SiteSettingResponse {
 
 type WalkAuditSegment = { name: string };
 type RouteCoord = [number, number]; // [lat, lng]
+type RouteSegment = { name: string; lines: RouteCoord[][] };
 type StrapiWalkAudit = {
   title: string
   slug: string
@@ -181,7 +182,15 @@ type StrapiWalkAudit = {
   summary: string | null
 };
 
-async function fetchRouteFromKml(mapUrl: string): Promise<RouteCoord[][]> {
+function parseCoordinateBlock(block: string): RouteCoord[] {
+  const raw = block.replace(/<\/?coordinates>/g, "").trim();
+  return raw.split(/\s+/).map(p => {
+    const [lng, lat] = p.split(",").map(Number);
+    return [lat, lng] as RouteCoord;
+  }).filter(([lat, lng]) => !isNaN(lat) && !isNaN(lng));
+}
+
+async function fetchRouteFromKml(mapUrl: string): Promise<RouteSegment[]> {
   const midMatch = mapUrl.match(/mid=([^&]+)/);
   if (!midMatch) return [];
   const kmlUrl = `https://www.google.com/maps/d/kml?mid=${midMatch[1]}&forcekml=1`;
@@ -191,17 +200,29 @@ async function fetchRouteFromKml(mapUrl: string): Promise<RouteCoord[][]> {
     });
     if (!res.ok) return [];
     const kml = await res.text();
-    const lines: RouteCoord[][] = [];
-    const coordBlocks = kml.match(/<coordinates>[^<]+<\/coordinates>/g) || [];
-    for (const block of coordBlocks) {
-      const raw = block.replace(/<\/?coordinates>/g, "").trim();
-      const points: RouteCoord[] = raw.split(/\s+/).map(p => {
-        const [lng, lat] = p.split(",").map(Number);
-        return [lat, lng] as RouteCoord;
-      }).filter(([lat, lng]) => !isNaN(lat) && !isNaN(lng));
-      if (points.length >= 2) lines.push(points);
+    const segments: RouteSegment[] = [];
+    const folderRegex = /<Folder>([\s\S]*?)<\/Folder>/g;
+    for (const folderMatch of kml.matchAll(folderRegex)) {
+      const folder = folderMatch[1];
+      const nameMatch = folder.match(/<name>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/name>/);
+      const name = nameMatch?.[1]?.trim() || "";
+      if (name.toLowerCase().includes("observation")) continue;
+      const coordBlocks = folder.match(/<coordinates>[^<]+<\/coordinates>/g) || [];
+      const lines: RouteCoord[][] = [];
+      for (const block of coordBlocks) {
+        const points = parseCoordinateBlock(block);
+        if (points.length >= 2) lines.push(points);
+      }
+      if (lines.length > 0) {
+        const existing = segments.find(s => s.name[0] === name[0] && /^\d/.test(name[0]));
+        if (existing) {
+          existing.lines.push(...lines);
+        } else {
+          segments.push({ name, lines });
+        }
+      }
     }
-    return lines;
+    return segments;
   } catch {
     return [];
   }
@@ -413,17 +434,17 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
   try {
     const walkAuditResult = await strapiGraphqlClient.request<WalkAuditResponse>(getAllStrapiWalkAudits);
     for (const audit of walkAuditResult.walkAudits) {
-      let routeLines: RouteCoord[][] = [];
+      let routeSegments: RouteSegment[] = [];
       if (audit.mapUrl) {
-        routeLines = await fetchRouteFromKml(audit.mapUrl);
+        routeSegments = await fetchRouteFromKml(audit.mapUrl);
       }
       createNode({
         ...audit,
-        routeLines,
+        routeSegments,
         id: createNodeId(`walk-audit-${audit.slug}`),
         internal: {
           type: "GatsbyWalkAudit",
-          contentDigest: createContentDigest({ ...audit, routeLines }),
+          contentDigest: createContentDigest({ ...audit, routeSegments }),
         },
       });
     }
@@ -653,7 +674,7 @@ export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] 
       description: String
       mapUrl: String
       segments: [GatsbyWalkAuditSegment!]!
-      routeLines: JSON
+      routeSegments: JSON
       summary: String
     }
   `);

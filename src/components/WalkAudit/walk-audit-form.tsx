@@ -1,14 +1,16 @@
 import { useState, useRef, useCallback, useEffect, type ChangeEvent } from "react";
 import * as s from "./walk-audit.module.css";
-import PinMap, { forwardGeocode, type PinMapHandle } from "./pin-map";
+import PinMap, { forwardGeocode, SEGMENT_COLORS, type PinMapHandle } from "./pin-map";
 
 type Segment = { name: string };
+
+type RouteSegment = { name: string; lines: number[][][] };
 
 type WalkAuditFormProps = {
   auditSlug: string;
   segments: Segment[];
   mapUrl: string | null;
-  routeLines: number[][] | null;
+  routeSegments: RouteSegment[] | null;
 };
 
 type FormState = {
@@ -106,7 +108,7 @@ function resizePhoto(file: File): Promise<string> {
 const SUPABASE_URL = process.env.GATSBY_SUPABASE_URL || "";
 const SUPABASE_KEY = process.env.GATSBY_SUPABASE_KEY || "";
 
-export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeLines }: WalkAuditFormProps) {
+export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegments }: WalkAuditFormProps) {
   const supabaseUrl = SUPABASE_URL;
   const supabaseKey = SUPABASE_KEY;
   const [tab, setTab] = useState<"new" | "list">("new");
@@ -311,9 +313,20 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeLines 
         </div>
       </div>
 
-      <select className={s.segment} value={segment} onChange={e => { setSegment(e.target.value); localStorage.setItem(`${LS}_segment`, e.target.value); }}>
-        {segments.map(seg => <option key={seg.name} value={seg.name}>{seg.name}</option>)}
-      </select>
+      <div className={s.segmentPicker}>
+        {segments.map((seg, i) => (
+          <button
+            key={seg.name}
+            type="button"
+            className={segment === seg.name ? s.segmentBtnActive : s.segmentBtn}
+            style={{ borderColor: SEGMENT_COLORS[i % SEGMENT_COLORS.length] }}
+            onClick={() => { setSegment(seg.name); localStorage.setItem(`${LS}_segment`, seg.name); }}
+          >
+            <span className={s.segmentDot} style={{ background: SEGMENT_COLORS[i % SEGMENT_COLORS.length] }} />
+            {seg.name}
+          </button>
+        ))}
+      </div>
 
       <nav className={s.tabs}>
         <button className={tab === "new" ? s.tabActive : s.tab} onClick={() => setTab("new")}>New entry</button>
@@ -337,7 +350,9 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeLines 
               ref={pinMapRef}
               lat={form.lat}
               lng={form.lng}
-              routeLines={routeLines}
+              routeSegments={routeSegments}
+              segments={segments}
+              activeSegment={segment}
               onPin={(lat, lng, label) => {
                 setForm(prev => ({ ...prev, lat, lng, location: label || prev.location }));
                 setGeoStatus({ text: `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}`, cls: s.geoOk });
