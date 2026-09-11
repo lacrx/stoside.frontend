@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
+import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import * as s from "./walk-audit.module.css";
 
 type Segment = { name: string };
@@ -122,7 +122,7 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
   const polylinesRef = useRef<any[]>([]);
   const [ready, setReady] = useState(false);
   const [locating, setLocating] = useState(false);
-  const [gpsError, setGpsError] = useState<string | null>(null);
+  const [gpsError, setGpsError] = useState<React.ReactNode | null>(null);
 
   useImperativeHandle(ref, () => ({
     setPin(newLat: number, newLng: number) {
@@ -242,16 +242,40 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
     }
 
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+
+    const deniedMsg = isIOS ? (
+      <>
+        <strong>Location is blocked.</strong> To fix:
+        <ol>
+          <li>Open your iPhone <strong>Settings</strong> app</li>
+          <li>Scroll down and tap <strong>Safari</strong></li>
+          <li>Tap <strong>Location</strong></li>
+          <li>Select <strong>Ask</strong> or <strong>Allow</strong></li>
+          <li>Come back here and tap "Use my location" again</li>
+        </ol>
+      </>
+    ) : isAndroid ? (
+      <>
+        <strong>Location is blocked.</strong> To fix:
+        <ol>
+          <li>Tap the <strong>lock icon</strong> in your browser address bar</li>
+          <li>Tap <strong>Permissions</strong> or <strong>Site settings</strong></li>
+          <li>Set <strong>Location</strong> to <strong>Allow</strong></li>
+          <li>Reload the page and try again</li>
+        </ol>
+      </>
+    ) : (
+      <>
+        <strong>Location is blocked.</strong> Click the lock/info icon in your address bar, allow location for this site, then reload.
+      </>
+    );
 
     if (navigator.permissions) {
       try {
         const status = await navigator.permissions.query({ name: "geolocation" as PermissionName });
         if (status.state === "denied") {
-          setGpsError(
-            isIOS
-              ? "Location blocked. Open iPhone Settings > Safari > Location, then set to \"Ask\" or \"Allow\"."
-              : "Location blocked. Enable location in your browser settings for this site."
-          );
+          setGpsError(deniedMsg);
           return;
         }
       } catch {}
@@ -279,11 +303,7 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
       (err) => {
         setLocating(false);
         if (err.code === 1) {
-          setGpsError(
-            isIOS
-              ? "Location blocked. Open iPhone Settings > Safari > Location, then set to \"Ask\" or \"Allow\"."
-              : "Location blocked. Enable location in your browser settings for this site."
-          );
+          setGpsError(deniedMsg);
         } else if (err.code === 2) {
           setGpsError("Could not determine location. Try again outside.");
         } else {
@@ -300,7 +320,7 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
       <button type="button" className={s.btnGps} onClick={handleGPS} disabled={locating}>
         {locating ? "Locating…" : "📍 Use my location"}
       </button>
-      {gpsError && <p className={s.geoFail}>{gpsError}</p>}
+      {gpsError && <div className={s.gpsDenied}>{gpsError}</div>}
     </div>
   );
 });

@@ -20,6 +20,7 @@ declare const styles: {
   readonly pinMapWrap: string;
   readonly pinMap: string;
   readonly btnGps: string;
+  readonly gpsDenied: string;
   readonly tabs: string;
   readonly tab: string;
   readonly tabActive: string;
