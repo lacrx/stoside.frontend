@@ -169,6 +169,7 @@ interface SiteSettingResponse {
 }
 
 type WalkAuditSegment = { name: string };
+type RouteCoord = [number, number]; // [lat, lng]
 type StrapiWalkAudit = {
   title: string
   slug: string
@@ -179,6 +180,32 @@ type StrapiWalkAudit = {
   segments: WalkAuditSegment[]
   summary: string | null
 };
+
+async function fetchRouteFromKml(mapUrl: string): Promise<RouteCoord[][]> {
+  const midMatch = mapUrl.match(/mid=([^&]+)/);
+  if (!midMatch) return [];
+  const kmlUrl = `https://www.google.com/maps/d/kml?mid=${midMatch[1]}&forcekml=1`;
+  try {
+    const res = await fetch(kmlUrl, {
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; StosideBot/1.0)" },
+    });
+    if (!res.ok) return [];
+    const kml = await res.text();
+    const lines: RouteCoord[][] = [];
+    const coordBlocks = kml.match(/<coordinates>[^<]+<\/coordinates>/g) || [];
+    for (const block of coordBlocks) {
+      const raw = block.replace(/<\/?coordinates>/g, "").trim();
+      const points: RouteCoord[] = raw.split(/\s+/).map(p => {
+        const [lng, lat] = p.split(",").map(Number);
+        return [lat, lng] as RouteCoord;
+      }).filter(([lat, lng]) => !isNaN(lat) && !isNaN(lng));
+      if (points.length >= 2) lines.push(points);
+    }
+    return lines;
+  } catch {
+    return [];
+  }
+}
 interface WalkAuditResponse {
   walkAudits: StrapiWalkAudit[]
 }
@@ -386,12 +413,17 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
   try {
     const walkAuditResult = await strapiGraphqlClient.request<WalkAuditResponse>(getAllStrapiWalkAudits);
     for (const audit of walkAuditResult.walkAudits) {
+      let routeLines: RouteCoord[][] = [];
+      if (audit.mapUrl) {
+        routeLines = await fetchRouteFromKml(audit.mapUrl);
+      }
       createNode({
         ...audit,
+        routeLines,
         id: createNodeId(`walk-audit-${audit.slug}`),
         internal: {
           type: "GatsbyWalkAudit",
-          contentDigest: createContentDigest(audit),
+          contentDigest: createContentDigest({ ...audit, routeLines }),
         },
       });
     }
@@ -621,6 +653,7 @@ export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] 
       description: String
       mapUrl: String
       segments: [GatsbyWalkAuditSegment!]!
+      routeLines: JSON
       summary: String
     }
   `);

@@ -4,6 +4,7 @@ import * as s from "./walk-audit.module.css";
 type PinMapProps = {
   lat: number | null;
   lng: number | null;
+  routeLines: number[][] | null;
   onPin: (lat: number, lng: number, label: string | null) => void;
 };
 
@@ -76,7 +77,20 @@ export async function forwardGeocode(query: string): Promise<{ lat: number; lng:
   }
 }
 
-const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap({ lat, lng, onPin }, ref) {
+function parseRouteLines(raw: number[][] | null): [number, number][][] {
+  if (!raw || !raw.length) return [];
+  if (Array.isArray(raw[0]) && Array.isArray(raw[0][0])) {
+    return (raw as unknown as number[][][]).map(line =>
+      line.map(([lat, lng]) => [lat, lng] as [number, number])
+    );
+  }
+  if (raw.length >= 2 && typeof raw[0][0] === "number" && typeof raw[0][1] === "number") {
+    return [raw.map(([lat, lng]) => [lat, lng] as [number, number])];
+  }
+  return [];
+}
+
+const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap({ lat, lng, routeLines, onPin }, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
@@ -106,10 +120,16 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap({ lat, lng,
   useEffect(() => {
     if (!ready || !containerRef.current || mapRef.current) return;
     const L = (window as any).L;
-    const center: [number, number] = lat != null && lng != null ? [lat, lng] : OCEANSIDE;
+    const lines = parseRouteLines(routeLines);
+    const hasRoute = lines.length > 0;
+
+    const center: [number, number] = lat != null && lng != null
+      ? [lat, lng]
+      : hasRoute ? lines[0][0] : OCEANSIDE;
+
     const map = L.map(containerRef.current, {
       center,
-      zoom: 17,
+      zoom: 15,
       zoomControl: true,
       attributionControl: false,
     });
@@ -117,6 +137,17 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap({ lat, lng,
       maxZoom: 19,
     }).addTo(map);
     mapRef.current = map;
+
+    if (hasRoute) {
+      const allPoints: [number, number][] = [];
+      for (const line of lines) {
+        L.polyline(line, { color: "#e8613a", weight: 4, opacity: 0.8 }).addTo(map);
+        allPoints.push(...line);
+      }
+      if (lat == null || lng == null) {
+        map.fitBounds(L.latLngBounds(allPoints), { padding: [30, 30] });
+      }
+    }
 
     if (lat != null && lng != null) {
       markerRef.current = L.marker([lat, lng]).addTo(map);

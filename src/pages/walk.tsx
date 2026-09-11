@@ -12,6 +12,7 @@ type WalkAudit = {
   description: string | null;
   mapUrl: string | null;
   segments: Array<{ name: string }>;
+  routeLines: number[][] | null;
 };
 
 interface WalkAuditQuery {
@@ -33,6 +34,7 @@ const query = graphql`
         segments {
           name
         }
+        routeLines
       }
     }
   }
@@ -64,6 +66,7 @@ export default function Walk() {
           auditSlug={audit.slug}
           segments={audit.segments}
           mapUrl={audit.mapUrl}
+          routeLines={audit.routeLines}
         />
       </Content>
     </Layout>
