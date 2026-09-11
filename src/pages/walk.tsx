@@ -55,13 +55,13 @@ export default function Walk() {
 
   return (
     <Layout>
-      <Hero title="Walk Audit" />
+      <Hero
+        title={`Walk Audit: ${audit.title}`}
+        description={`${audit.date}${audit.description ? ` · ${audit.description}` : ""}`}
+      />
       <Content type="section">
         <WalkAuditForm
           auditSlug={audit.slug}
-          title={audit.title}
-          date={audit.date}
-          description={audit.description}
           segments={audit.segments}
           mapUrl={audit.mapUrl}
         />

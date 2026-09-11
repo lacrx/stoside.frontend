@@ -6,9 +6,6 @@ type Segment = { name: string };
 
 type WalkAuditFormProps = {
   auditSlug: string;
-  title: string;
-  date: string;
-  description: string | null;
   segments: Segment[];
   mapUrl: string | null;
 };
@@ -108,7 +105,7 @@ function resizePhoto(file: File): Promise<string> {
 const SUPABASE_URL = process.env.GATSBY_SUPABASE_URL || "";
 const SUPABASE_KEY = process.env.GATSBY_SUPABASE_KEY || "";
 
-export default function WalkAuditForm({ auditSlug, title, date, description, segments, mapUrl }: WalkAuditFormProps) {
+export default function WalkAuditForm({ auditSlug, segments, mapUrl }: WalkAuditFormProps) {
   const supabaseUrl = SUPABASE_URL;
   const supabaseKey = SUPABASE_KEY;
   const [tab, setTab] = useState<"new" | "list">("new");
@@ -308,9 +305,6 @@ export default function WalkAuditForm({ auditSlug, title, date, description, seg
 
   return (
     <div className={s.form}>
-      <h2 className={s.auditTitle}>{title}</h2>
-      <p className={s.auditMeta}>{date}{description ? ` · ${description}` : ""}</p>
-
       <div className={s.controls}>
         <label>Today's Audit</label>
         <div className={s.syncBadge}>
