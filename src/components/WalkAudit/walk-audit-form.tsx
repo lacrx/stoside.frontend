@@ -331,7 +331,6 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
               lat={form.lat}
               lng={form.lng}
               routeSegments={routeSegments}
-              segments={segments}
               onPin={(lat, lng, label) => {
                 setForm(prev => ({ ...prev, lat, lng, location: label || prev.location }));
                 setGeoStatus({ text: `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}`, cls: s.geoOk });

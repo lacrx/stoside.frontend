@@ -1,14 +1,12 @@
 import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import * as s from "./walk-audit.module.css";
 
-type Segment = { name: string };
 type RouteSegment = { name: string; lines: number[][][] };
 
 type PinMapProps = {
   lat: number | null;
   lng: number | null;
   routeSegments: RouteSegment[] | null;
-  segments: Segment[];
   onPin: (lat: number, lng: number, label: string | null) => void;
 };
 
@@ -17,14 +15,7 @@ export type PinMapHandle = {
   clearPin: () => void;
 };
 
-export const SEGMENT_COLORS = [
-  "#e8613a", // coral (STO accent)
-  "#1267FF", // blue
-  "#2d8a4e", // green
-  "#9b59b6", // purple
-  "#e6a817", // amber
-  "#00838f", // teal
-];
+const ROUTE_COLOR = "#e8613a";
 
 const OCEANSIDE: [number, number] = [33.1959, -117.3795];
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
@@ -91,35 +82,13 @@ export async function forwardGeocode(query: string): Promise<{ lat: number; lng:
   }
 }
 
-function matchSegmentIndex(routeName: string, segments: Segment[]): number {
-  const num = routeName.match(/^(\d+)/)?.[1];
-  if (!num) return -1;
-  return segments.findIndex(seg => seg.name.startsWith(num));
-}
-
-function circleIcon(L: any, label: string, color: string) {
-  return L.divIcon({
-    className: "",
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    html: `<div style="
-      width:24px;height:24px;border-radius:50%;
-      background:${color};color:#fff;
-      display:flex;align-items:center;justify-content:center;
-      font:bold 12px/${24}px sans-serif;
-      border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.4);
-    ">${label}</div>`,
-  });
-}
-
 const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
-  { lat, lng, routeSegments, segments, onPin },
+  { lat, lng, routeSegments, onPin },
   ref
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
-  const polylinesRef = useRef<any[]>([]);
   const [ready, setReady] = useState(false);
   const [locating, setLocating] = useState(false);
   const [gpsError, setGpsError] = useState<React.ReactNode | null>(null);
@@ -172,26 +141,13 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
 
     if (hasRoute) {
       const allPoints: [number, number][] = [];
-      const segCoords: Map<number, [number, number][]> = new Map();
 
       for (const rs of routeSegments!) {
-        const segIdx = matchSegmentIndex(rs.name, segments);
         for (const line of rs.lines) {
           const coords = line as [number, number][];
-          const pl = L.polyline(coords, { color: SEGMENT_COLORS[0], weight: 5, opacity: 0.85 }).addTo(map);
-          polylinesRef.current.push(pl);
+          L.polyline(coords, { color: ROUTE_COLOR, weight: 5, opacity: 0.85 }).addTo(map);
           allPoints.push(...coords);
-          if (segIdx >= 0) {
-            const prev = segCoords.get(segIdx) || [];
-            prev.push(...coords);
-            segCoords.set(segIdx, prev);
-          }
         }
-      }
-
-      for (const [segIdx, coords] of segCoords) {
-        const mid = coords[Math.floor(coords.length / 2)];
-        L.marker(mid, { icon: circleIcon(L, String(segIdx + 1), SEGMENT_COLORS[0]), interactive: false }).addTo(map);
       }
 
       if (lat == null || lng == null) {
@@ -218,7 +174,6 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
       map.remove();
       mapRef.current = null;
       markerRef.current = null;
-      polylinesRef.current = [];
     };
   }, [ready]);
 
