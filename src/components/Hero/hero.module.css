@@ -2,7 +2,6 @@
   position: relative;
   padding-top: 2rem;
   padding-bottom: 2rem;
-  min-height: 14rem;
   border-bottom: 1px solid var(--rule);
 
   > :nth-child(n) {
