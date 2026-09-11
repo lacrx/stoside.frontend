@@ -71,6 +71,23 @@ const getStrapiSiteSetting = `
   }
 `;
 
+const getAllStrapiWalkAudits = `
+  query GetAllStrapiWalkAudits {
+    walkAudits(filters: { status: { ne: "draft" } }, sort: ["date:desc"]) {
+      title
+      slug
+      date
+      status
+      description
+      mapUrl
+      segments {
+        name
+      }
+      summary
+    }
+  }
+`;
+
 const getAllMeetupEvents = `
   query GetAllMeetupEvents {
     proNetworkByUrlname(urlname: "strong-towns-oceanside") {
@@ -149,6 +166,21 @@ interface SiteSettingResponse {
     instagramUrl: string | null
     meetupUrl: string | null
   } | null
+}
+
+type WalkAuditSegment = { name: string };
+type StrapiWalkAudit = {
+  title: string
+  slug: string
+  date: string
+  status: "active" | "completed"
+  description: string | null
+  mapUrl: string | null
+  segments: WalkAuditSegment[]
+  summary: string | null
+};
+interface WalkAuditResponse {
+  walkAudits: StrapiWalkAudit[]
 }
 
 type MeetupEventJsonLd = {
@@ -351,6 +383,22 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
     });
   });
 
+  try {
+    const walkAuditResult = await strapiGraphqlClient.request<WalkAuditResponse>(getAllStrapiWalkAudits);
+    for (const audit of walkAuditResult.walkAudits) {
+      createNode({
+        ...audit,
+        id: createNodeId(`walk-audit-${audit.slug}`),
+        internal: {
+          type: "GatsbyWalkAudit",
+          contentDigest: createContentDigest(audit),
+        },
+      });
+    }
+  } catch (err) {
+    console.warn(`[gatsby-node] Skipping Strapi walk audits: ${(err as Error).message}`);
+  }
+
   const visualizationsDir = path.resolve(__dirname, "src/assets/visualizations");
   if (fs.existsSync(visualizationsDir)) {
     for (const vizDir of fs.readdirSync(visualizationsDir)) {
@@ -421,6 +469,11 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
 };
 
 const articleTemplate = path.resolve("./src/templates/article.tsx");
+const walkAuditTemplate = path.resolve("./src/templates/walk-audit.tsx");
+
+const SUPABASE_URL = process.env.GATSBY_SUPABASE_URL || "";
+const SUPABASE_KEY = process.env.GATSBY_SUPABASE_KEY || "";
+
 export const createPages: GatsbyNode["createPages"] = async ({ actions: { createPage }, graphql }) => {
   const allGatsbyArticle = await graphql<GatsbyArticles>(`
     query AllGatsbyArticle {
@@ -461,6 +514,37 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions: { create
       path: `/articles/${article?.slug}`,
       component: articleTemplate,
       context: article
+    });
+  });
+
+  const allGatsbyWalkAudit = await graphql<{ allGatsbyWalkAudit: { nodes: StrapiWalkAudit[] } }>(`
+    query AllGatsbyWalkAudit {
+      allGatsbyWalkAudit {
+        nodes {
+          title
+          slug
+          date
+          status
+          description
+          mapUrl
+          segments {
+            name
+          }
+          summary
+        }
+      }
+    }
+  `);
+
+  allGatsbyWalkAudit?.data?.allGatsbyWalkAudit?.nodes?.forEach(audit => {
+    createPage({
+      path: `/walk-audits/${audit.slug}`,
+      component: walkAuditTemplate,
+      context: {
+        ...audit,
+        supabaseUrl: SUPABASE_URL,
+        supabaseKey: SUPABASE_KEY,
+      },
     });
   });
 };
@@ -530,5 +614,18 @@ export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] 
     type GatsbySiteSetting implements Node {
       instagramUrl: String
       meetupUrl: String
+    }
+    type GatsbyWalkAuditSegment {
+      name: String!
+    }
+    type GatsbyWalkAudit implements Node {
+      title: String!
+      slug: String!
+      date: Date! @dateformat
+      status: String!
+      description: String
+      mapUrl: String
+      segments: [GatsbyWalkAuditSegment!]!
+      summary: String
     }
   `);
