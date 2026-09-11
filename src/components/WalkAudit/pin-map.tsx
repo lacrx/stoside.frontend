@@ -9,12 +9,12 @@ type PinMapProps = {
   lng: number | null;
   routeSegments: RouteSegment[] | null;
   segments: Segment[];
-  activeSegment: string;
   onPin: (lat: number, lng: number, label: string | null) => void;
 };
 
 export type PinMapHandle = {
   setPin: (lat: number, lng: number) => void;
+  clearPin: () => void;
 };
 
 export const SEGMENT_COLORS = [
@@ -113,7 +113,7 @@ function circleIcon(L: any, label: string, color: string) {
 }
 
 const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
-  { lat, lng, routeSegments, segments, activeSegment, onPin },
+  { lat, lng, routeSegments, segments, onPin },
   ref
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -134,6 +134,12 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
         markerRef.current.setLatLng([newLat, newLng]);
       } else {
         markerRef.current = L.marker([newLat, newLng]).addTo(map);
+      }
+    },
+    clearPin() {
+      if (markerRef.current) {
+        markerRef.current.remove();
+        markerRef.current = null;
       }
     },
   }));
@@ -215,25 +221,6 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
       polylinesRef.current = [];
     };
   }, [ready]);
-
-  useEffect(() => {
-    if (!mapRef.current || !polylinesRef.current.length || !routeSegments) return;
-    const activeIdx = segments.findIndex(seg => seg.name === activeSegment);
-    polylinesRef.current.forEach(pl => pl.setStyle({ opacity: 0.7, weight: 4 }));
-
-    let highlightIdx = 0;
-    for (const rs of routeSegments) {
-      const segIdx = matchSegmentIndex(rs.name, segments);
-      for (let i = 0; i < rs.lines.length; i++) {
-        if (highlightIdx < polylinesRef.current.length) {
-          if (segIdx === activeIdx) {
-            polylinesRef.current[highlightIdx].setStyle({ opacity: 1, weight: 6 });
-          }
-          highlightIdx++;
-        }
-      }
-    }
-  }, [activeSegment]);
 
   const handleGPS = async () => {
     if (!navigator.geolocation) {

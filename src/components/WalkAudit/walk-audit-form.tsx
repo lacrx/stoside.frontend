@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect, type ChangeEvent } from "react";
 import * as s from "./walk-audit.module.css";
-import PinMap, { forwardGeocode, SEGMENT_COLORS, type PinMapHandle } from "./pin-map";
+import PinMap, { forwardGeocode, type PinMapHandle } from "./pin-map";
 
 type Segment = { name: string };
 
@@ -118,11 +118,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
       ? JSON.parse(localStorage.getItem(`${LS}_entries_${auditSlug}`) || "[]")
       : []
   );
-  const [segment, setSegment] = useState(() =>
-    typeof window !== "undefined"
-      ? localStorage.getItem(`${LS}_segment`) || segments[0]?.name || ""
-      : segments[0]?.name || ""
-  );
+  const segment = segments[0]?.name || "";
   const [observer, setObserver] = useState(() =>
     typeof window !== "undefined"
       ? localStorage.getItem(`${LS}_observer`) || ""
@@ -194,7 +190,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
     toastTimer.current = setTimeout(() => setToast(null), 2500);
   };
 
-  const filtered = entries.filter(e => e.segment === segment);
+  const filtered = entries;
 
   const handlePill = (field: keyof FormState, value: string) => {
     setForm(prev => ({ ...prev, [field]: prev[field] === value ? null : value }));
@@ -229,7 +225,6 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
     }
 
     localStorage.setItem(`${LS}_observer`, observer);
-    localStorage.setItem(`${LS}_segment`, segment);
 
     const entry: Entry = {
       id: crypto.randomUUID(),
@@ -295,7 +290,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `walk-audit-${auditSlug}-${segment.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.csv`;
+    a.download = `walk-audit-${auditSlug}.csv`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -313,21 +308,6 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
         </div>
       </div>
 
-      <div className={s.segmentPicker}>
-        {segments.map((seg, i) => (
-          <button
-            key={seg.name}
-            type="button"
-            className={segment === seg.name ? s.segmentBtnActive : s.segmentBtn}
-            style={{ borderColor: SEGMENT_COLORS[0] }}
-            onClick={() => { setSegment(seg.name); localStorage.setItem(`${LS}_segment`, seg.name); }}
-          >
-            <span className={s.segmentDot} style={{ background: SEGMENT_COLORS[0] }} />
-            {seg.name}
-          </button>
-        ))}
-      </div>
-
       <nav className={s.tabs}>
         <button className={tab === "new" ? s.tabActive : s.tab} onClick={() => setTab("new")}>New entry</button>
         <button className={tab === "list" ? s.tabActive : s.tab} onClick={() => setTab("list")}>
@@ -343,7 +323,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
             <span className={s.fieldLabelFirst}>Cross street / address / stop</span>
             <div className={s.inputRow}>
               <input className={s.textInput} type="text" value={form.location} onChange={handleLocationChange} placeholder="Mission Ave & Cleveland St" />
-              {form.location && <button type="button" className={s.btnClear} onClick={() => setForm(prev => ({ ...prev, location: "", lat: null, lng: null }))}>✕</button>}
+              {form.location && <button type="button" className={s.btnClear} onClick={() => { setForm(prev => ({ ...prev, location: "", lat: null, lng: null })); setGeoStatus({ text: "", cls: "" }); pinMapRef.current?.clearPin(); }}>✕</button>}
             </div>
             <div className={`${s.geoStatus} ${geoStatus.cls}`}>{geoStatus.text}</div>
             <PinMap
@@ -352,7 +332,6 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
               lng={form.lng}
               routeSegments={routeSegments}
               segments={segments}
-              activeSegment={segment}
               onPin={(lat, lng, label) => {
                 setForm(prev => ({ ...prev, lat, lng, location: label || prev.location }));
                 setGeoStatus({ text: `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}`, cls: s.geoOk });
@@ -408,12 +387,12 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
       {tab === "list" && (
         <>
           <div className={s.entriesHeader}>
-            <span className={s.entriesLabel}>{filtered.length} entr{filtered.length === 1 ? "y" : "ies"} in {segment}</span>
+            <span className={s.entriesLabel}>{filtered.length} entr{filtered.length === 1 ? "y" : "ies"}</span>
             <button className={s.btnExport} type="button" onClick={handleExport}>Export CSV</button>
           </div>
           <div>
             {!filtered.length ? (
-              <div className={s.empty}>No entries yet for this segment.</div>
+              <div className={s.empty}>No entries yet.</div>
             ) : (
               [...filtered].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map(entry => (
                 <div key={entry.id} className={s.entry}>
