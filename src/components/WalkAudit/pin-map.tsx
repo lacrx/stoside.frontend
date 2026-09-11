@@ -17,21 +17,6 @@ export type PinMapHandle = {
 
 const ROUTE_COLOR = "#e8613a";
 
-function routeBubble(L: any, label: string) {
-  return L.divIcon({
-    className: "",
-    iconSize: [label.length > 3 ? 40 : 28, 28],
-    iconAnchor: [label.length > 3 ? 20 : 14, 14],
-    html: `<div style="
-      padding:0 6px;height:28px;border-radius:14px;
-      background:${ROUTE_COLOR};color:#fff;
-      display:flex;align-items:center;justify-content:center;
-      font:bold 11px/28px sans-serif;white-space:nowrap;
-      border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.4);
-    ">${label}</div>`,
-  });
-}
-
 const OCEANSIDE: [number, number] = [33.1959, -117.3795];
 const LEAFLET_CSS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
 const LEAFLET_JS = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
@@ -163,11 +148,6 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
           L.polyline(coords, { color: ROUTE_COLOR, weight: 5, opacity: 0.85 }).addTo(map);
           allPoints.push(...coords);
         }
-      }
-
-      if (allPoints.length >= 2) {
-        L.marker(allPoints[0], { icon: routeBubble(L, "Start"), interactive: false }).addTo(map);
-        L.marker(allPoints[allPoints.length - 1], { icon: routeBubble(L, "End"), interactive: false }).addTo(map);
       }
 
       if (lat == null || lng == null) {
