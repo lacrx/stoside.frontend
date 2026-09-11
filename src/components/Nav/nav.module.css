@@ -86,14 +86,15 @@
 
 .loginBtn {
   background: none;
-  border: none;
+  border: 1px solid var(--rule);
+  border-radius: 0.25rem;
   font-family: var(--sans);
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   color: var(--light-grey);
   cursor: pointer;
-  padding: 0.25rem 0;
+  padding: 0.25rem 0.5rem;
 }
 
 .loginBtn:hover {
