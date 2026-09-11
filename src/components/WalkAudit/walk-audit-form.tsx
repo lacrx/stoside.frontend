@@ -34,6 +34,7 @@ type Entry = FormState & {
   audit_slug: string;
   created_at: string;
   photo_url: string | null;
+  device_id?: string;
 };
 
 const LS = "walkaudit";
@@ -108,9 +109,21 @@ function resizePhoto(file: File): Promise<string> {
 const SUPABASE_URL = process.env.GATSBY_SUPABASE_URL || "";
 const SUPABASE_KEY = process.env.GATSBY_SUPABASE_KEY || "";
 
+function getDeviceId(): string {
+  if (typeof window === "undefined") return "";
+  let id = localStorage.getItem(`${LS}_device_id`);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(`${LS}_device_id`, id);
+  }
+  return id;
+}
+
 export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegments }: WalkAuditFormProps) {
   const supabaseUrl = SUPABASE_URL;
   const supabaseKey = SUPABASE_KEY;
+  const deviceId = getDeviceId();
+  const isAdmin = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("admin");
   const [tab, setTab] = useState<"new" | "list">("new");
   const [form, setForm] = useState<FormState>({ ...EMPTY_FORM });
   const [entries, setEntries] = useState<Entry[]>(() =>
@@ -244,6 +257,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
       notes: form.notes,
       observer,
       created_at: new Date().toISOString(),
+      device_id: deviceId,
     };
 
     const updated = [...entries, entry];
@@ -424,7 +438,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
                   {entry.notes && <div className={s.entryNotes}>"{entry.notes}"</div>}
                   <div className={s.entryFooter}>
                     <span className={s.entryObserver}>{entry.observer || "Anonymous"}</span>
-                    <button className={s.btnDelete} type="button" onClick={() => handleDelete(entry.id)}>Delete</button>
+                    {(isAdmin || entry.device_id === deviceId) && <button className={s.btnDelete} type="button" onClick={() => handleDelete(entry.id)}>Delete</button>}
                   </div>
                 </div>
               ))
