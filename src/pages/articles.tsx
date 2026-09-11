@@ -14,10 +14,26 @@ type GatsbyArticle = {
   authorName: string | null
   publishedAt: string | null
 };
-interface GatsbyArticles {
-  allGatsbyArticle: {
-    nodes: GatsbyArticle[]
-  }
+
+type GatsbyWalkAudit = {
+  title: string
+  slug: string
+  date: string
+  description: string | null
+};
+
+type ListItem = {
+  slug: string
+  title: string
+  description: string
+  image: IGatsbyImageData | null
+  authorName: string | null
+  publishedAt: string | null
+};
+
+interface ArticlesQuery {
+  allGatsbyArticle: { nodes: GatsbyArticle[] }
+  allGatsbyWalkAudit: { nodes: GatsbyWalkAudit[] }
 }
 
 const query = graphql`
@@ -42,26 +58,53 @@ const query = graphql`
         publishedAt
       }
     }
+    allGatsbyWalkAudit(
+      filter: { status: { eq: "completed" } }
+      sort: { date: DESC }
+    ) {
+      nodes {
+        title
+        slug
+        date
+        description
+      }
+    }
   }
 `;
 
-const heroProps = {
-  title: "We've put pen to paper",
-};
-
-const contentProps = {
-  type: "section"
-};
-
 export default function Articles() {
-  const { allGatsbyArticle: { nodes } } = useStaticQuery<GatsbyArticles>(query);
+  const { allGatsbyArticle, allGatsbyWalkAudit } = useStaticQuery<ArticlesQuery>(query);
+
+  const items: ListItem[] = [
+    ...allGatsbyArticle.nodes.map(a => ({
+      slug: a.slug,
+      title: a.title,
+      description: a.description,
+      image: a.image,
+      authorName: a.authorName,
+      publishedAt: a.publishedAt,
+    })),
+    ...allGatsbyWalkAudit.nodes.map(w => ({
+      slug: w.slug,
+      title: `Walk Audit: ${w.title}`,
+      description: w.description || "Community walk audit results",
+      image: null,
+      authorName: null,
+      publishedAt: w.date,
+    })),
+  ].sort((a, b) => {
+    const da = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+    const db = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+    return db - da;
+  });
+
   return (
     <Layout>
-      <Hero { ...heroProps } />
-      <Content { ...contentProps } >
-        {nodes.map(({ slug, title, description, image, authorName, publishedAt }, i) => (
+      <Hero title="We've put pen to paper" />
+      <Content type="section">
+        {items.map(({ slug, title, description, image, authorName, publishedAt }) => (
           <Card
-            key={i}
+            key={slug}
             link={`/articles/${slug}`}
             title={title}
             description={description}

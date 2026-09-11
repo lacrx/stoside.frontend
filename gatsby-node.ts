@@ -537,7 +537,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions: { create
     ?.filter(audit => audit.status === "completed")
     .forEach(audit => {
       createPage({
-        path: `/walk-audits/${audit.slug}`,
+        path: `/articles/${audit.slug}`,
         component: walkAuditTemplate,
         context: audit,
       });

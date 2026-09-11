@@ -48,7 +48,7 @@ export default function Walk() {
         <Hero title="Walk Audit" style={{ paddingBottom: "1.5rem" }} />
         <Content type="section">
           <p>No active walk audit right now. Check back soon.</p>
-          <p><Link to="/walk-audits">View previous audits</Link></p>
+          <p><Link to="/articles">View previous audits</Link></p>
         </Content>
       </Layout>
     );
@@ -68,7 +68,7 @@ export default function Walk() {
           mapUrl={audit.mapUrl}
         />
         <p style={{ marginTop: "2rem", textAlign: "center" }}>
-          <Link to="/walk-audits">View previous audits</Link>
+          <Link to="/articles">View previous audits</Link>
         </p>
       </Content>
     </Layout>
