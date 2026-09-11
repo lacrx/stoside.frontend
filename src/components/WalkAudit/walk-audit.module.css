@@ -418,6 +418,7 @@
 .photoPreview {
   display: none;
   margin-bottom: 0.75rem;
+  max-width: 16rem;
   border-radius: 0.375rem;
   overflow: hidden;
   position: relative;
@@ -595,12 +596,14 @@
 
 .entryPhoto {
   margin-top: 0.5rem;
+  max-width: 16rem;
   border-radius: 0.375rem;
   overflow: hidden;
 }
 
 .entryPhoto img {
   width: 100%;
+  height: auto;
   display: block;
 }
 

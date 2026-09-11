@@ -93,9 +93,12 @@ function resizePhoto(file: File): Promise<string> {
     reader.onload = (e) => {
       const img = new Image();
       img.onload = () => {
-        const MAX = 1200;
+        const MAX = 800;
         let w = img.width, h = img.height;
-        if (w > MAX) { h = h * MAX / w; w = MAX; }
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = h * MAX / w; w = MAX; }
+          else { w = w * MAX / h; h = MAX; }
+        }
         const c = document.createElement("canvas");
         c.width = w; c.height = h;
         c.getContext("2d")!.drawImage(img, 0, 0, w, h);
