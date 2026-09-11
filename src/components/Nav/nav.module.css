@@ -86,30 +86,45 @@
 
 .loginBtn {
   background: none;
-  border: 1px solid var(--rule);
-  border-radius: 0.25rem;
+  border: none;
   font-family: var(--sans);
-  font-size: 0.65rem;
+  font-size: 1rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: .05em;
   color: var(--light-grey);
   cursor: pointer;
-  padding: 0.25rem 0.5rem;
+  padding: 1rem 0;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .loginBtn:hover {
   color: var(--grey);
-  border-color: var(--light-grey);
+}
+
+@media (min-width: 600px) {
+  .loginBtn {
+    font-size: 0.75rem;
+    padding: 0.5rem 0;
+  }
 }
 
 .loggedIn {
   font-family: var(--sans);
-  font-size: 0.65rem;
+  font-size: 1rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: .05em;
   color: var(--light-grey);
   display: flex;
   align-items: center;
   gap: 0.5rem;
   justify-content: center;
+  padding: 1rem 0;
+}
+
+@media (min-width: 600px) {
+  .loggedIn {
+    font-size: 0.75rem;
+    padding: 0.5rem 0;
+  }
 }
