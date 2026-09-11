@@ -317,9 +317,15 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl }: WalkAudit
       </select>
 
       {mapUrl && (
-        <a className={s.routeLink} href={mapUrl} target="_blank" rel="noopener noreferrer">
-          &#x1f5fa;&#xfe0f; View route map
-        </a>
+        <details className={s.mapDetails}>
+          <summary className={s.routeLink}>&#x1f5fa;&#xfe0f; Route map</summary>
+          <iframe
+            className={s.mapEmbed}
+            src={mapUrl.replace(/\/edit\b/, "/embed").replace(/\/viewer\b/, "/embed")}
+            title="Route map"
+            loading="lazy"
+          />
+        </details>
       )}
 
       <nav className={s.tabs}>

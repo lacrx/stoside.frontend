@@ -5,7 +5,9 @@ declare const styles: {
   readonly dot: string;
   readonly dotConnected: string;
   readonly segment: string;
+  readonly mapDetails: string;
   readonly routeLink: string;
+  readonly mapEmbed: string;
   readonly tabs: string;
   readonly tab: string;
   readonly tabActive: string;

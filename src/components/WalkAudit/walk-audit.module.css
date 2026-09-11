@@ -52,6 +52,10 @@
   font-size: 1rem;
 }
 
+.mapDetails {
+  margin-bottom: 0.75rem;
+}
+
 .routeLink {
   display: inline-flex;
   align-items: center;
@@ -61,7 +65,15 @@
   color: var(--grey);
   text-decoration: underline;
   padding: 0.4rem 0;
-  margin-bottom: 0.75rem;
+  cursor: pointer;
+}
+
+.mapEmbed {
+  width: 100%;
+  height: 350px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  margin-top: 0.5rem;
 }
 
 .tabs {

@@ -1,4 +1,4 @@
-import { graphql, useStaticQuery, Link } from "gatsby";
+import { graphql, useStaticQuery } from "gatsby";
 import Layout from "@/components/Layout/layout";
 import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
@@ -48,7 +48,6 @@ export default function Walk() {
         <Hero title="Walk Audit" style={{ paddingBottom: "1.5rem" }} />
         <Content type="section">
           <p>No active walk audit right now. Check back soon.</p>
-          <p><Link to="/articles">View previous audits</Link></p>
         </Content>
       </Layout>
     );
@@ -67,9 +66,6 @@ export default function Walk() {
           segments={audit.segments}
           mapUrl={audit.mapUrl}
         />
-        <p style={{ marginTop: "2rem", textAlign: "center" }}>
-          <Link to="/articles">View previous audits</Link>
-        </p>
       </Content>
     </Layout>
   );
