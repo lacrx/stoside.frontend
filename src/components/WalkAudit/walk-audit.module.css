@@ -369,30 +369,26 @@
 
 .pillSelected {
   composes: pill;
-  border: 2px solid #e8613a;
+  border-color: #e8613a;
   color: #e8613a;
-  background: rgba(232, 97, 58, 0.06);
 }
 
 .pillGreen {
   composes: pill;
-  border: 2px solid #2a8a6a;
+  border-color: #2a8a6a;
   color: #2a8a6a;
-  background: rgba(61, 184, 147, 0.1);
 }
 
 .pillYellow {
   composes: pill;
-  border: 2px solid #b07820;
+  border-color: #b07820;
   color: #b07820;
-  background: rgba(240, 160, 48, 0.1);
 }
 
 .pillRed {
   composes: pill;
-  border: 2px solid #c44020;
+  border-color: #c44020;
   color: #c44020;
-  background: rgba(232, 97, 58, 0.08);
 }
 
 .flagRow {

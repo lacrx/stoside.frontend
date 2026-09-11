@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "gatsby";
-import { nav } from './nav.module.css';
+import { nav, loginBtn, loginForm, loginInput, loginSubmit, loginError as loginErrorCls, loggedIn } from './nav.module.css';
 import logo from "@/images/logo.svg";
+import { useAuth } from "@/components/Auth/auth-context";
 
 const Hamburger = () =>
   <svg width="16" height="10" viewBox="0 0 16 10">
@@ -22,6 +23,12 @@ const X = () =>
 export default function Nav() {
   const navRef = useRef<HTMLLIElement>(null);
   const [open, setOpen] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { isAdmin, userName, login, logout } = useAuth();
 
   useEffect(() => {
     function onClickOutHandler(event: MouseEvent) {
@@ -69,6 +76,30 @@ export default function Nav() {
         <Link to="/about">
           <span>About</span>
         </Link>
+      </li>
+      <li>
+        {isAdmin ? (
+          <span className={loggedIn}>
+            {userName} <button className={loginBtn} onClick={logout}>Log out</button>
+          </span>
+        ) : showLogin ? (
+          <form className={loginForm} onSubmit={async (e) => {
+            e.preventDefault();
+            setLoading(true);
+            setError("");
+            const err = await login(email, pass);
+            setLoading(false);
+            if (err) { setError(err); } else { setShowLogin(false); setEmail(""); setPass(""); }
+          }}>
+            <input className={loginInput} type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+            <input className={loginInput} type="password" placeholder="Password" value={pass} onChange={e => setPass(e.target.value)} required />
+            <button className={loginSubmit} type="submit" disabled={loading}>{loading ? "..." : "Log in"}</button>
+            <button className={loginBtn} type="button" onClick={() => { setShowLogin(false); setError(""); }}>Cancel</button>
+            {error && <span className={loginErrorCls}>{error}</span>}
+          </form>
+        ) : (
+          <button className={loginBtn} onClick={() => setShowLogin(true)}>Log in</button>
+        )}
       </li>
     </ul>
   )

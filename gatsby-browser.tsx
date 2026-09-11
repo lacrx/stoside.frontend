@@ -1,4 +1,10 @@
+import React from "react";
 import type { GatsbyBrowser } from "gatsby";
+import { AuthProvider } from "./src/components/Auth/auth-context";
+
+export const wrapRootElement: GatsbyBrowser["wrapRootElement"] = ({ element }) => (
+  <AuthProvider>{element}</AuthProvider>
+);
 
 // Self-heal for users whose service worker or HTTP cache has stale
 // webpack chunks that reference hashed asset URLs the current build

@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect, type ChangeEvent } from "react";
 import * as s from "./walk-audit.module.css";
 import PinMap, { forwardGeocode, type PinMapHandle } from "./pin-map";
+import { useAuth } from "@/components/Auth/auth-context";
 
 type Segment = { name: string };
 
@@ -123,7 +124,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
   const supabaseUrl = SUPABASE_URL;
   const supabaseKey = SUPABASE_KEY;
   const deviceId = getDeviceId();
-  const isAdmin = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("admin");
+  const { isAdmin } = useAuth();
   const [tab, setTab] = useState<"new" | "list">("new");
   const [form, setForm] = useState<FormState>({ ...EMPTY_FORM });
   const [entries, setEntries] = useState<Entry[]>(() =>
