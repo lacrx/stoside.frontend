@@ -170,10 +170,9 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
 
       for (const rs of routeSegments!) {
         const segIdx = matchSegmentIndex(rs.name, segments);
-        const color = segIdx >= 0 ? SEGMENT_COLORS[segIdx % SEGMENT_COLORS.length] : "#888";
         for (const line of rs.lines) {
           const coords = line as [number, number][];
-          const pl = L.polyline(coords, { color, weight: 5, opacity: 0.85 }).addTo(map);
+          const pl = L.polyline(coords, { color: SEGMENT_COLORS[0], weight: 5, opacity: 0.85 }).addTo(map);
           polylinesRef.current.push(pl);
           allPoints.push(...coords);
           if (segIdx >= 0) {
@@ -186,8 +185,7 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
 
       for (const [segIdx, coords] of segCoords) {
         const mid = coords[Math.floor(coords.length / 2)];
-        const color = SEGMENT_COLORS[segIdx % SEGMENT_COLORS.length];
-        L.marker(mid, { icon: circleIcon(L, String(segIdx + 1), color), interactive: false }).addTo(map);
+        L.marker(mid, { icon: circleIcon(L, String(segIdx + 1), SEGMENT_COLORS[0]), interactive: false }).addTo(map);
       }
 
       if (lat == null || lng == null) {

@@ -319,10 +319,10 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
             key={seg.name}
             type="button"
             className={segment === seg.name ? s.segmentBtnActive : s.segmentBtn}
-            style={{ borderColor: SEGMENT_COLORS[i % SEGMENT_COLORS.length] }}
+            style={{ borderColor: SEGMENT_COLORS[0] }}
             onClick={() => { setSegment(seg.name); localStorage.setItem(`${LS}_segment`, seg.name); }}
           >
-            <span className={s.segmentDot} style={{ background: SEGMENT_COLORS[i % SEGMENT_COLORS.length] }} />
+            <span className={s.segmentDot} style={{ background: SEGMENT_COLORS[0] }} />
             {seg.name}
           </button>
         ))}
