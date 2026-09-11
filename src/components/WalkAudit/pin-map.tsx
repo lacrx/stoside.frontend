@@ -110,6 +110,7 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
         markerRef.current.remove();
         markerRef.current = null;
       }
+      setGpsError(null);
     },
   }));
 
@@ -161,6 +162,7 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
 
     map.on("click", async (e: any) => {
       const { lat: clickLat, lng: clickLng } = e.latlng;
+      setGpsError(null);
       if (markerRef.current) {
         markerRef.current.setLatLng([clickLat, clickLng]);
       } else {
