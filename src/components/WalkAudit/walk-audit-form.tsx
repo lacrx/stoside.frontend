@@ -109,6 +109,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl }: WalkAudit
   const supabaseUrl = SUPABASE_URL;
   const supabaseKey = SUPABASE_KEY;
   const [tab, setTab] = useState<"new" | "list">("new");
+  const [mapMode, setMapMode] = useState<"route" | "pin">(mapUrl ? "route" : "pin");
   const [form, setForm] = useState<FormState>({ ...EMPTY_FORM });
   const [entries, setEntries] = useState<Entry[]>(() =>
     typeof window !== "undefined"
@@ -314,18 +315,6 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl }: WalkAudit
         {segments.map(seg => <option key={seg.name} value={seg.name}>{seg.name}</option>)}
       </select>
 
-      {mapUrl && (
-        <details className={s.mapDetails}>
-          <summary className={s.routeLink}>&#x1f5fa;&#xfe0f; Route map</summary>
-          <iframe
-            className={s.mapEmbed}
-            src={mapUrl.replace(/\/edit\b/, "/embed").replace(/\/viewer\b/, "/embed")}
-            title="Route map"
-            loading="lazy"
-          />
-        </details>
-      )}
-
       <nav className={s.tabs}>
         <button className={tab === "new" ? s.tabActive : s.tab} onClick={() => setTab("new")}>New entry</button>
         <button className={tab === "list" ? s.tabActive : s.tab} onClick={() => setTab("list")}>
@@ -341,15 +330,30 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl }: WalkAudit
             <span className={s.fieldLabelFirst}>Cross street / address / stop</span>
             <input className={s.textInput} type="text" value={form.location} onChange={handleLocationChange} placeholder="Mission Ave & Cleveland St" />
             <div className={`${s.geoStatus} ${geoStatus.cls}`}>{geoStatus.text}</div>
-            <PinMap
-              ref={pinMapRef}
-              lat={form.lat}
-              lng={form.lng}
-              onPin={(lat, lng, label) => {
-                setForm(prev => ({ ...prev, lat, lng, location: label || prev.location }));
-                setGeoStatus({ text: `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}`, cls: s.geoOk });
-              }}
-            />
+            {mapUrl && (
+              <nav className={s.mapToggle}>
+                <button type="button" className={mapMode === "route" ? s.mapToggleActive : s.mapToggleBtn} onClick={() => setMapMode("route")}>Route</button>
+                <button type="button" className={mapMode === "pin" ? s.mapToggleActive : s.mapToggleBtn} onClick={() => setMapMode("pin")}>Drop pin</button>
+              </nav>
+            )}
+            {mapMode === "route" && mapUrl ? (
+              <iframe
+                className={s.mapEmbed}
+                src={mapUrl.replace(/\/edit\b/, "/embed").replace(/\/viewer\b/, "/embed")}
+                title="Route map"
+                loading="lazy"
+              />
+            ) : (
+              <PinMap
+                ref={pinMapRef}
+                lat={form.lat}
+                lng={form.lng}
+                onPin={(lat, lng, label) => {
+                  setForm(prev => ({ ...prev, lat, lng, location: label || prev.location }));
+                  setGeoStatus({ text: `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}`, cls: s.geoOk });
+                }}
+              />
+            )}
           </div>
 
           <div className={s.card}>

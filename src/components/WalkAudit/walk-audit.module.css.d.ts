@@ -9,6 +9,9 @@ declare const styles: {
   readonly segment: string;
   readonly mapDetails: string;
   readonly routeLink: string;
+  readonly mapToggle: string;
+  readonly mapToggleBtn: string;
+  readonly mapToggleActive: string;
   readonly mapEmbed: string;
   readonly pinMapWrap: string;
   readonly pinMap: string;
