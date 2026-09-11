@@ -122,6 +122,7 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
   const polylinesRef = useRef<any[]>([]);
   const [ready, setReady] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [gpsError, setGpsError] = useState<string | null>(null);
 
   useImperativeHandle(ref, () => ({
     setPin(newLat: number, newLng: number) {
@@ -237,8 +238,12 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
   }, [activeSegment]);
 
   const handleGPS = () => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      setGpsError("Location not supported on this browser");
+      return;
+    }
     setLocating(true);
+    setGpsError(null);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const { latitude, longitude } = pos.coords;
@@ -256,7 +261,16 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
         onPin(latitude, longitude, label);
         setLocating(false);
       },
-      () => setLocating(false),
+      (err) => {
+        setLocating(false);
+        if (err.code === 1) {
+          setGpsError("Location access denied. Check Settings > Safari > Location Services.");
+        } else if (err.code === 2) {
+          setGpsError("Could not determine location. Try again outside.");
+        } else {
+          setGpsError("Location timed out. Try again.");
+        }
+      },
       { enableHighAccuracy: true, timeout: 15000 }
     );
   };
@@ -267,6 +281,7 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
       <button type="button" className={s.btnGps} onClick={handleGPS} disabled={locating}>
         {locating ? "Locating…" : "📍 Use my location"}
       </button>
+      {gpsError && <p className={s.geoFail}>{gpsError}</p>}
     </div>
   );
 });
