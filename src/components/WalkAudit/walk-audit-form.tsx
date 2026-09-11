@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect, type ChangeEvent } from "react";
 import * as s from "./walk-audit.module.css";
-import PinMap from "./pin-map";
+import PinMap, { forwardGeocode, type PinMapHandle } from "./pin-map";
 
 type Segment = { name: string };
 
@@ -132,6 +132,8 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl }: WalkAudit
   const sbRef = useRef<any>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const formTopRef = useRef<HTMLDivElement>(null);
+  const pinMapRef = useRef<PinMapHandle>(null);
+  const geocodeTimer = useRef<ReturnType<typeof setTimeout>>();
   const toastTimer = useRef<ReturnType<typeof setTimeout>>();
 
   const persist = useCallback((updated: Entry[]) => {
@@ -195,23 +197,18 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl }: WalkAudit
     setForm(prev => ({ ...prev, [field]: prev[field] === value ? null : value }));
   };
 
-  const handlePin = () => {
-    if (!navigator.geolocation) {
-      setGeoStatus({ text: "Geolocation not available.", cls: s.geoFail });
-      return;
-    }
-    setGeoStatus({ text: "Getting location…", cls: "" });
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setForm(prev => ({ ...prev, lat: pos.coords.latitude, lng: pos.coords.longitude }));
-        setGeoStatus({ text: `📍 ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`, cls: s.geoOk });
-      },
-      (err) => {
-        const msgs: Record<number, string> = { 1: "Location access denied.", 2: "Position unavailable.", 3: "Request timed out." };
-        setGeoStatus({ text: msgs[err.code] || "Could not get location.", cls: s.geoFail });
-      },
-      { enableHighAccuracy: true, timeout: 15000 }
-    );
+  const handleLocationChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setForm(prev => ({ ...prev, location: value }));
+    if (geocodeTimer.current) clearTimeout(geocodeTimer.current);
+    if (value.trim().length < 3) return;
+    geocodeTimer.current = setTimeout(async () => {
+      const result = await forwardGeocode(value.trim());
+      if (!result) return;
+      setForm(prev => ({ ...prev, lat: result.lat, lng: result.lng }));
+      setGeoStatus({ text: `📍 ${result.lat.toFixed(5)}, ${result.lng.toFixed(5)}`, cls: s.geoOk });
+      pinMapRef.current?.setPin(result.lat, result.lng);
+    }, 800);
   };
 
   const handlePhoto = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -340,8 +337,12 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl }: WalkAudit
         <>
           <div className={s.card} ref={formTopRef}>
             <h3>Location</h3>
-            <p className={s.hint}>Tap the map to drop a pin, or use GPS.</p>
+            <p className={s.hint}>Type a location, tap the map, or use GPS.</p>
+            <span className={s.fieldLabelFirst}>Cross street / address / stop</span>
+            <input className={s.textInput} type="text" value={form.location} onChange={handleLocationChange} placeholder="Mission Ave & Cleveland St" />
+            <div className={`${s.geoStatus} ${geoStatus.cls}`}>{geoStatus.text}</div>
             <PinMap
+              ref={pinMapRef}
               lat={form.lat}
               lng={form.lng}
               onPin={(lat, lng, label) => {
@@ -349,9 +350,6 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl }: WalkAudit
                 setGeoStatus({ text: `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}`, cls: s.geoOk });
               }}
             />
-            <span className={s.fieldLabel}>Label (optional)</span>
-            <input className={s.textInput} type="text" value={form.location} onChange={e => setForm(prev => ({ ...prev, location: e.target.value }))} placeholder="Mission Ave & Cleveland St" />
-            <div className={`${s.geoStatus} ${geoStatus.cls}`}>{geoStatus.text}</div>
           </div>
 
           <div className={s.card}>

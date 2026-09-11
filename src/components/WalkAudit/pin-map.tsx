@@ -1,10 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import * as s from "./walk-audit.module.css";
 
 type PinMapProps = {
   lat: number | null;
   lng: number | null;
   onPin: (lat: number, lng: number, label: string | null) => void;
+};
+
+export type PinMapHandle = {
+  setPin: (lat: number, lng: number) => void;
 };
 
 const OCEANSIDE: [number, number] = [33.1959, -117.3795];
@@ -30,7 +34,7 @@ function loadCSS(href: string) {
   document.head.appendChild(el);
 }
 
-async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
+export async function reverseGeocode(lat: number, lng: number): Promise<string | null> {
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=18`,
@@ -48,12 +52,50 @@ async function reverseGeocode(lat: number, lng: number): Promise<string | null> 
   }
 }
 
-export default function PinMap({ lat, lng, onPin }: PinMapProps) {
+export async function forwardGeocode(query: string): Promise<{ lat: number; lng: number } | null> {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&viewbox=-117.45,33.25,-117.30,33.15&bounded=1`,
+      { headers: { "Accept-Language": "en" } }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data.length) {
+      const unbounded = await fetch(
+        `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query + ", Oceanside, CA")}&format=json&limit=1`,
+        { headers: { "Accept-Language": "en" } }
+      );
+      if (!unbounded.ok) return null;
+      const data2 = await unbounded.json();
+      if (!data2.length) return null;
+      return { lat: parseFloat(data2[0].lat), lng: parseFloat(data2[0].lon) };
+    }
+    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+  } catch {
+    return null;
+  }
+}
+
+const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap({ lat, lng, onPin }, ref) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
   const [ready, setReady] = useState(false);
   const [locating, setLocating] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    setPin(newLat: number, newLng: number) {
+      const L = (window as any).L;
+      const map = mapRef.current;
+      if (!map || !L) return;
+      map.setView([newLat, newLng], 17);
+      if (markerRef.current) {
+        markerRef.current.setLatLng([newLat, newLng]);
+      } else {
+        markerRef.current = L.marker([newLat, newLng]).addTo(map);
+      }
+    },
+  }));
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -131,4 +173,6 @@ export default function PinMap({ lat, lng, onPin }: PinMapProps) {
       </button>
     </div>
   );
-}
+});
+
+export default PinMap;
