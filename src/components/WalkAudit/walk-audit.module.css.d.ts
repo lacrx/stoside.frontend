@@ -1,5 +1,7 @@
 declare const styles: {
   readonly form: string;
+  readonly auditTitle: string;
+  readonly auditMeta: string;
   readonly controls: string;
   readonly syncBadge: string;
   readonly dot: string;

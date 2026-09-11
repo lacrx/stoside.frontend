@@ -45,7 +45,7 @@ export default function Walk() {
   if (!audit) {
     return (
       <Layout>
-        <Hero title="Walk Audit" style={{ paddingBottom: "1.5rem" }} />
+        <Hero title="Walk Audit" />
         <Content type="section">
           <p>No active walk audit right now. Check back soon.</p>
         </Content>
@@ -55,14 +55,13 @@ export default function Walk() {
 
   return (
     <Layout>
-      <Hero
-        title={`Walk Audit: ${audit.title}`}
-        description={`${audit.date}${audit.description ? ` · ${audit.description}` : ""}`}
-        style={{ paddingBottom: "1.5rem" }}
-      />
+      <Hero title="Walk Audit" />
       <Content type="section">
         <WalkAuditForm
           auditSlug={audit.slug}
+          title={audit.title}
+          date={audit.date}
+          description={audit.description}
           segments={audit.segments}
           mapUrl={audit.mapUrl}
         />
