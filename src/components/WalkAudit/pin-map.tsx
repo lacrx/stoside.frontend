@@ -112,10 +112,6 @@ function circleIcon(L: any, label: string, color: string) {
   });
 }
 
-function nearExisting(pt: [number, number], existing: [number, number][], threshold = 0.0003): boolean {
-  return existing.some(([lat, lng]) => Math.abs(pt[0] - lat) < threshold && Math.abs(pt[1] - lng) < threshold);
-}
-
 const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
   { lat, lng, routeSegments, segments, activeSegment, onPin },
   ref
@@ -169,7 +165,7 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
 
     if (hasRoute) {
       const allPoints: [number, number][] = [];
-      const endpoints: { pt: [number, number]; segIdx: number }[] = [];
+      const segCoords: Map<number, [number, number][]> = new Map();
 
       for (const rs of routeSegments!) {
         const segIdx = matchSegmentIndex(rs.name, segments);
@@ -179,32 +175,18 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
           const pl = L.polyline(coords, { color, weight: 5, opacity: 0.85 }).addTo(map);
           polylinesRef.current.push(pl);
           allPoints.push(...coords);
-          endpoints.push({ pt: coords[0], segIdx });
-          endpoints.push({ pt: coords[coords.length - 1], segIdx });
+          if (segIdx >= 0) {
+            const prev = segCoords.get(segIdx) || [];
+            prev.push(...coords);
+            segCoords.set(segIdx, prev);
+          }
         }
       }
 
-      const placed: [number, number][] = [];
-      const hubCounts: Map<string, { pt: [number, number]; segs: Set<number> }> = new Map();
-      for (const ep of endpoints) {
-        const key = `${ep.pt[0].toFixed(4)},${ep.pt[1].toFixed(4)}`;
-        if (!hubCounts.has(key)) hubCounts.set(key, { pt: ep.pt, segs: new Set() });
-        hubCounts.get(key)!.segs.add(ep.segIdx);
-      }
-
-      for (const [, { pt, segs }] of hubCounts) {
-        if (segs.size > 1) {
-          L.marker(pt, { icon: circleIcon(L, "S", "#333"), interactive: false }).addTo(map);
-          placed.push(pt);
-        }
-      }
-
-      for (const ep of endpoints) {
-        if (!nearExisting(ep.pt, placed) && ep.segIdx >= 0) {
-          const color = SEGMENT_COLORS[ep.segIdx % SEGMENT_COLORS.length];
-          L.marker(ep.pt, { icon: circleIcon(L, String(ep.segIdx + 1), color), interactive: false }).addTo(map);
-          placed.push(ep.pt);
-        }
+      for (const [segIdx, coords] of segCoords) {
+        const mid = coords[Math.floor(coords.length / 2)];
+        const color = SEGMENT_COLORS[segIdx % SEGMENT_COLORS.length];
+        L.marker(mid, { icon: circleIcon(L, String(segIdx + 1), color), interactive: false }).addTo(map);
       }
 
       if (lat == null || lng == null) {
