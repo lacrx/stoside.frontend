@@ -97,6 +97,25 @@ function matchSegmentIndex(routeName: string, segments: Segment[]): number {
   return segments.findIndex(seg => seg.name.startsWith(num));
 }
 
+function circleIcon(L: any, label: string, color: string) {
+  return L.divIcon({
+    className: "",
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    html: `<div style="
+      width:24px;height:24px;border-radius:50%;
+      background:${color};color:#fff;
+      display:flex;align-items:center;justify-content:center;
+      font:bold 12px/${24}px sans-serif;
+      border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.4);
+    ">${label}</div>`,
+  });
+}
+
+function nearExisting(pt: [number, number], existing: [number, number][], threshold = 0.0003): boolean {
+  return existing.some(([lat, lng]) => Math.abs(pt[0] - lat) < threshold && Math.abs(pt[1] - lng) < threshold);
+}
+
 const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
   { lat, lng, routeSegments, segments, activeSegment, onPin },
   ref
@@ -150,6 +169,8 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
 
     if (hasRoute) {
       const allPoints: [number, number][] = [];
+      const endpoints: { pt: [number, number]; segIdx: number }[] = [];
+
       for (const rs of routeSegments!) {
         const segIdx = matchSegmentIndex(rs.name, segments);
         const color = segIdx >= 0 ? SEGMENT_COLORS[segIdx % SEGMENT_COLORS.length] : "#888";
@@ -158,8 +179,34 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
           const pl = L.polyline(coords, { color, weight: 5, opacity: 0.85 }).addTo(map);
           polylinesRef.current.push(pl);
           allPoints.push(...coords);
+          endpoints.push({ pt: coords[0], segIdx });
+          endpoints.push({ pt: coords[coords.length - 1], segIdx });
         }
       }
+
+      const placed: [number, number][] = [];
+      const hubCounts: Map<string, { pt: [number, number]; segs: Set<number> }> = new Map();
+      for (const ep of endpoints) {
+        const key = `${ep.pt[0].toFixed(4)},${ep.pt[1].toFixed(4)}`;
+        if (!hubCounts.has(key)) hubCounts.set(key, { pt: ep.pt, segs: new Set() });
+        hubCounts.get(key)!.segs.add(ep.segIdx);
+      }
+
+      for (const [, { pt, segs }] of hubCounts) {
+        if (segs.size > 1) {
+          L.marker(pt, { icon: circleIcon(L, "S", "#333"), interactive: false }).addTo(map);
+          placed.push(pt);
+        }
+      }
+
+      for (const ep of endpoints) {
+        if (!nearExisting(ep.pt, placed) && ep.segIdx >= 0) {
+          const color = SEGMENT_COLORS[ep.segIdx % SEGMENT_COLORS.length];
+          L.marker(ep.pt, { icon: circleIcon(L, String(ep.segIdx + 1), color), interactive: false }).addTo(map);
+          placed.push(ep.pt);
+        }
+      }
+
       if (lat == null || lng == null) {
         map.fitBounds(L.latLngBounds(allPoints), { padding: [30, 30] });
       }
