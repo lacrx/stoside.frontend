@@ -110,13 +110,19 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl }: WalkAudit
   const [tab, setTab] = useState<"new" | "list">("new");
   const [form, setForm] = useState<FormState>({ ...EMPTY_FORM });
   const [entries, setEntries] = useState<Entry[]>(() =>
-    JSON.parse(localStorage.getItem(`${LS}_entries_${auditSlug}`) || "[]")
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem(`${LS}_entries_${auditSlug}`) || "[]")
+      : []
   );
   const [segment, setSegment] = useState(() =>
-    localStorage.getItem(`${LS}_segment`) || segments[0]?.name || ""
+    typeof window !== "undefined"
+      ? localStorage.getItem(`${LS}_segment`) || segments[0]?.name || ""
+      : segments[0]?.name || ""
   );
   const [observer, setObserver] = useState(() =>
-    localStorage.getItem(`${LS}_observer`) || ""
+    typeof window !== "undefined"
+      ? localStorage.getItem(`${LS}_observer`) || ""
+      : ""
   );
   const [geoStatus, setGeoStatus] = useState<{ text: string; cls: string }>({ text: "", cls: "" });
   const [synced, setSynced] = useState<boolean | null>(null);
