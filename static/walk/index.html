@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0f1923">
+<title>Walk Audit | Strong Towns Oceanside</title>
+<style>
+:root {
+  --bg: #0f1923;
+  --card: #172331;
+  --surface: #1e2d3d;
+  --border: #2a3d52;
+  --text: #e4eaf0;
+  --muted: #7a8da0;
+  --accent: #e8613a;
+  --accent-hover: #f07050;
+  --accent-bg: rgba(232, 97, 58, 0.12);
+  --success: #3db893;
+  --warn: #f0a030;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg); color: var(--text);
+  line-height: 1.5; min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+input, select, textarea, button { font-family: inherit; }
+input[type="text"], textarea, select { font-size: 16px; }
+
+header {
+  background: linear-gradient(160deg, #0c1520, #1a2e40 60%, #0f1923);
+  padding: 2rem 1.25rem 1.5rem; text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+header small {
+  display: block; font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 0.25rem;
+}
+header h1 { font-size: 1.75rem; font-weight: 800; line-height: 1.1; }
+header p { font-size: 0.85rem; color: var(--muted); margin-top: 0.375rem; }
+
+main { max-width: 40rem; margin: 0 auto; padding: 1rem 1rem 2rem; }
+
+.controls {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.controls label {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted);
+}
+.sync-badge {
+  font-size: 0.75rem; display: flex; align-items: center; gap: 0.35rem;
+}
+.sync-badge .dot {
+  width: 0.5rem; height: 0.5rem; border-radius: 50%;
+  background: var(--muted); display: inline-block;
+}
+.sync-badge.connected .dot { background: var(--success); }
+
+select#segment {
+  width: 100%; padding: 0.625rem 1rem; margin-bottom: 0.5rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 0.5rem; color: var(--text); font-size: 1rem;
+  appearance: auto;
+}
+
+.route-link {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.85rem; color: var(--success); text-decoration: none;
+  padding: 0.4rem 0; margin-bottom: 0.75rem;
+}
+.route-link:hover { text-decoration: underline; }
+
+.tabs {
+  display: flex; border-radius: 0.5rem; overflow: hidden;
+  border: 1px solid var(--border); margin-bottom: 1rem;
+}
+.tab {
+  flex: 1; padding: 0.7rem; background: var(--card); border: none;
+  color: var(--muted); font-size: 0.9rem; font-weight: 600; cursor: pointer;
+}
+.tab.active { background: var(--surface); color: var(--text); }
+
+.panel { display: none; }
+.panel.active { display: block; }
+
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 0.75rem;
+}
+.card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.125rem; }
+.card .hint { font-size: 0.8rem; color: var(--muted); margin-bottom: 0.875rem; }
+.field-label {
+  display: block; font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--muted); margin: 1rem 0 0.5rem;
+}
+.field-label:first-of-type { margin-top: 0; }
+
+.input-row { display: flex; gap: 0.5rem; }
+.input-row input { flex: 1; }
+input[type="text"], textarea {
+  width: 100%; padding: 0.7rem 0.875rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 0.5rem; color: var(--text);
+}
+input[type="text"]:focus, textarea:focus, select:focus {
+  outline: none; border-color: var(--accent);
+}
+textarea { resize: vertical; min-height: 5rem; }
+
+.btn-pin {
+  padding: 0.625rem 0.875rem; border: 1.5px solid var(--border);
+  border-radius: 0.5rem; background: transparent;
+  color: var(--success); font-size: 0.85rem; cursor: pointer;
+  white-space: nowrap;
+}
+.btn-pin:hover { border-color: var(--success); }
+
+.geo-status {
+  font-size: 0.8rem; margin-top: 0.375rem; min-height: 1.25rem;
+}
+.geo-status.pending { color: var(--muted); }
+.geo-status.ok { color: var(--success); }
+.geo-status.fail { color: var(--accent); }
+
+.pills { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.pills button {
+  padding: 0.5rem 0.875rem; border-radius: 2rem;
+  border: 1.5px solid var(--border); background: transparent;
+  color: var(--text); font-size: 0.85rem; cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.pills button:hover { border-color: var(--muted); }
+.pills button.sel {
+  border-color: var(--accent); color: var(--accent); background: var(--accent-bg);
+}
+
+.flag-row {
+  display: flex; align-items: center; gap: 0.6rem;
+  margin-top: 1.25rem; padding: 0.75rem;
+  background: var(--surface); border-radius: 0.5rem;
+}
+.flag-row input[type="checkbox"] {
+  width: 1.25rem; height: 1.25rem; accent-color: var(--accent);
+}
+.flag-row label { font-size: 0.9rem; cursor: pointer; }
+
+.photo-preview {
+  margin-bottom: 0.75rem; border-radius: 0.5rem; overflow: hidden;
+  position: relative; display: none;
+}
+.photo-preview.has-photo { display: block; }
+.photo-preview img {
+  width: 100%; display: block; border-radius: 0.5rem;
+}
+.photo-remove {
+  position: absolute; top: 0.5rem; right: 0.5rem;
+  width: 2rem; height: 2rem; border-radius: 50%;
+  background: rgba(0,0,0,0.6); border: none;
+  color: white; font-size: 1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-photo {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.625rem 1rem; border: 1.5px dashed var(--border);
+  border-radius: 0.5rem; background: transparent;
+  color: var(--muted); font-size: 0.85rem; cursor: pointer;
+}
+.btn-photo:hover { border-color: var(--muted); color: var(--text); }
+input[type="file"] { display: none; }
+
+.btn-save {
+  display: block; width: 100%; padding: 1rem; border: none;
+  border-radius: 0.75rem; background: var(--accent); color: white;
+  font-size: 1.1rem; font-weight: 700; cursor: pointer;
+  transition: background 0.12s; margin-top: 0.25rem;
+}
+.btn-save:hover { background: var(--accent-hover); }
+.btn-save:active { transform: scale(0.98); }
+.btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.entries-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 0.75rem;
+}
+.btn-export {
+  padding: 0.5rem 1rem; border: 1.5px solid var(--border);
+  border-radius: 0.5rem; background: transparent;
+  color: var(--success); font-size: 0.8rem; font-weight: 600;
+  cursor: pointer;
+}
+.btn-export:hover { border-color: var(--success); }
+
+.empty {
+  text-align: center; color: var(--muted); padding: 3rem 1rem;
+  font-size: 0.9rem;
+}
+
+.entry {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 0.75rem; padding: 1rem; margin-bottom: 0.625rem;
+}
+.entry-top {
+  display: flex; justify-content: space-between; align-items: start;
+  gap: 0.5rem;
+}
+.entry-location { font-weight: 600; font-size: 0.95rem; }
+.entry-time { font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+.entry-meta {
+  font-size: 0.8rem; color: var(--muted); margin-top: 0.125rem;
+}
+.entry-badges {
+  display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem;
+}
+.badge {
+  font-size: 0.7rem; padding: 0.15rem 0.55rem; border-radius: 1rem;
+  font-weight: 600;
+}
+.badge-safe { background: rgba(61,184,147,0.15); color: var(--success); }
+.badge-concerns { background: rgba(240,160,48,0.15); color: var(--warn); }
+.badge-unsafe { background: var(--accent-bg); color: var(--accent); }
+.badge-flag { background: var(--accent-bg); color: var(--accent); }
+.badge-good { background: rgba(61,184,147,0.1); color: var(--success); }
+.badge-fair { background: rgba(240,160,48,0.1); color: var(--warn); }
+.badge-poor { background: rgba(232,97,58,0.1); color: var(--accent); }
+.badge-none { background: rgba(122,141,160,0.15); color: var(--muted); }
+.badge-low { background: rgba(61,184,147,0.1); color: var(--success); }
+.badge-moderate { background: rgba(240,160,48,0.1); color: var(--warn); }
+.badge-high { background: rgba(232,97,58,0.1); color: var(--accent); }
+
+.entry-photo {
+  margin-top: 0.5rem; border-radius: 0.375rem; overflow: hidden;
+}
+.entry-photo img { width: 100%; display: block; }
+.entry-notes {
+  font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem;
+  font-style: italic;
+}
+.entry-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 0.625rem; padding-top: 0.5rem; border-top: 1px solid var(--border);
+}
+.entry-observer { font-size: 0.8rem; color: var(--muted); }
+.btn-delete {
+  padding: 0.3rem 0.75rem; border: 1px solid var(--border);
+  border-radius: 0.375rem; background: transparent;
+  color: var(--accent); font-size: 0.75rem; cursor: pointer;
+}
+.btn-delete:hover { border-color: var(--accent); }
+
+.toast-wrap {
+  position: fixed; bottom: 1.5rem; left: 50%;
+  transform: translateX(-50%); z-index: 200; pointer-events: none;
+}
+.toast {
+  padding: 0.65rem 1.25rem; border-radius: 0.5rem;
+  font-size: 0.9rem; font-weight: 500;
+  background: var(--success); color: #fff;
+  opacity: 0; transform: translateY(1rem);
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: auto;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.warn { background: var(--warn); color: #1a1a1a; }
+.toast.err { background: var(--accent); }
+
+footer {
+  text-align: center; padding: 1.5rem 1rem; font-size: 0.8rem;
+  color: var(--muted); border-top: 1px solid var(--border);
+}
+footer strong { color: var(--text); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header>
+  <small>Strong Towns Oceanside</small>
+  <h1>Walk Audit</h1>
+  <p>Field notes from the pier to the neighborhoods.</p>
+</header>
+
+<main>
+  <div class="controls">
+    <label>Today's Audit</label>
+    <div class="sync-badge" id="sync-badge">
+      <span class="dot"></span>
+      <span id="sync-text">Local only</span>
+    </div>
+  </div>
+
+  <select id="segment">
+    <option>1: Mission to Douglas</option>
+    <option>1: Douglass to Mission</option>
+    <option>2: El Camino x Mission to Mission View West</option>
+    <option>2: Trico MHP to El Camino x Mission</option>
+    <option>3: El Camino 76</option>
+    <option>3: Mission x El Camino</option>
+  </select>
+
+  <a class="route-link" href="https://www.google.com/maps/d/u/0/viewer?mid=1FU08sNqgb8aM1Xq0UEZefaRdBAdDoMQ" target="_blank" rel="noopener">
+    &#x1f5fa;&#xfe0f; View route map
+  </a>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="new">New entry</button>
+    <button class="tab" data-tab="list">All entries (<span id="count">0</span>)</button>
+  </nav>
+
+  <div id="panel-new" class="panel active">
+    <div class="card" id="form-top">
+      <h3>Location</h3>
+      <p class="hint">Where are you right now?</p>
+      <span class="field-label">Cross street / address / stop</span>
+      <div class="input-row">
+        <input type="text" id="f-location" placeholder="Mission Ave &amp; Cleveland St">
+        <button class="btn-pin" id="btn-pin" type="button">&#x1f4cd; Pin</button>
+      </div>
+      <div class="geo-status" id="geo-status"></div>
+    </div>
+
+    <div class="card">
+      <h3>Conditions</h3>
+      <p class="hint">Rate what you observe at this stop.</p>
+
+      <span class="field-label">Sidewalk condition</span>
+      <div class="pills" data-field="sidewalk">
+        <button type="button" data-value="good">Good</button>
+        <button type="button" data-value="fair">Fair</button>
+        <button type="button" data-value="poor">Poor</button>
+        <button type="button" data-value="none">No sidewalk</button>
+      </div>
+
+      <span class="field-label">Crosswalk safety</span>
+      <div class="pills" data-field="crosswalk">
+        <button type="button" data-value="good">Good</button>
+        <button type="button" data-value="fair">Fair</button>
+        <button type="button" data-value="poor">Poor</button>
+        <button type="button" data-value="none">None present</button>
+      </div>
+
+      <span class="field-label">Street lighting</span>
+      <div class="pills" data-field="lighting">
+        <button type="button" data-value="good">Good</button>
+        <button type="button" data-value="fair">Fair</button>
+        <button type="button" data-value="poor">Poor</button>
+      </div>
+
+      <span class="field-label">Traffic speed &amp; volume</span>
+      <div class="pills" data-field="traffic">
+        <button type="button" data-value="low">Low</button>
+        <button type="button" data-value="moderate">Moderate</button>
+        <button type="button" data-value="high">High</button>
+      </div>
+
+      <span class="field-label">Overall safety rating</span>
+      <div class="pills" data-field="safety">
+        <button type="button" data-value="safe">Feels safe</button>
+        <button type="button" data-value="concerns">Some concerns</button>
+        <button type="button" data-value="unsafe">Feels unsafe</button>
+      </div>
+
+      <div class="flag-row">
+        <input type="checkbox" id="f-flagged">
+        <label for="f-flagged">Flag for immediate follow-up</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Photo</h3>
+      <div class="photo-preview" id="photo-preview">
+        <img id="photo-img" src="" alt="Preview">
+        <button class="photo-remove" id="btn-photo-remove" type="button">&times;</button>
+      </div>
+      <button class="btn-photo" id="btn-photo" type="button">&#x1f4f7; Add photo</button>
+      <input type="file" id="f-photo" accept="image/*" capture="environment">
+    </div>
+
+    <div class="card">
+      <h3>Notes</h3>
+      <textarea id="f-notes" placeholder="Anything else to note..."></textarea>
+    </div>
+
+    <div class="card">
+      <h3>Observer</h3>
+      <input type="text" id="f-observer" placeholder="Your name">
+    </div>
+
+    <button class="btn-save" id="btn-save" type="button">Save entry</button>
+  </div>
+
+  <div id="panel-list" class="panel">
+    <div class="entries-header">
+      <span id="list-label" style="font-size:0.85rem;color:var(--muted)"></span>
+      <button class="btn-export" id="btn-export" type="button">Export CSV</button>
+    </div>
+    <div id="entries"></div>
+  </div>
+</main>
+
+<footer>
+  <strong>Strong Towns Oceanside</strong>
+</footer>
+
+<div class="toast-wrap"><div class="toast" id="toast"></div></div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────
+// Set these after creating your Supabase project to enable team sync.
+// Without them the app stores everything in localStorage (works fine solo).
+const SUPABASE_URL = '';
+const SUPABASE_KEY = '';
+// ────────────────────────────────────────────────────────
+
+const LS = 'walkaudit';
+const $ = (s) => document.querySelector(s);
+const $$ = (s) => document.querySelectorAll(s);
+
+const form = {
+  location: '', lat: null, lng: null,
+  sidewalk: null, crosswalk: null, lighting: null,
+  traffic: null, safety: null, flagged: false,
+  photo: null, notes: ''
+};
+
+let entries = JSON.parse(localStorage.getItem(LS + '_entries') || '[]');
+let sb = null;
+
+const segmentEl = $('#segment');
+const observerEl = $('#f-observer');
+
+// Restore persisted prefs
+segmentEl.value = localStorage.getItem(LS + '_segment') || segmentEl.options[0].value;
+observerEl.value = localStorage.getItem(LS + '_observer') || '';
+
+// ── SUPABASE ────────────────────────────────────────────
+
+async function initSupabase() {
+  if (!SUPABASE_URL || !SUPABASE_KEY) return;
+  try {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+      s.onload = resolve;
+      s.onerror = reject;
+      document.head.appendChild(s);
+    });
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const { data } = await sb.from('entries').select('*');
+    if (data) {
+      const ids = new Set(entries.map(e => e.id));
+      for (const row of data) {
+        if (!ids.has(row.id)) { entries.push(row); ids.add(row.id); }
+      }
+      persist();
+    }
+
+    sb.channel('walk-audit')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'entries' }, (p) => {
+        if (p.eventType === 'INSERT' && !entries.find(e => e.id === p.new.id)) {
+          entries.push(p.new);
+          persist(); renderList();
+        } else if (p.eventType === 'DELETE') {
+          entries = entries.filter(e => e.id !== p.old.id);
+          persist(); renderList();
+        }
+      })
+      .subscribe((status) => {
+        const badge = $('#sync-badge');
+        const text = $('#sync-text');
+        if (status === 'SUBSCRIBED') {
+          badge.classList.add('connected');
+          text.textContent = 'Synced with team';
+        } else {
+          badge.classList.remove('connected');
+          text.textContent = 'Reconnecting...';
+        }
+      });
+  } catch (err) {
+    console.error('Supabase init failed:', err);
+  }
+}
+
+// ── PERSISTENCE ─────────────────────────────────────────
+
+function persist() {
+  localStorage.setItem(LS + '_entries', JSON.stringify(entries));
+}
+
+// ── TABS ────────────────────────────────────────────────
+
+$$('.tab').forEach(t => t.addEventListener('click', () => {
+  $$('.tab').forEach(b => b.classList.remove('active'));
+  $$('.panel').forEach(p => p.classList.remove('active'));
+  t.classList.add('active');
+  $(`#panel-${t.dataset.tab}`).classList.add('active');
+  if (t.dataset.tab === 'list') renderList();
+}));
+
+// ── PILLS ───────────────────────────────────────────────
+
+$$('.pills').forEach(group => {
+  group.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const field = group.dataset.field;
+    const wasSelected = btn.classList.contains('sel');
+    group.querySelectorAll('button').forEach(b => b.classList.remove('sel'));
+    if (!wasSelected) {
+      btn.classList.add('sel');
+      form[field] = btn.dataset.value;
+    } else {
+      form[field] = null;
+    }
+  });
+});
+
+// ── GEOLOCATION ─────────────────────────────────────────
+
+$('#btn-pin').addEventListener('click', () => {
+  const el = $('#geo-status');
+  if (!navigator.geolocation) {
+    el.textContent = 'Geolocation not available.';
+    el.className = 'geo-status fail';
+    return;
+  }
+  el.textContent = 'Getting location…';
+  el.className = 'geo-status pending';
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      form.lat = pos.coords.latitude;
+      form.lng = pos.coords.longitude;
+      el.textContent = `📍 ${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+      el.className = 'geo-status ok';
+    },
+    (err) => {
+      const msgs = { 1: 'Location access denied.', 2: 'Position unavailable.', 3: 'Request timed out.' };
+      el.textContent = msgs[err.code] || 'Could not get location.';
+      el.className = 'geo-status fail';
+    },
+    { enableHighAccuracy: true, timeout: 15000 }
+  );
+});
+
+// ── PHOTO ───────────────────────────────────────────────
+
+$('#btn-photo').addEventListener('click', () => $('#f-photo').click());
+
+$('#f-photo').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  form.photo = await resizePhoto(file);
+  $('#photo-img').src = form.photo;
+  $('#photo-preview').classList.add('has-photo');
+});
+
+$('#btn-photo-remove').addEventListener('click', () => {
+  form.photo = null;
+  $('#f-photo').value = '';
+  $('#photo-img').src = '';
+  $('#photo-preview').classList.remove('has-photo');
+});
+
+function resizePhoto(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        if (w > MAX) { h = h * MAX / w; w = MAX; }
+        const c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(c.toDataURL('image/jpeg', 0.7));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── SAVE ────────────────────────────────────────────────
+
+$('#btn-save').addEventListener('click', async () => {
+  form.location = $('#f-location').value.trim();
+  form.notes = $('#f-notes').value.trim();
+  form.flagged = $('#f-flagged').checked;
+
+  if (!form.location && !form.sidewalk && !form.crosswalk &&
+      !form.lighting && !form.traffic && !form.safety && !form.notes) {
+    toast('Add a location or at least one observation.', 'warn');
+    return;
+  }
+
+  const observer = observerEl.value.trim();
+  localStorage.setItem(LS + '_observer', observer);
+  localStorage.setItem(LS + '_segment', segmentEl.value);
+
+  const entry = {
+    id: crypto.randomUUID(),
+    segment: segmentEl.value,
+    location: form.location,
+    lat: form.lat,
+    lng: form.lng,
+    sidewalk: form.sidewalk,
+    crosswalk: form.crosswalk,
+    lighting: form.lighting,
+    traffic: form.traffic,
+    safety: form.safety,
+    flagged: form.flagged,
+    photo_url: form.photo,
+    notes: form.notes,
+    observer: observer,
+    created_at: new Date().toISOString()
+  };
+
+  entries.push(entry);
+  persist();
+
+  if (sb) {
+    try { await sb.from('entries').insert(entry); }
+    catch (err) { console.error('Sync insert failed:', err); }
+  }
+
+  resetForm();
+  toast('Entry saved');
+});
+
+function resetForm() {
+  form.location = ''; form.lat = null; form.lng = null;
+  form.sidewalk = null; form.crosswalk = null; form.lighting = null;
+  form.traffic = null; form.safety = null; form.flagged = false;
+  form.photo = null; form.notes = '';
+
+  $('#f-location').value = '';
+  $('#f-notes').value = '';
+  $('#f-flagged').checked = false;
+  $$('.pills button.sel').forEach(b => b.classList.remove('sel'));
+  $('#f-photo').value = '';
+  $('#photo-img').src = '';
+  $('#photo-preview').classList.remove('has-photo');
+  $('#geo-status').textContent = '';
+  $('#geo-status').className = 'geo-status';
+  $('#form-top').scrollIntoView({ behavior: 'smooth' });
+  renderCount();
+}
+
+// ── ENTRY LIST ──────────────────────────────────────────
+
+function renderCount() {
+  const seg = segmentEl.value;
+  const n = entries.filter(e => e.segment === seg).length;
+  $('#count').textContent = n;
+}
+
+function renderList() {
+  const seg = segmentEl.value;
+  const filtered = entries
+    .filter(e => e.segment === seg)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  $('#count').textContent = filtered.length;
+  $('#list-label').textContent = `${filtered.length} entr${filtered.length === 1 ? 'y' : 'ies'} in ${seg}`;
+
+  const el = $('#entries');
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty">No entries yet for this segment.</div>';
+    return;
+  }
+
+  const labels = {
+    sidewalk: { good: 'Sidewalk: Good', fair: 'Sidewalk: Fair', poor: 'Sidewalk: Poor', none: 'No sidewalk' },
+    crosswalk: { good: 'Crosswalk: Good', fair: 'Crosswalk: Fair', poor: 'Crosswalk: Poor', none: 'No crosswalk' },
+    lighting: { good: 'Lighting: Good', fair: 'Lighting: Fair', poor: 'Lighting: Poor' },
+    traffic: { low: 'Traffic: Low', moderate: 'Traffic: Moderate', high: 'Traffic: High' },
+    safety: { safe: 'Feels safe', concerns: 'Some concerns', unsafe: 'Feels unsafe' }
+  };
+  const badgeClass = {
+    good: 'good', fair: 'fair', poor: 'poor', none: 'none',
+    low: 'low', moderate: 'moderate', high: 'high',
+    safe: 'safe', concerns: 'concerns', unsafe: 'unsafe'
+  };
+
+  el.innerHTML = filtered.map(e => {
+    const badges = [];
+    for (const cat of ['safety', 'sidewalk', 'crosswalk', 'lighting', 'traffic']) {
+      if (e[cat]) badges.push(`<span class="badge badge-${badgeClass[e[cat]]}">${esc(labels[cat][e[cat]])}</span>`);
+    }
+    if (e.flagged) badges.push('<span class="badge badge-flag">⚑ Flagged</span>');
+
+    const t = new Date(e.created_at);
+    const time = t.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+    return `<div class="entry" data-id="${e.id}">
+      <div class="entry-top">
+        <div>
+          <div class="entry-location">${esc(e.location || 'No location')}</div>
+          ${e.lat ? `<div class="entry-meta">${e.lat.toFixed(5)}, ${e.lng.toFixed(5)}</div>` : ''}
+        </div>
+        <span class="entry-time">${time}</span>
+      </div>
+      ${badges.length ? `<div class="entry-badges">${badges.join('')}</div>` : ''}
+      ${e.photo_url ? `<div class="entry-photo"><img src="${e.photo_url}" alt="Photo" loading="lazy"></div>` : ''}
+      ${e.notes ? `<div class="entry-notes">"${esc(e.notes)}"</div>` : ''}
+      <div class="entry-footer">
+        <span class="entry-observer">${esc(e.observer || 'Anonymous')}</span>
+        <button class="btn-delete" data-id="${e.id}" type="button">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── DELETE ───────────────────────────────────────────────
+
+$('#entries').addEventListener('click', async (e) => {
+  const btn = e.target.closest('.btn-delete');
+  if (!btn) return;
+  if (!confirm('Delete this entry?')) return;
+  const id = btn.dataset.id;
+  entries = entries.filter(e => e.id !== id);
+  persist();
+  if (sb) {
+    try { await sb.from('entries').delete().eq('id', id); }
+    catch (err) { console.error('Sync delete failed:', err); }
+  }
+  renderList();
+  toast('Entry deleted');
+});
+
+// ── EXPORT ──────────────────────────────────────────────
+
+$('#btn-export').addEventListener('click', () => {
+  const seg = segmentEl.value;
+  const filtered = entries.filter(e => e.segment === seg);
+  if (!filtered.length) { toast('No entries to export.', 'warn'); return; }
+
+  const cols = ['segment','location','lat','lng','sidewalk','crosswalk','lighting','traffic','safety','flagged','notes','observer','created_at'];
+  const rows = filtered.map(e => cols.map(c => {
+    const v = e[c];
+    if (v == null) return '';
+    const s = String(v);
+    return (s.includes(',') || s.includes('"') || s.includes('\n')) ? `"${s.replace(/"/g, '""')}"` : s;
+  }));
+
+  const csv = [cols.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `walk-audit-${seg.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast('CSV downloaded');
+});
+
+// ── SEGMENT CHANGE ──────────────────────────────────────
+
+segmentEl.addEventListener('change', () => {
+  localStorage.setItem(LS + '_segment', segmentEl.value);
+  renderCount();
+});
+
+// ── TOAST ───────────────────────────────────────────────
+
+let toastTimer;
+function toast(msg, type) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.className = 'toast' + (type === 'warn' ? ' warn' : type === 'err' ? ' err' : '');
+  clearTimeout(toastTimer);
+  requestAnimationFrame(() => {
+    el.classList.add('show');
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+  });
+}
+
+// ── UTILS ───────────────────────────────────────────────
+
+function esc(s) {
+  const d = document.createElement('span');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
+// ── INIT ────────────────────────────────────────────────
+
+renderCount();
+initSupabase();
+</script>
+</body>
+</html>
