@@ -61,7 +61,7 @@ export default function Nav() {
         </Link>
       </li>
       <li>
-        <Link to="/walk-audits">
+        <Link to="/walk">
           <span>Walk</span>
         </Link>
       </li>

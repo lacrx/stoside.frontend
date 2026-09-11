@@ -7,8 +7,6 @@ type WalkAuditFormProps = {
   auditSlug: string;
   segments: Segment[];
   mapUrl: string | null;
-  supabaseUrl: string;
-  supabaseKey: string;
 };
 
 type FormState = {
@@ -103,7 +101,12 @@ function resizePhoto(file: File): Promise<string> {
   });
 }
 
-export default function WalkAuditForm({ auditSlug, segments, mapUrl, supabaseUrl, supabaseKey }: WalkAuditFormProps) {
+const SUPABASE_URL = process.env.GATSBY_SUPABASE_URL || "";
+const SUPABASE_KEY = process.env.GATSBY_SUPABASE_KEY || "";
+
+export default function WalkAuditForm({ auditSlug, segments, mapUrl }: WalkAuditFormProps) {
+  const supabaseUrl = SUPABASE_URL;
+  const supabaseKey = SUPABASE_KEY;
   const [tab, setTab] = useState<"new" | "list">("new");
   const [form, setForm] = useState<FormState>({ ...EMPTY_FORM });
   const [entries, setEntries] = useState<Entry[]>(() =>

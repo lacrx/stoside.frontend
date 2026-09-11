@@ -471,9 +471,6 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
 const articleTemplate = path.resolve("./src/templates/article.tsx");
 const walkAuditTemplate = path.resolve("./src/templates/walk-audit.tsx");
 
-const SUPABASE_URL = process.env.GATSBY_SUPABASE_URL || "";
-const SUPABASE_KEY = process.env.GATSBY_SUPABASE_KEY || "";
-
 export const createPages: GatsbyNode["createPages"] = async ({ actions: { createPage }, graphql }) => {
   const allGatsbyArticle = await graphql<GatsbyArticles>(`
     query AllGatsbyArticle {
@@ -536,17 +533,15 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions: { create
     }
   `);
 
-  allGatsbyWalkAudit?.data?.allGatsbyWalkAudit?.nodes?.forEach(audit => {
-    createPage({
-      path: `/walk-audits/${audit.slug}`,
-      component: walkAuditTemplate,
-      context: {
-        ...audit,
-        supabaseUrl: SUPABASE_URL,
-        supabaseKey: SUPABASE_KEY,
-      },
+  allGatsbyWalkAudit?.data?.allGatsbyWalkAudit?.nodes
+    ?.filter(audit => audit.status === "completed")
+    .forEach(audit => {
+      createPage({
+        path: `/walk-audits/${audit.slug}`,
+        component: walkAuditTemplate,
+        context: audit,
+      });
     });
-  });
 };
 
 export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] = ({ actions: { createTypes } }) =>

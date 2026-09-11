@@ -2,14 +2,14 @@ import { graphql, useStaticQuery, Link } from "gatsby";
 import Layout from "@/components/Layout/layout";
 import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
-import { auditCard, auditCardHeader, auditCardTitle, auditCardDate, auditCardDesc, activeBadge } from "@/components/WalkAudit/walk-audit.module.css";
+import { auditCard, auditCardHeader, auditCardTitle, auditCardDate, auditCardDesc } from "@/components/WalkAudit/walk-audit.module.css";
 
 type WalkAudit = {
   title: string;
   slug: string;
   date: string;
-  status: string;
   description: string | null;
+  segments: Array<{ name: string }>;
 };
 
 interface WalkAuditsQuery {
@@ -19,14 +19,16 @@ interface WalkAuditsQuery {
 }
 
 const query = graphql`
-  query AllWalkAudits {
-    allGatsbyWalkAudit(sort: { date: DESC }) {
+  query CompletedWalkAudits {
+    allGatsbyWalkAudit(filter: { status: { eq: "completed" } }, sort: { date: DESC }) {
       nodes {
         title
         slug
         date(formatString: "MMMM D, YYYY")
-        status
         description
+        segments {
+          name
+        }
       }
     }
   }
@@ -37,23 +39,23 @@ export default function WalkAudits() {
 
   return (
     <Layout>
-      <Hero title="Walk Audits" description="Field notes from the pier to the neighborhoods." style={{ paddingBottom: "1.5rem" }} />
+      <Hero title="Previous Walk Audits" style={{ paddingBottom: "1.5rem" }} />
       <Content type="section">
         {nodes.length === 0 ? (
-          <p>No walk audits yet.</p>
+          <p>No completed walk audits yet. <Link to="/walk">Join the current audit</Link>.</p>
         ) : (
-          nodes.map(({ title, slug, date, status, description }) => (
+          nodes.map(({ title, slug, date, description, segments }) => (
             <div key={slug} className={auditCard}>
               <div className={auditCardHeader}>
-                <div>
-                  <Link to={`/walk-audits/${slug}`} className={auditCardTitle}>
-                    {title}
-                  </Link>
-                  {status === "active" && <span className={activeBadge}>Active</span>}
-                </div>
+                <Link to={`/walk-audits/${slug}`} className={auditCardTitle}>
+                  {title}
+                </Link>
                 <span className={auditCardDate}>{date}</span>
               </div>
               {description && <p className={auditCardDesc}>{description}</p>}
+              {segments.length > 0 && (
+                <p className={auditCardDesc}>{segments.length} segment{segments.length === 1 ? "" : "s"}</p>
+              )}
             </div>
           ))
         )}
