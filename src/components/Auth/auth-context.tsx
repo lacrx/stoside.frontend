@@ -30,17 +30,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (email: string, password: string): Promise<string | null> => {
     if (!STRAPI_URL) return "Admin login not configured";
     try {
-      const res = await fetch(`${STRAPI_URL}/api/auth/local`, {
+      const res = await fetch(`${STRAPI_URL}/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier: email, password }),
+        body: JSON.stringify({ email, password }),
       });
       if (!res.ok) {
         const err = await res.json().catch(() => null);
         return err?.error?.message || "Invalid email or password";
       }
       const data = await res.json();
-      const name = data.user?.username || data.user?.email || email;
+      const name = data.data?.user?.firstname || data.data?.user?.email || email;
       sessionStorage.setItem(SS_KEY, "true");
       sessionStorage.setItem(`${SS_KEY}_name`, name);
       setIsAdmin(true);
