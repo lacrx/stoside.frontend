@@ -36,6 +36,7 @@ type Entry = FormState & {
   created_at: string;
   photo_url: string | null;
   device_id?: string;
+  _synced?: boolean;
 };
 
 const LS = "walkaudit";
@@ -123,6 +124,11 @@ function getDeviceId(): string {
   return id;
 }
 
+function toRow(entry: Entry) {
+  const { photo, _synced, ...row } = entry;
+  return row;
+}
+
 export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegments }: WalkAuditFormProps) {
   const supabaseUrl = SUPABASE_URL;
   const supabaseKey = SUPABASE_KEY;
@@ -151,10 +157,34 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
   const pinMapRef = useRef<PinMapHandle>(null);
   const geocodeTimer = useRef<ReturnType<typeof setTimeout>>();
   const toastTimer = useRef<ReturnType<typeof setTimeout>>();
+  const syncingRef = useRef(false);
 
   const persist = useCallback((updated: Entry[]) => {
     localStorage.setItem(`${LS}_entries_${auditSlug}`, JSON.stringify(updated));
   }, [auditSlug]);
+
+  const doSync = useCallback(async () => {
+    const sb = sbRef.current;
+    if (!sb || syncingRef.current) return;
+    syncingRef.current = true;
+    try {
+      const current: Entry[] = JSON.parse(localStorage.getItem(`${LS}_entries_${auditSlug}`) || "[]");
+      const pending = current.filter(e => !e._synced);
+      if (!pending.length) return;
+      let changed = false;
+      for (const entry of pending) {
+        const { error } = await sb.from("entries").upsert(toRow(entry), { onConflict: "id" });
+        if (!error) { entry._synced = true; changed = true; }
+        else console.warn("Sync failed for entry", entry.id, error.message);
+      }
+      if (changed) {
+        persist(current);
+        setEntries(current);
+      }
+    } finally {
+      syncingRef.current = false;
+    }
+  }, [auditSlug, persist]);
 
   // Init Supabase
   useEffect(() => {
@@ -167,24 +197,24 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
       sbRef.current = sb;
 
       const { data } = await sb.from("entries").select("*").eq("audit_slug", auditSlug);
-      if (data) {
-        setEntries(prev => {
-          const ids = new Set(prev.map((e: Entry) => e.id));
-          const merged = [...prev];
-          for (const row of data) {
-            if (!ids.has(row.id)) { merged.push(row); ids.add(row.id); }
-          }
-          persist(merged);
-          return merged;
-        });
-      }
+      const remoteIds = new Set((data || []).map((r: any) => r.id));
+      setEntries(prev => {
+        const ids = new Set(prev.map((e: Entry) => e.id));
+        const merged = prev.map(e => remoteIds.has(e.id) ? { ...e, _synced: true } : e);
+        for (const row of (data || [])) {
+          if (!ids.has(row.id)) { merged.push({ ...row, _synced: true }); ids.add(row.id); }
+        }
+        persist(merged);
+        return merged;
+      });
+      doSync();
 
       sb.channel(`walk-audit-${auditSlug}`)
         .on("postgres_changes", { event: "*", schema: "public", table: "entries", filter: `audit_slug=eq.${auditSlug}` }, (p: any) => {
           if (p.eventType === "INSERT") {
             setEntries(prev => {
               if (prev.find(e => e.id === p.new.id)) return prev;
-              const updated = [...prev, p.new];
+              const updated = [...prev, { ...p.new, _synced: true }];
               persist(updated);
               return updated;
             });
@@ -199,7 +229,18 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
         .subscribe((status: string) => setSynced(status === "SUBSCRIBED"));
     };
     document.head.appendChild(script);
-  }, [supabaseUrl, supabaseKey, auditSlug, persist]);
+  }, [supabaseUrl, supabaseKey, auditSlug, persist, doSync]);
+
+  useEffect(() => {
+    const onOnline = () => doSync();
+    const onVisible = () => { if (document.visibilityState === "visible") doSync(); };
+    window.addEventListener("online", onOnline);
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [doSync]);
 
   const showToast = (text: string, warn = false) => {
     setToast({ text, cls: warn ? s.toastWarn : "" });
@@ -262,18 +303,13 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
       observer,
       created_at: new Date().toISOString(),
       device_id: deviceId,
+      _synced: false,
     };
 
     const updated = [...entries, entry];
     setEntries(updated);
     persist(updated);
-
-    if (sbRef.current) {
-      try {
-        const { photo, ...row } = entry;
-        await sbRef.current.from("entries").insert(row);
-      } catch (err) { console.error("Sync insert failed:", err); }
-    }
+    doSync();
 
     setForm({ ...EMPTY_FORM });
     setGeoStatus({ text: "", cls: "" });
