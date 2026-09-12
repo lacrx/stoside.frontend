@@ -1,4 +1,3 @@
-import React from "react";
 import type { GatsbyBrowser } from "gatsby";
 import { AuthProvider } from "./src/components/Auth/auth-context";
 

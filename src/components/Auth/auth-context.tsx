@@ -4,7 +4,6 @@ const STRAPI_URL = process.env.GATSBY_STRAPI_URL || "";
 const LS_KEY = "sto_admin";
 
 type AuthState = {
-  ready: boolean;
   isAdmin: boolean;
   userName: string | null;
   login: (email: string, password: string) => Promise<string | null>;
@@ -12,7 +11,6 @@ type AuthState = {
 };
 
 const AuthContext = createContext<AuthState>({
-  ready: false,
   isAdmin: false,
   userName: null,
   login: async () => "No auth provider",
@@ -28,8 +26,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (typeof window === "undefined") return null;
     return localStorage.getItem(`${LS_KEY}_name`);
   });
-  const ready = true;
-
   const login = useCallback(async (email: string, password: string): Promise<string | null> => {
     if (!STRAPI_URL) return "Admin login not configured";
     try {
@@ -64,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ ready, isAdmin, userName, login, logout }}>
+    <AuthContext.Provider value={{ isAdmin, userName, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

@@ -14,13 +14,11 @@ type SiteSettingQuery = {
   allGatsbySiteSetting: {
     nodes: Array<{
       instagramUrl: string | null
-      meetupUrl: string | null
     }>
   }
 };
 
 const DEFAULT_INSTAGRAM_URL = "https://www.instagram.com/strongtowns.oceanside/";
-const DEFAULT_MEETUP_URL = "https://www.meetup.com/north-county-urbanists/";
 const DISCORD_URL = "https://discord.com/invite/sraXTxwC3P";
 
 const siteSettingQuery = graphql`
@@ -28,7 +26,6 @@ const siteSettingQuery = graphql`
     allGatsbySiteSetting {
       nodes {
         instagramUrl
-        meetupUrl
       }
     }
   }
@@ -42,7 +39,6 @@ export default function Hero({ title, cta, description, showBuddy = false, cente
   const { allGatsbySiteSetting } = useStaticQuery<SiteSettingQuery>(siteSettingQuery);
   const settings = allGatsbySiteSetting.nodes[0];
   const instagramUrl = settings?.instagramUrl || DEFAULT_INSTAGRAM_URL;
-  const meetupUrl = settings?.meetupUrl || DEFAULT_MEETUP_URL;
 
   return (
     <header className={`${hero}${centered ? ` ${centeredCls}` : ''}`}>

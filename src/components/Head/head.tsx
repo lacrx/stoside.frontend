@@ -38,5 +38,4 @@ function SEO({ subheading, children }: SEOProps) {
 export const Head = ({ subheading, location }: HeadProps) =>
   <SEO subheading={subheading}>
     <body className={ location?.pathname === "/" ? "home" : location?.pathname.replaceAll("/", "") } />
-    <link id="icon" rel="icon" href="" />
   </SEO>
