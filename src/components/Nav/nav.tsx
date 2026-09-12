@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "gatsby";
-import { nav, loginBtn, loggedIn } from './nav.module.css';
+import { Link, navigate } from "gatsby";
+import { nav, loginBtn } from './nav.module.css';
 import logo from "@/images/logo.svg";
 import { useAuth } from "@/components/Auth/auth-context";
 
@@ -23,7 +23,7 @@ const X = () =>
 export default function Nav() {
   const navRef = useRef<HTMLLIElement>(null);
   const [open, setOpen] = useState(false);
-  const { ready, isAdmin, userName, logout } = useAuth();
+  const { isAdmin, logout } = useAuth();
 
   useEffect(() => {
     function onClickOutHandler(event: MouseEvent) {
@@ -73,13 +73,13 @@ export default function Nav() {
         </Link>
       </li>
       <li>
-        {ready && isAdmin ? (
-          <span className={loggedIn}>
-            {userName} <button className={loginBtn} onClick={logout}>Sign out</button>
-          </span>
-        ) : (
-          <Link to="/sign-in"><span className={loginBtn}>Sign in</span></Link>
-        )}
+        <button
+          className={loginBtn}
+          suppressHydrationWarning
+          onClick={isAdmin ? logout : () => navigate('/sign-in')}
+        >
+          {isAdmin ? 'Sign out' : 'Sign in'}
+        </button>
       </li>
     </ul>
   )
