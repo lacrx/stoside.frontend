@@ -412,7 +412,6 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
       {tab === "list" && (
         <>
           <div className={s.entriesHeader}>
-            <span className={s.entriesLabel}>{filtered.length} entr{filtered.length === 1 ? "y" : "ies"}</span>
             <button className={s.btnExport} type="button" onClick={handleExport}>Export CSV</button>
           </div>
           <div>
