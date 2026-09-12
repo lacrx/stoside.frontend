@@ -91,19 +91,27 @@
   background: none;
   border: 1px solid var(--rule);
   border-radius: 0.25rem;
-  font-size: 0.65rem;
+  font-family: var(--sans);
+  font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   color: var(--light-grey);
   padding: 0.25rem 0.5rem;
   cursor: pointer;
-  width: 62px;
+  min-width: 5.5rem;
   text-align: center;
 }
 
 .loginBtn:hover {
   color: var(--grey);
   border-color: var(--light-grey);
+}
+
+@media (min-width: 600px) {
+  .loginBtn {
+    font-size: 0.65rem;
+    min-width: auto;
+  }
 }
 
 .authOnly {
