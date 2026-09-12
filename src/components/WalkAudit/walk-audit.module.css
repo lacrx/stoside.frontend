@@ -365,10 +365,16 @@
 
 .pill:hover {
   border-color: var(--light-grey);
+  color: var(--light-grey);
 }
 
 .pillSelected {
   composes: pill;
+  border-color: #e8613a;
+  color: #e8613a;
+}
+
+.pillSelected:hover {
   border-color: #e8613a;
   color: #e8613a;
 }
@@ -379,14 +385,29 @@
   color: #2a8a6a;
 }
 
+.pillGreen:hover {
+  border-color: #2a8a6a;
+  color: #2a8a6a;
+}
+
 .pillYellow {
   composes: pill;
   border-color: #b07820;
   color: #b07820;
 }
 
+.pillYellow:hover {
+  border-color: #b07820;
+  color: #b07820;
+}
+
 .pillRed {
   composes: pill;
+  border-color: #c44020;
+  color: #c44020;
+}
+
+.pillRed:hover {
   border-color: #c44020;
   color: #c44020;
 }
