@@ -318,20 +318,16 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
 
   return (
     <div className={s.form}>
-      <div className={s.controls}>
-        <label>Today's Audit</label>
-        <div className={s.syncBadge}>
-          <span className={synced ? s.dotConnected : s.dot} />
-          <span>{synced === null ? "Local only" : synced ? "Synced with team" : "Reconnecting…"}</span>
-        </div>
-      </div>
-
       <nav className={s.tabs}>
         <button className={tab === "new" ? s.tabActive : s.tab} onClick={() => setTab("new")}>New entry</button>
         <button className={tab === "list" ? s.tabActive : s.tab} onClick={() => setTab("list")}>
           All entries ({filtered.length})
         </button>
       </nav>
+      <div className={s.syncBadge}>
+        <span className={synced ? s.dotConnected : s.dot} />
+        <span>{synced === null ? "Local only" : synced ? "Synced" : "Reconnecting…"}</span>
+      </div>
 
       {tab === "new" && (
         <>

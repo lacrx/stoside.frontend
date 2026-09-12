@@ -35,11 +35,14 @@
 
 .syncBadge {
   font-family: var(--sans);
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 0.35rem;
-  color: var(--grey);
+  color: var(--light-grey);
+  margin-top: -0.75rem;
+  margin-bottom: 0.75rem;
 }
 
 .dot {
