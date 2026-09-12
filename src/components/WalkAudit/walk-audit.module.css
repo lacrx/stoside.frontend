@@ -412,6 +412,36 @@
   color: #c44020;
 }
 
+.pillGreenMuted {
+  composes: pill;
+  color: #2a8a6a;
+}
+
+.pillGreenMuted:hover {
+  border-color: #2a8a6a;
+  color: #2a8a6a;
+}
+
+.pillYellowMuted {
+  composes: pill;
+  color: #b07820;
+}
+
+.pillYellowMuted:hover {
+  border-color: #b07820;
+  color: #b07820;
+}
+
+.pillRedMuted {
+  composes: pill;
+  color: #c44020;
+}
+
+.pillRedMuted:hover {
+  border-color: #c44020;
+  color: #c44020;
+}
+
 .flagRow {
   display: flex;
   align-items: center;

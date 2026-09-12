@@ -365,14 +365,15 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
                 <div className={s.pills}>
                   {options.map(opt => {
                     const selected = form[field] === opt.value;
-                    let cls = s.pill;
-                    if (selected) {
-                      const v = opt.value;
-                      if (v === "good" || v === "safe" || v === "low") cls = s.pillGreen;
-                      else if (v === "fair" || v === "concerns" || v === "moderate") cls = s.pillYellow;
-                      else if (v === "poor" || v === "high" || v === "unsafe" || v === "none") cls = s.pillRed;
-                      else cls = s.pillSelected;
-                    }
+                    const v = opt.value;
+                    let color: string;
+                    if (v === "good" || v === "safe" || v === "low") color = "green";
+                    else if (v === "fair" || v === "concerns" || v === "moderate") color = "yellow";
+                    else if (v === "poor" || v === "high" || v === "unsafe" || v === "none") color = "red";
+                    else color = "default";
+                    const cls = selected
+                      ? (color === "green" ? s.pillGreen : color === "yellow" ? s.pillYellow : color === "red" ? s.pillRed : s.pillSelected)
+                      : (color === "green" ? s.pillGreenMuted : color === "yellow" ? s.pillYellowMuted : color === "red" ? s.pillRedMuted : s.pill);
                     return (
                       <button key={opt.value} type="button" className={cls} onClick={() => handlePill(field, opt.value)}>
                         {opt.label}

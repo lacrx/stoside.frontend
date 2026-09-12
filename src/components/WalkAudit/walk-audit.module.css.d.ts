@@ -42,6 +42,9 @@ declare const styles: {
   readonly pillGreen: string;
   readonly pillYellow: string;
   readonly pillRed: string;
+  readonly pillGreenMuted: string;
+  readonly pillYellowMuted: string;
+  readonly pillRedMuted: string;
   readonly flagRow: string;
   readonly photoPreview: string;
   readonly photoPreviewVisible: string;
