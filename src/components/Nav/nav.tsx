@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, navigate } from "gatsby";
-import { nav, loginBtn } from './nav.module.css';
+import { nav, loginBtn, authOnly, noAuthOnly } from './nav.module.css';
 import logo from "@/images/logo.svg";
 import { useAuth } from "@/components/Auth/auth-context";
 
@@ -73,12 +73,11 @@ export default function Nav() {
         </Link>
       </li>
       <li>
-        <button
-          className={loginBtn}
-          suppressHydrationWarning
-          onClick={isAdmin ? logout : () => navigate('/sign-in')}
-        >
-          {isAdmin ? 'Sign out' : 'Sign in'}
+        <button className={`${loginBtn} ${authOnly}`} onClick={logout}>
+          Sign out
+        </button>
+        <button className={`${loginBtn} ${noAuthOnly}`} onClick={() => navigate('/sign-in')}>
+          Sign in
         </button>
       </li>
     </ul>

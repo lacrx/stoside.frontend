@@ -103,3 +103,15 @@
   color: var(--grey);
   border-color: var(--light-grey);
 }
+
+.authOnly {
+  display: none;
+}
+
+:global(html.authed) .authOnly {
+  display: inline;
+}
+
+:global(html.authed) .noAuthOnly {
+  display: none;
+}

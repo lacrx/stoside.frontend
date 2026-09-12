@@ -46,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const name = data.data?.user?.firstname || data.data?.user?.email || email;
       localStorage.setItem(LS_KEY, "true");
       localStorage.setItem(`${LS_KEY}_name`, name);
+      document.documentElement.classList.add("authed");
       setIsAdmin(true);
       setUserName(name);
       return null;
@@ -57,6 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     localStorage.removeItem(LS_KEY);
     localStorage.removeItem(`${LS_KEY}_name`);
+    document.documentElement.classList.remove("authed");
     setIsAdmin(false);
     setUserName(null);
   }, []);
