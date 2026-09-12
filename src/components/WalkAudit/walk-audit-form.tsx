@@ -134,7 +134,17 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
   const supabaseKey = SUPABASE_KEY;
   const deviceId = getDeviceId();
   const { isAdmin } = useAuth();
-  const [tab, setTab] = useState<"new" | "list">("new");
+  const [tab, setTabState] = useState<"new" | "list">(() => {
+    if (typeof window === "undefined") return "new";
+    const p = new URLSearchParams(window.location.search).get("tab");
+    return p === "all" ? "list" : "new";
+  });
+  const setTab = useCallback((t: "new" | "list") => {
+    setTabState(t);
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", t === "list" ? "all" : "new");
+    window.history.replaceState({}, "", url.toString());
+  }, []);
   const [form, setForm] = useState<FormState>({ ...EMPTY_FORM });
   const [entries, setEntries] = useState<Entry[]>(() =>
     typeof window !== "undefined"
