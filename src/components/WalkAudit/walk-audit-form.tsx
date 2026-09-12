@@ -333,7 +333,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
         <>
           <div className={s.card} ref={formTopRef}>
             <h3>Location</h3>
-            <p className={s.hint}>Type a location, tap the map, or use GPS.</p>
+            <p className={s.hint}>Type a location, tap the map, or enable location.</p>
             <span className={s.fieldLabelFirst}>Cross street / address / stop</span>
             <div className={s.inputRow}>
               <input className={s.textInput} type="text" value={form.location} onChange={handleLocationChange} placeholder="Mission Ave & Cleveland St" />
