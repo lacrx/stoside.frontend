@@ -26,11 +26,10 @@
 
 .controls label {
   font-family: var(--sans);
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--light-grey);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--black);
 }
 
 .syncBadge {
@@ -85,7 +84,7 @@
   width: 100%;
   padding: 0.5rem 0.75rem;
   background: white;
-  border: 2px solid var(--rule);
+  border: 1px solid var(--rule);
   border-radius: 0.375rem;
   font-family: var(--sans);
   font-size: 0.875rem;
@@ -97,6 +96,7 @@
 .segmentBtnActive {
   color: var(--black);
   font-weight: 600;
+  border-color: var(--black);
 }
 
 .segmentDot {
@@ -229,14 +229,14 @@
 
 .tabActive {
   composes: tab;
-  background: #f7f7f7;
-  color: var(--black);
+  background: var(--black);
+  color: white;
 }
 
 .card {
-  background: #fafafa;
+  background: white;
   border: 1px solid var(--rule);
-  border-radius: 0.625rem;
+  border-radius: 0.375rem;
   padding: 1.25rem;
   margin-bottom: 0.75rem;
 }
@@ -251,8 +251,8 @@
 
 .hint {
   font-family: var(--sans);
-  font-size: 0.8rem;
-  color: var(--light-grey);
+  font-size: 0.875rem;
+  color: var(--grey);
   margin-bottom: 0.875rem;
   line-height: 1.4;
 }
@@ -260,12 +260,11 @@
 .fieldLabel {
   display: block;
   font-family: var(--sans);
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--light-grey);
-  margin: 1rem 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--black);
+  margin: 1rem 0 0.25rem;
 }
 
 .fieldLabelFirst {
@@ -296,7 +295,7 @@
 .textarea {
   width: 100%;
   box-sizing: border-box;
-  padding: 0.7rem 0.875rem;
+  padding: 0.5rem 0.625rem;
   background: white;
   border: 1px solid var(--rule);
   border-radius: 0.375rem;
@@ -356,8 +355,8 @@
 
 .pill {
   padding: 0.5rem 0.875rem;
-  border-radius: 2rem;
-  border: 1.5px solid var(--rule);
+  border-radius: 0.375rem;
+  border: 1px solid var(--rule);
   background: white;
   color: var(--grey);
   font-family: var(--sans);
@@ -373,13 +372,14 @@
 
 .pillSelected {
   composes: pill;
-  border-color: #e8613a;
-  color: #e8613a;
+  border-color: var(--black);
+  color: var(--black);
+  font-weight: 600;
 }
 
 .pillSelected:hover {
-  border-color: #e8613a;
-  color: #e8613a;
+  border-color: var(--black);
+  color: var(--black);
 }
 
 .pillGreen {
@@ -451,7 +451,7 @@
   gap: 0.6rem;
   margin-top: 1.25rem;
   padding: 0.75rem;
-  background: white;
+  background: none;
   border: 1px solid var(--rule);
   border-radius: 0.375rem;
 }
@@ -459,7 +459,7 @@
 .flagRow input[type="checkbox"] {
   width: 1.25rem;
   height: 1.25rem;
-  accent-color: #e8613a;
+  accent-color: var(--black);
 }
 
 .flagRow label {
@@ -510,10 +510,10 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.625rem 1rem;
-  border: 1.5px dashed var(--rule);
+  border: 1px dashed var(--rule);
   border-radius: 0.375rem;
   background: white;
-  color: var(--light-grey);
+  color: var(--grey);
   font-family: var(--sans);
   font-size: 0.85rem;
   cursor: pointer;
@@ -527,21 +527,22 @@
 .btnSave {
   display: block;
   width: 100%;
-  padding: 1rem;
+  padding: 0.625rem;
   border: none;
-  border-radius: 0.5rem;
-  background: #e8613a;
+  border-radius: 0.375rem;
+  background: var(--black);
   color: white;
   font-family: var(--sans);
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
   transition: background 0.12s;
   margin-top: 0.25rem;
+  box-sizing: border-box;
 }
 
 .btnSave:hover {
-  background: #f07050;
+  background: var(--grey);
 }
 
 .btnSave:active {
@@ -586,9 +587,9 @@
 }
 
 .entry {
-  background: #fafafa;
+  background: white;
   border: 1px solid var(--rule);
-  border-radius: 0.625rem;
+  border-radius: 0.375rem;
   padding: 1rem;
   margin-bottom: 0.625rem;
 }
@@ -632,7 +633,7 @@
   font-family: var(--sans);
   font-size: 0.7rem;
   padding: 0.15rem 0.55rem;
-  border-radius: 1rem;
+  border-radius: 0.25rem;
   font-weight: 600;
 }
 
@@ -707,9 +708,9 @@
   padding: 0.65rem 1.25rem;
   border-radius: 0.375rem;
   font-family: var(--sans);
-  font-size: 0.9rem;
-  font-weight: 500;
-  background: #3db893;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--black);
   color: #fff;
   opacity: 0;
   transition: opacity 0.25s, transform 0.25s;
@@ -742,9 +743,9 @@
 }
 
 .stat {
-  background: #fafafa;
+  background: white;
   border: 1px solid var(--rule);
-  border-radius: 0.5rem;
+  border-radius: 0.375rem;
   padding: 1rem;
   text-align: center;
 }
@@ -813,7 +814,7 @@
   font-size: 0.7rem;
   font-weight: 700;
   padding: 0.2rem 0.6rem;
-  border-radius: 1rem;
+  border-radius: 0.25rem;
   background: rgba(61, 184, 147, 0.12);
   color: #2a8a6a;
   margin-left: 0.5rem;
