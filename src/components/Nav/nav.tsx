@@ -72,17 +72,15 @@ export default function Nav() {
           <span>About</span>
         </Link>
       </li>
-      {ready && (
-        <li>
-          {isAdmin ? (
-            <span className={loggedIn}>
-              {userName} <button className={loginBtn} onClick={logout}>Sign out</button>
-            </span>
-          ) : (
-            <Link to="/sign-in"><span className={loginBtn}>Sign in</span></Link>
-          )}
-        </li>
-      )}
+      <li>
+        {ready && isAdmin ? (
+          <span className={loggedIn}>
+            {userName} <button className={loginBtn} onClick={logout}>Sign out</button>
+          </span>
+        ) : (
+          <Link to="/sign-in"><span className={loginBtn}>Sign in</span></Link>
+        )}
+      </li>
     </ul>
   )
 }
