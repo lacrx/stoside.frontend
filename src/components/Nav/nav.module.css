@@ -85,11 +85,18 @@
 }
 
 .loginBtn {
+  border: 1px solid var(--rule);
+  border-radius: 0.25rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   color: var(--light-grey);
+  padding: 0.25rem 0.5rem;
 }
 
 .loginBtn:hover {
   color: var(--grey);
+  border-color: var(--light-grey);
 }
 
 .loggedIn {
