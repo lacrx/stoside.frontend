@@ -23,7 +23,7 @@ const X = () =>
 export default function Nav() {
   const navRef = useRef<HTMLLIElement>(null);
   const [open, setOpen] = useState(false);
-  const { isAdmin, userName, logout } = useAuth();
+  const { ready, isAdmin, userName, logout } = useAuth();
 
   useEffect(() => {
     function onClickOutHandler(event: MouseEvent) {
@@ -72,15 +72,17 @@ export default function Nav() {
           <span>About</span>
         </Link>
       </li>
-      <li>
-        {isAdmin ? (
-          <span className={loggedIn}>
-            {userName} <button className={loginBtn} onClick={logout}>Sign out</button>
-          </span>
-        ) : (
-          <Link to="/sign-in"><span className={loginBtn}>Sign in</span></Link>
-        )}
-      </li>
+      {ready && (
+        <li>
+          {isAdmin ? (
+            <span className={loggedIn}>
+              {userName} <button className={loginBtn} onClick={logout}>Sign out</button>
+            </span>
+          ) : (
+            <Link to="/sign-in"><span className={loginBtn}>Sign in</span></Link>
+          )}
+        </li>
+      )}
     </ul>
   )
 }
