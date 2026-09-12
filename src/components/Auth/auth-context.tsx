@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 
 const STRAPI_URL = process.env.GATSBY_STRAPI_URL || "";
 const LS_KEY = "sto_admin";
@@ -20,15 +20,15 @@ const AuthContext = createContext<AuthState>({
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [ready, setReady] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [userName, setUserName] = useState<string | null>(null);
-
-  useEffect(() => {
-    setIsAdmin(localStorage.getItem(LS_KEY) === "true");
-    setUserName(localStorage.getItem(`${LS_KEY}_name`));
-    setReady(true);
-  }, []);
+  const [isAdmin, setIsAdmin] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(LS_KEY) === "true";
+  });
+  const [userName, setUserName] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(`${LS_KEY}_name`);
+  });
+  const ready = true;
 
   const login = useCallback(async (email: string, password: string): Promise<string | null> => {
     if (!STRAPI_URL) return "Admin login not configured";
