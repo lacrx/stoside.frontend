@@ -97,6 +97,8 @@
   color: var(--light-grey);
   padding: 0.25rem 0.5rem;
   cursor: pointer;
+  width: 62px;
+  text-align: center;
 }
 
 .loginBtn:hover {
