@@ -85,46 +85,31 @@
 }
 
 .loginBtn {
-  background: none;
-  border: none;
-  font-family: var(--sans);
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: .05em;
   color: var(--light-grey);
-  cursor: pointer;
-  padding: 1rem 0;
-  text-decoration: none;
-  display: inline-block;
 }
 
 .loginBtn:hover {
   color: var(--grey);
 }
 
-@media (min-width: 600px) {
-  .loginBtn {
-    font-size: 0.75rem;
-    padding: 0.5rem 0;
-  }
-}
-
 .loggedIn {
-  font-family: var(--sans);
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: .05em;
   color: var(--light-grey);
   display: flex;
   align-items: center;
   gap: 0.5rem;
   justify-content: center;
-  padding: 1rem 0;
 }
 
-@media (min-width: 600px) {
-  .loggedIn {
-    font-size: 0.75rem;
-    padding: 0.5rem 0;
-  }
+.loggedIn button {
+  background: none;
+  border: none;
+  font: inherit;
+  color: var(--light-grey);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.loggedIn button:hover {
+  color: var(--grey);
 }

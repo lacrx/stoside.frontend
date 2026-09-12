@@ -78,7 +78,7 @@ export default function Nav() {
             {userName} <button className={loginBtn} onClick={logout}>Sign out</button>
           </span>
         ) : (
-          <Link to="/sign-in" className={loginBtn}>Sign in</Link>
+          <Link to="/sign-in"><span className={loginBtn}>Sign in</span></Link>
         )}
       </li>
     </ul>
