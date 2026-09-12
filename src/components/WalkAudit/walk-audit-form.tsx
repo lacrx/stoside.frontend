@@ -367,7 +367,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
       <nav className={s.tabs}>
         <button className={tab === "new" ? s.tabActive : s.tab} onClick={() => setTab("new")}>New entry</button>
         <button className={tab === "list" ? s.tabActive : s.tab} onClick={() => setTab("list")}>
-          All entries ({filtered.length})
+          All entries{filtered.length ? ` (${filtered.length})` : ""}
         </button>
       </nav>
       <div className={s.syncBadge}>
