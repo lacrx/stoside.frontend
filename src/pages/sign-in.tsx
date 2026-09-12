@@ -41,7 +41,7 @@ export default function SignIn() {
             if (err) { setError(err); } else { navigate(-1); }
           }}>
             <label className={s.label} htmlFor="si-email">Email address</label>
-            <input className={s.input} id="si-email" type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" autoFocus required />
+            <input className={s.input} id="si-email" type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" required />
             <label className={s.label} htmlFor="si-pass">Password</label>
             <input className={s.input} id="si-pass" type="password" value={pass} onChange={e => setPass(e.target.value)} autoComplete="current-password" required />
             {error && <p className={s.error}>{error}</p>}
