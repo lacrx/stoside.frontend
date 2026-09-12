@@ -96,7 +96,7 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   color: var(--light-grey);
-  padding: 0.5rem 0.5rem;
+  padding: 0.5rem 1rem;
   cursor: pointer;
   min-width: 5.5rem;
   text-align: center;
