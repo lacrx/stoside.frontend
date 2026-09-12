@@ -1,13 +1,10 @@
 .wrap {
-  display: flex;
-  justify-content: center;
   padding: 3rem 0;
-  overflow-x: hidden;
 }
 
 .card {
-  width: 100%;
   max-width: 22rem;
+  margin: 0 auto;
 }
 
 .title {
@@ -64,6 +61,7 @@
 .btnPrimary {
   display: block;
   width: 100%;
+  box-sizing: border-box;
   padding: 0.625rem;
   font-family: var(--sans);
   font-size: 0.875rem;
@@ -87,6 +85,7 @@
 .btnSecondary {
   display: block;
   width: 100%;
+  box-sizing: border-box;
   padding: 0.625rem;
   margin-top: 0.5rem;
   font-family: var(--sans);
