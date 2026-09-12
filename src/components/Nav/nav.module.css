@@ -3,7 +3,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  padding: 0.75rem 0;
+  padding: 0.75rem 0 1.5rem;
   border-bottom: 1px solid var(--rule);
 
   > :first-child {
@@ -96,7 +96,7 @@
   font-weight: 600;
   letter-spacing: 0.05em;
   color: var(--light-grey);
-  padding: 0.25rem 0.5rem;
+  padding: 0.5rem 0.5rem;
   cursor: pointer;
   min-width: 5.5rem;
   text-align: center;
