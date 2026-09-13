@@ -1,25 +1,9 @@
 import { graphql, useStaticQuery } from "gatsby";
-import { IGatsbyImageData } from "gatsby-plugin-image";
-import Layout from '@/components/Layout/layout';
-import Hero from '@/components/Hero/hero';
+import type { GatsbyEvent } from "@/types";
+import Layout from "@/components/Layout/layout";
+import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
 import EventList from "@/components/EventList/eventList";
-
-type GatsbyEvent = {
-  id: string
-  title: string
-  description: string
-  url: string
-  location: string
-  startDate: string
-  startDateDisplay: string
-  image: { childImageSharp: { gatsbyImageData: IGatsbyImageData } } | null
-};
-interface GatsbyEvents {
-  allGatsbyEvent: {
-    nodes: GatsbyEvent[]
-  }
-}
 
 const query = graphql`
   query UpcomingEvents {
@@ -48,29 +32,16 @@ const query = graphql`
   }
 `;
 
-const heroProps = {
-  title: "Upcoming events",
-};
-
-const contentProps = {
-  type: "section",
-};
-
 export default function Events() {
-  const { allGatsbyEvent: { nodes } } = useStaticQuery<GatsbyEvents>(query);
-  const hasEvents = nodes.length > 0;
-
+  const { allGatsbyEvent: { nodes } } = useStaticQuery<{ allGatsbyEvent: { nodes: GatsbyEvent[] } }>(query);
   return (
     <Layout>
-      <Hero { ...heroProps } />
-      {hasEvents && (
-        <Content { ...contentProps } >
-          <EventList events={ nodes } />
-        </Content>
-      )}
-      {!hasEvents && <Content { ...contentProps }><p>No upcoming events. Check back soon.</p></Content>}
+      <Hero title="Upcoming events" />
+      <Content type="section" ruled>
+        <EventList events={nodes} />
+      </Content>
     </Layout>
   );
-};
+}
 
 export { Head } from "@/components/Head/head";
