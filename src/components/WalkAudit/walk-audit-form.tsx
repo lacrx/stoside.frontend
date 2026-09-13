@@ -3,15 +3,8 @@ import * as s from "./walk-audit.module.css";
 import PinMap, { forwardGeocode, type PinMapHandle } from "./pin-map";
 import { useAuth } from "@/components/Auth/auth-context";
 
-type Segment = { name: string };
-
-type RouteSegment = { name: string; lines: number[][][] };
-
 type WalkAuditFormProps = {
   auditSlug: string;
-  segments: Segment[];
-  mapUrl: string | null;
-  routeSegments: RouteSegment[] | null;
 };
 
 type FormState = {
@@ -129,7 +122,7 @@ function toRow(entry: Entry) {
   return row;
 }
 
-export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegments }: WalkAuditFormProps) {
+export default function WalkAuditForm({ auditSlug }: WalkAuditFormProps) {
   const supabaseUrl = SUPABASE_URL;
   const supabaseKey = SUPABASE_KEY;
   const deviceId = getDeviceId();
@@ -151,7 +144,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
       ? JSON.parse(localStorage.getItem(`${LS}_entries_${auditSlug}`) || "[]")
       : []
   );
-  const segment = segments[0]?.name || "";
+  const segment = "";
   const [observer, setObserver] = useState(() =>
     typeof window !== "undefined"
       ? localStorage.getItem(`${LS}_observer`) || ""
@@ -288,7 +281,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
   const handleSave = async () => {
     if (!form.location && !form.sidewalk && !form.crosswalk &&
         !form.lighting && !form.traffic && !form.safety && !form.notes) {
-      showToast("Add a location or at least one observation.", true);
+      showToast("Add a location or describe the condition.", true);
       return;
     }
 
@@ -325,7 +318,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
     setGeoStatus({ text: "", cls: "" });
     if (fileRef.current) fileRef.current.value = "";
     formTopRef.current?.scrollIntoView({ behavior: "smooth" });
-    showToast("Entry saved");
+    showToast("Report submitted");
   };
 
   const handleDelete = async (id: string) => {
@@ -337,11 +330,11 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
       try { await sbRef.current.from("entries").delete().eq("id", id); }
       catch (err) { console.error("Sync delete failed:", err); }
     }
-    showToast("Entry deleted");
+    showToast("Report deleted");
   };
 
   const handleExport = () => {
-    if (!filtered.length) { showToast("No entries to export.", true); return; }
+    if (!filtered.length) { showToast("No reports to export.", true); return; }
     const cols = ["segment", "location", "lat", "lng", "sidewalk", "crosswalk", "lighting", "traffic", "safety", "flagged", "notes", "observer", "created_at"];
     const rows = filtered.map(e => cols.map(c => {
       const v = (e as any)[c];
@@ -365,9 +358,9 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
   return (
     <div className={s.form}>
       <nav className={s.tabs}>
-        <button className={tab === "new" ? s.tabActive : s.tab} onClick={() => setTab("new")}>New entry</button>
+        <button className={tab === "new" ? s.tabActive : s.tab} onClick={() => setTab("new")}>New report</button>
         <button className={tab === "list" ? s.tabActive : s.tab} onClick={() => setTab("list")}>
-          All entries{filtered.length ? ` (${filtered.length})` : ""}
+          All reports{filtered.length ? ` (${filtered.length})` : ""}
         </button>
       </nav>
       <div className={s.syncBadge}>
@@ -379,8 +372,8 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
         <>
           <div className={s.card} ref={formTopRef}>
             <h3>Location</h3>
-            <p className={s.hint}>Type a location, tap the map, or enable location.</p>
-            <span className={s.fieldLabelFirst}>Cross street / address / stop</span>
+            <p className={s.hint}>Where did you see the issue? Type an address, tap the map, or enable location.</p>
+            <span className={s.fieldLabelFirst}>Address or intersection</span>
             <div className={s.inputRow}>
               <input className={s.textInput} type="text" value={form.location} onChange={handleLocationChange} placeholder="Mission Ave & Cleveland St" />
               {form.location && <button type="button" className={s.btnClear} onClick={() => { setForm(prev => ({ ...prev, location: "", lat: null, lng: null })); setGeoStatus({ text: "", cls: "" }); pinMapRef.current?.clearPin(); }}>✕</button>}
@@ -390,7 +383,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
               ref={pinMapRef}
               lat={form.lat}
               lng={form.lng}
-              routeSegments={routeSegments}
+              routeSegments={null}
               onPin={(lat, lng, label) => {
                 setForm(prev => ({ ...prev, lat, lng, location: label || prev.location }));
                 setGeoStatus({ text: `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}`, cls: s.geoOk });
@@ -400,7 +393,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
 
           <div className={s.card}>
             <h3>Conditions</h3>
-            <p className={s.hint}>Rate what you observe at this stop.</p>
+            <p className={s.hint}>Rate what you observe at this location.</p>
             {CONDITION_FIELDS.map(({ field, label, options }, i) => (
               <div key={field as string}>
                 <span className={i === 0 ? s.fieldLabelFirst : s.fieldLabel}>{label}</span>
@@ -443,15 +436,15 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
 
           <div className={s.card}>
             <h3>Notes</h3>
-            <textarea className={s.textarea} value={form.notes} onChange={e => setForm(prev => ({ ...prev, notes: e.target.value }))} placeholder="Anything else to note..." />
+            <textarea className={s.textarea} value={form.notes} onChange={e => setForm(prev => ({ ...prev, notes: e.target.value }))} placeholder="Describe what you see..." />
           </div>
 
           <div className={s.card}>
-            <h3>Observer</h3>
+            <h3>Your name</h3>
             <input className={s.textInput} type="text" value={observer} onChange={e => setObserver(e.target.value)} placeholder="Your name" />
           </div>
 
-          <button className={s.btnSave} type="button" onClick={handleSave}>Save entry</button>
+          <button className={s.btnSave} type="button" onClick={handleSave}>Submit report</button>
         </>
       )}
 
@@ -462,7 +455,7 @@ export default function WalkAuditForm({ auditSlug, segments, mapUrl, routeSegmen
           </div>
           <div>
             {!filtered.length ? (
-              <div className={s.empty}>No entries yet.</div>
+              <div className={s.empty}>No reports yet.</div>
             ) : (
               [...filtered].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map(entry => (
                 <div key={entry.id} className={s.entry}>

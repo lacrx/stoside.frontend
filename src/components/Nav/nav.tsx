@@ -64,7 +64,7 @@ export default function Nav() {
       </li>
       <li>
         <Link to="/walk">
-          <span>Walk</span>
+          <span>Report</span>
         </Link>
       </li>
       <li ref={navRef}>

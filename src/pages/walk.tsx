@@ -1,75 +1,17 @@
-import { graphql, useStaticQuery } from "gatsby";
 import Layout from "@/components/Layout/layout";
 import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
 import WalkAuditForm from "@/components/WalkAudit/walk-audit-form";
 
-type RouteSegment = { name: string; lines: number[][][] };
-
-type WalkAudit = {
-  title: string;
-  slug: string;
-  date: string;
-  status: string;
-  description: string | null;
-  mapUrl: string | null;
-  segments: Array<{ name: string }>;
-  routeSegments: RouteSegment[] | null;
-};
-
-interface WalkAuditQuery {
-  allGatsbyWalkAudit: {
-    nodes: WalkAudit[];
-  };
-}
-
-const query = graphql`
-  query ActiveWalkAudit {
-    allGatsbyWalkAudit(filter: { status: { eq: "active" } }, sort: { date: DESC }) {
-      nodes {
-        title
-        slug
-        date(formatString: "MMMM D, YYYY")
-        status
-        description
-        mapUrl
-        segments {
-          name
-        }
-        routeSegments
-      }
-    }
-  }
-`;
-
 export default function Walk() {
-  const { allGatsbyWalkAudit: { nodes } } = useStaticQuery<WalkAuditQuery>(query);
-  const audit = nodes[0];
-
-  if (!audit) {
-    return (
-      <Layout>
-        <Hero title="Walk Audit" />
-        <Content type="section">
-          <p>No active walk audit right now. Check back soon.</p>
-        </Content>
-      </Layout>
-    );
-  }
-
   return (
     <Layout>
       <Hero
-        title={`Walk Audit: ${audit.title}`}
-        description={`${audit.date}${audit.description ? ` · ${audit.description}` : ""}`}
+        title="Report a Condition"
+        description="Help us identify and document unsafe conditions on Oceanside streets."
       />
       <Content type="section">
-        <WalkAuditForm
-          auditSlug={audit.slug}
-          segments={audit.segments}
-          mapUrl={audit.mapUrl}
-          routeSegments={audit.routeSegments}
-        />
+        <WalkAuditForm auditSlug="oceanside" />
       </Content>
     </Layout>
   );
