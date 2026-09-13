@@ -1,16 +1,12 @@
 .card {
   display: flex;
-  align-items: flex-start;
+  align-items: start;
   gap: 1.25rem;
+  min-height: 9.375rem;
   padding: 0.75rem 0;
-  border-bottom: 1px solid var(--rule);
-
-  &:first-of-type {
-    padding-top: 0;
-  }
+  overflow: hidden;
 
   &:last-child {
-    border-bottom: none;
     padding-bottom: 0;
   }
 
@@ -30,11 +26,19 @@
 
   > :last-child {
     flex: 0 0 9.375rem;
-    display: flex;
-    justify-content: flex-end;
+    height: 9.375rem;
+    overflow: hidden;
+
+    :global(.gatsby-image-wrapper) {
+      height: 100%;
+    }
   }
 
   :global(a) > h2 {
     text-decoration: underline;
   }
+}
+
+.card + .card {
+  border-top: 1px solid var(--rule);
 }
