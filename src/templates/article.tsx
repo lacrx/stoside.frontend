@@ -21,22 +21,13 @@ interface ArticlePageProps extends PageProps {
   pageContext: GatsbyArticle
 }
 
-const contentProps = {
-  type: "section"
-}
-
 export default function Article({ pageContext: { title, description, image, blocks, authorName, publishedAt }}: ArticlePageProps) {
-  const heroProps = {
-    title,
-    description,
-  }
-
   const img = getImage(image);
 
   return (
     <Layout>
-      <Hero { ...heroProps } />
-      <Content { ...contentProps } >
+      <Hero title={title} description={description} style={{ paddingBottom: 0 }} />
+      <Content type="section">
         <Byline author={authorName} publishedAt={publishedAt} />
         {img && <GatsbyImage image={img} alt={title} className={cover} />}
         <ArticleBlocks blocks={blocks} />
@@ -45,4 +36,5 @@ export default function Article({ pageContext: { title, description, image, bloc
   );
 }
 
-export const Head = ({ pageContext: { title } }: ArticlePageProps) => _Head({ subheading: title, location: { pathname: "article" }})
+export const Head = ({ pageContext: { title } }: ArticlePageProps) =>
+  _Head({ subheading: title, bodyClass: "article" });

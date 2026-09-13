@@ -1,7 +1,18 @@
 .content {
   padding-top: 0.75rem;
-  padding-bottom: 1.25rem;
   position: relative;
+}
+
+.content + .content {
+  border-top: 1px solid var(--rule);
+}
+
+.content + .content:has(> :global(h2)) {
+  border-top: none;
+}
+
+.ruled {
+  border-top: 1px solid var(--rule);
 }
 
 .content:last-of-type {
@@ -9,11 +20,8 @@
 
   > :last-child {
     margin-bottom: 0;
+    border-bottom: none;
   }
-}
-
-.content + .content {
-  border-top: 1px solid var(--rule);
 }
 
 .content > :global(h2) {
@@ -32,7 +40,7 @@
   font-weight: 600;
   font-size: 0.75rem;
   letter-spacing: .05em;
-  color: var(--grey);
+  color: var(--text);
 }
 
 .content > :global(h2)::after {

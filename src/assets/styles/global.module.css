@@ -1,15 +1,22 @@
 :root {
+  --bg: #fff;
+  --text: #121212;
   --black: #121212;
   --grey: #333;
   --light-grey: #767676;
   --rule: #e2e2e2;
   --serif: Georgia, "Times New Roman", Times, serif;
-  --sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --sans: Helvetica, "Helvetica Neue", Arial, sans-serif;
 }
 
 :global(html) {
-  overflow-x: hidden;
   overflow-y: scroll;
+}
+
+:global(body) {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
 }
 
 :global(main) {
@@ -45,7 +52,6 @@
   font-weight: 700;
   font-size: 1.75rem;
   line-height: 2rem;
-  color: var(--black);
 }
 
 :global(h2) {
@@ -53,16 +59,13 @@
   font-weight: 700;
   font-size: 1.0625rem;
   line-height: 1.375rem;
-  color: var(--black);
 }
-
 
 :global(p) {
   font-family: var(--serif);
   font-weight: 400;
   font-size: 1rem;
   line-height: 1.75rem;
-  color: var(--grey);
 
   > img {
     max-width: 100%;

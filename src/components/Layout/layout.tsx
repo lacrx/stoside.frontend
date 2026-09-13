@@ -9,7 +9,9 @@ export default function Layout({ children }: PropsWithChildren) {
     <main>
       <Nav />
       { children }
-      <Footer />
+      <div>
+        <Footer />
+      </div>
     </main>
   );
 };

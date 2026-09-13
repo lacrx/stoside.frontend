@@ -1,39 +1,22 @@
 import { graphql, useStaticQuery } from "gatsby";
-import { IGatsbyImageData } from "gatsby-plugin-image";
+import type { GatsbyArticle, GatsbyWalkAudit } from "@/types";
 import Layout from "@/components/Layout/layout";
 import Hero from "@/components/Hero/hero";
 import Content from "@/components/Content/content";
 import Card from "@/components/Card/card";
-import articleCoverFallback from "@/images/oceanside-wealth-poster-desktop.jpg";
-
-type GatsbyArticle = {
-  title: string
-  description: string
-  slug: string
-  image: IGatsbyImageData | null
-  authorName: string | null
-  publishedAt: string | null
-};
-
-type GatsbyWalkAudit = {
-  title: string
-  slug: string
-  date: string
-  description: string | null
-};
 
 type ListItem = {
-  slug: string
-  title: string
-  description: string
-  image: IGatsbyImageData | null
-  authorName: string | null
-  publishedAt: string | null
+  slug: string;
+  title: string;
+  description: string;
+  image: GatsbyArticle["image"];
+  authorName: string | null;
+  publishedAt: string | null;
 };
 
 interface ArticlesQuery {
-  allGatsbyArticle: { nodes: GatsbyArticle[] }
-  allGatsbyWalkAudit: { nodes: GatsbyWalkAudit[] }
+  allGatsbyArticle: { nodes: GatsbyArticle[] };
+  allGatsbyWalkAudit: { nodes: GatsbyWalkAudit[] };
 }
 
 const query = graphql`
@@ -101,15 +84,14 @@ export default function Articles() {
   return (
     <Layout>
       <Hero title="We've put pen to paper" />
-      <Content type="section">
+      <Content type="section" ruled>
         {items.map(({ slug, title, description, image, authorName, publishedAt }) => (
           <Card
             key={slug}
             link={`/articles/${slug}`}
             title={title}
             description={description}
-            image={image ?? articleCoverFallback}
-            fallbackImage={articleCoverFallback}
+            image={image}
             authorName={authorName}
             publishedAt={publishedAt}
           />
@@ -117,6 +99,6 @@ export default function Articles() {
       </Content>
     </Layout>
   );
-};
+}
 
 export { Head } from "@/components/Head/head";

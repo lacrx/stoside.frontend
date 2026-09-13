@@ -11,31 +11,24 @@ export const siteTitleQuery = graphql`
   }
 `;
 
-type SEOProps = {
-  subheading?: string
-  children: ReactNode
-}
 type HeadProps = {
-  subheading?: string
-  location: {
-    pathname: string
-  }
-}
+  subheading?: string;
+  bodyClass?: string;
+  location?: { pathname: string };
+  children?: ReactNode;
+};
 
-function SEO({ subheading, children }: SEOProps) {
+export function Head({ subheading, bodyClass, location, children }: HeadProps) {
   const { site: { siteMetadata: { title }}} = useStaticQuery(siteTitleQuery)
-  const text = (!!subheading ? (subheading + " | ") : "") + title;
+  const text = (subheading ? subheading + " | " : "") + title;
+  const cls = bodyClass ?? (location?.pathname === "/" ? "home" : location?.pathname.replaceAll("/", ""));
   return (
     <>
-      <title>{ text }</title>
-      <meta name="description" content={ text } />
+      <title>{text}</title>
+      <meta name="description" content={text} />
       <link id="icon" rel="icon" href="" />
-      { children }
+      {cls && <body className={cls} />}
+      {children}
     </>
-  )
+  );
 }
-
-export const Head = ({ subheading, location }: HeadProps) =>
-  <SEO subheading={subheading}>
-    <body className={ location?.pathname === "/" ? "home" : location?.pathname.replaceAll("/", "") } />
-  </SEO>

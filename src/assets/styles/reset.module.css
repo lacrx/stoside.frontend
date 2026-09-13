@@ -1,3 +1,7 @@
+:global(*, *::before, *::after) {
+	box-sizing: border-box;
+}
+
 :global(html), :global(body), :global(div), :global(span), :global(applet), :global(object), :global(iframe),
 :global(h1), :global(h2), :global(h3), :global(h4), :global(h5), :global(h6), :global(p), :global(blockquote), :global(pre),
 :global(a), :global(abbr), :global(acronym), :global(address), :global(big), :global(cite), :global(code),

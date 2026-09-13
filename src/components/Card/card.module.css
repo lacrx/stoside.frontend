@@ -34,11 +34,24 @@
     }
   }
 
-  :global(a) > h2 {
+  :global(a) > h2,
+  h2 {
     text-decoration: underline;
   }
 }
 
 .card + .card {
   border-top: 1px solid var(--rule);
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  padding-left: 0 !important;
+  margin: 0 !important;
+  list-style: none !important;
+}
+
+.location {
+  display: block;
 }
