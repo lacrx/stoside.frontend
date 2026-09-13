@@ -92,6 +92,7 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
   const [ready, setReady] = useState(false);
   const [locating, setLocating] = useState(false);
   const [gpsError, setGpsError] = useState<React.ReactNode | null>(null);
+  const [geoPermission, setGeoPermission] = useState<"checking" | "prompt" | "granted" | "denied">("checking");
 
   useImperativeHandle(ref, () => ({
     setPin(newLat: number, newLng: number) {
@@ -118,6 +119,22 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
     if (typeof window === "undefined") return;
     loadCSS(LEAFLET_CSS);
     loadScript(LEAFLET_JS).then(() => setReady(true));
+  }, []);
+
+  useEffect(() => {
+    if (!navigator.permissions) {
+      setGeoPermission("prompt");
+      return;
+    }
+    let ps: PermissionStatus | null = null;
+    navigator.permissions.query({ name: "geolocation" as PermissionName }).then(status => {
+      ps = status;
+      setGeoPermission(status.state === "granted" ? "granted" : status.state === "denied" ? "denied" : "prompt");
+      status.addEventListener("change", () => {
+        setGeoPermission(status.state === "granted" ? "granted" : status.state === "denied" ? "denied" : "prompt");
+      });
+    }).catch(() => setGeoPermission("prompt"));
+    return () => { ps?.removeEventListener("change", () => {}); };
   }, []);
 
   useEffect(() => {
@@ -179,29 +196,23 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
     };
   }, [ready]);
 
-  const handleGPS = async () => {
-    if (!navigator.geolocation) {
-      setGpsError("Location not supported on this browser");
-      return;
-    }
-
+  const getDeniedMsg = () => {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     const isAndroid = /Android/.test(navigator.userAgent);
-
-    const deniedMsg = isIOS ? (
+    return isIOS ? (
       <>
-        <strong>Location is blocked.</strong> To fix:
+        <strong>Location is blocked.</strong> To enable:
         <ol>
           <li>Open your iPhone <strong>Settings</strong> app</li>
           <li>Scroll down and tap <strong>Safari</strong></li>
           <li>Tap <strong>Location</strong></li>
           <li>Select <strong>Ask</strong> or <strong>Allow</strong></li>
-          <li>Come back here and tap "Use my location" again</li>
+          <li>Come back here and try again</li>
         </ol>
       </>
     ) : isAndroid ? (
       <>
-        <strong>Location is blocked.</strong> To fix:
+        <strong>Location is blocked.</strong> To enable:
         <ol>
           <li>Tap the <strong>lock icon</strong> in your browser address bar</li>
           <li>Tap <strong>Permissions</strong> or <strong>Site settings</strong></li>
@@ -214,17 +225,17 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
         <strong>Location is blocked.</strong> Click the lock/info icon in your address bar, allow location for this site, then reload.
       </>
     );
+  };
 
-    if (navigator.permissions) {
-      try {
-        const status = await navigator.permissions.query({ name: "geolocation" as PermissionName });
-        if (status.state === "denied") {
-          setGpsError(deniedMsg);
-          return;
-        }
-      } catch {}
+  const handleEnableLocation = () => {
+    if (!navigator.geolocation) {
+      setGpsError("Location not supported on this browser.");
+      return;
     }
-
+    if (geoPermission === "denied") {
+      setGpsError(getDeniedMsg());
+      return;
+    }
     setLocating(true);
     setGpsError(null);
     navigator.geolocation.getCurrentPosition(
@@ -243,11 +254,13 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
         const label = await reverseGeocode(latitude, longitude);
         onPin(latitude, longitude, label);
         setLocating(false);
+        setGeoPermission("granted");
       },
       (err) => {
         setLocating(false);
         if (err.code === 1) {
-          setGpsError(deniedMsg);
+          setGeoPermission("denied");
+          setGpsError(getDeniedMsg());
         } else if (err.code === 2) {
           setGpsError("Could not determine location. Try again outside.");
         } else {
@@ -261,9 +274,11 @@ const PinMap = forwardRef<PinMapHandle, PinMapProps>(function PinMap(
   return (
     <div className={s.pinMapWrap}>
       <div ref={containerRef} className={s.pinMap} />
-      <button type="button" className={s.btnGps} onClick={handleGPS} disabled={locating}>
-        {locating ? "Locating…" : "📍 Use my location"}
-      </button>
+      {geoPermission !== "checking" && (
+        <button type="button" className={s.btnGps} onClick={handleEnableLocation} disabled={locating}>
+          {locating ? "Locating…" : geoPermission === "granted" ? "📍 Use my location" : "📍 Enable location"}
+        </button>
+      )}
       {gpsError && <div className={s.gpsDenied}>{gpsError}</div>}
     </div>
   );
