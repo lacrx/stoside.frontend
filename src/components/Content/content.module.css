@@ -1,5 +1,5 @@
 .content {
-  padding-top: 1.25rem;
+  padding-top: 1.5rem;
   position: relative;
 
   > :first-child {
@@ -18,8 +18,8 @@
 
 .content + .content:has(> :global(h2)) {
   border-top: none;
-  margin-top: 2rem;
-  padding-top: 1.25rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
 }
 
 .ruled {
@@ -27,7 +27,7 @@
 }
 
 .content:last-of-type {
-  padding-bottom: 1.25rem;
+  padding-bottom: 1.5rem;
   border-bottom: none;
 
   > :last-child {

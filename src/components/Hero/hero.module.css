@@ -1,7 +1,7 @@
 .hero {
   position: relative;
   padding-top: 2rem;
-  padding-bottom: 2rem;
+  padding-bottom: 5rem;
 
   > :nth-child(n) {
     max-width: 40rem;
