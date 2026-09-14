@@ -3,7 +3,7 @@
   align-items: start;
   gap: 1.25rem;
   min-height: 9.375rem;
-  padding: 1.25rem 0;
+  padding: 1.5rem 0;
   overflow: hidden;
 
   &:first-child {
