@@ -32,15 +32,16 @@
 }
 
 .syncBadge {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   font-family: var(--sans);
   font-size: 0.65rem;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
   gap: 0.35rem;
   color: var(--light-grey);
-  margin-top: -0.75rem;
-  margin-bottom: 0.75rem;
 }
 
 .dot {
@@ -206,6 +207,7 @@
 }
 
 .tabs {
+  position: relative;
   display: flex;
   border-radius: 0.375rem;
   overflow: hidden;
