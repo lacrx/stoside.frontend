@@ -338,7 +338,7 @@
 .geoStatus {
   font-family: var(--sans);
   font-size: 0.8rem;
-  margin-top: 0.25rem;
+  margin-top: 0;
   min-height: 0;
   color: var(--light-grey);
 }
