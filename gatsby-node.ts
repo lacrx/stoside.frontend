@@ -350,7 +350,8 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
   actions: { createNode },
   createContentDigest,
   createNodeId,
-  getCache
+  getCache,
+  getNodesByType,
 }) => {
   const strapiUrl = process.env.STRAPI_URL || "http://localhost:1337";
   const strapiGraphqlClient = new GraphQLClient(`${strapiUrl}/graphql`);
@@ -382,8 +383,21 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
     console.warn(`[gatsby-node] Skipping Strapi site settings: ${(err as Error).message}`);
   }
 
+  const COVER_FALLBACKS: Record<string, string> = {
+    'our-wealth-is-downtown': 'oceanside-wealth-poster-desktop.jpg',
+  };
+
   const images = articles.length === 0 ? [] : await Promise.all(articles.map( async (article) => {
-    if (!article?.cover?.url) return undefined;
+    if (!article?.cover?.url) {
+      const fallbackBase = COVER_FALLBACKS[article.slug];
+      if (fallbackBase) {
+        const fileNode = getNodesByType('File').find(
+          (n: Record<string, unknown>) => n.base === fallbackBase
+        );
+        return fileNode?.id as string | undefined;
+      }
+      return undefined;
+    }
     const coverUrl = article.cover.url.startsWith('http')
       ? article.cover.url
       : `${strapiUrl}${article.cover.url}`;
