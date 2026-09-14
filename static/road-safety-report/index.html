@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oceanside Road Safety Report Card</title>
+<style>
+  @font-face {
+    font-family: 'Display';
+    src: local('Avenir Next Condensed'), local('AvenirNextCondensed-Bold'), local('Arial Narrow Bold');
+    font-weight: 700;
+  }
+
+  :root {
+    --ground: #f3f2ee;
+    --surface: #ffffff;
+    --ink: #1a1917;
+    --ink-2: #6d6a63;
+    --ink-3: #9e9b94;
+    --accent: #c23028;
+    --accent-soft: #fceeed;
+    --accent-muted: rgba(194, 48, 40, 0.32);
+    --caution: #cf8a1e;
+    --safe: #4a7c38;
+    --info: #3a6b94;
+    --info-soft: #edf3f8;
+    --border: #dfddd8;
+    --strip-grad: linear-gradient(to right,
+      hsla(3, 58%, 72%, 0.38) 0%,
+      hsla(38, 50%, 72%, 0.26) 40%,
+      hsla(100, 32%, 68%, 0.26) 100%);
+    --marker-ring: var(--surface);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #131210;
+      --surface: #1c1b18;
+      --ink: #e4e2dc;
+      --ink-2: #918e87;
+      --ink-3: #5e5b55;
+      --accent: #e0534a;
+      --accent-soft: #2c1e1d;
+      --accent-muted: rgba(224, 83, 74, 0.28);
+      --caution: #dea23a;
+      --safe: #6a9c52;
+      --info: #5a9bcf;
+      --info-soft: #161e28;
+      --border: #2c2b27;
+      --strip-grad: linear-gradient(to right,
+        hsla(3, 42%, 34%, 0.45) 0%,
+        hsla(38, 36%, 30%, 0.32) 40%,
+        hsla(100, 26%, 26%, 0.32) 100%);
+      --marker-ring: var(--surface);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #131210;
+    --surface: #1c1b18;
+    --ink: #e4e2dc;
+    --ink-2: #918e87;
+    --ink-3: #5e5b55;
+    --accent: #e0534a;
+    --accent-soft: #2c1e1d;
+    --accent-muted: rgba(224, 83, 74, 0.28);
+    --caution: #dea23a;
+    --safe: #6a9c52;
+    --info: #5a9bcf;
+    --info-soft: #161e28;
+    --border: #2c2b27;
+    --strip-grad: linear-gradient(to right,
+      hsla(3, 42%, 34%, 0.45) 0%,
+      hsla(38, 36%, 30%, 0.32) 40%,
+      hsla(100, 26%, 26%, 0.32) 100%);
+    --marker-ring: var(--surface);
+  }
+
+  :root[data-theme="light"] {
+    --ground: #f3f2ee;
+    --surface: #ffffff;
+    --ink: #1a1917;
+    --ink-2: #6d6a63;
+    --ink-3: #9e9b94;
+    --accent: #c23028;
+    --accent-soft: #fceeed;
+    --accent-muted: rgba(194, 48, 40, 0.32);
+    --caution: #cf8a1e;
+    --safe: #4a7c38;
+    --info: #3a6b94;
+    --info-soft: #edf3f8;
+    --border: #dfddd8;
+    --strip-grad: linear-gradient(to right,
+      hsla(3, 58%, 72%, 0.38) 0%,
+      hsla(38, 50%, 72%, 0.26) 40%,
+      hsla(100, 32%, 68%, 0.26) 100%);
+    --marker-ring: var(--surface);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+    background: var(--ground);
+    color: var(--ink);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 4rem;
+  }
+
+  /* ---- Header ---- */
+  header { margin-bottom: 2rem; }
+
+  .eyebrow {
+    font-family: 'Display', 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-family: 'Display', 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.7rem, 4.5vw, 2.4rem);
+    line-height: 1.12;
+    text-wrap: balance;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+  }
+
+  .lede {
+    font-size: 1.05rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 58ch;
+  }
+
+  /* ---- Hero stat ---- */
+  .hero-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 1.5rem 0;
+    margin-bottom: 2rem;
+    border-top: 3px solid var(--accent);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-number {
+    font-family: 'Display', 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    font-size: clamp(3.5rem, 10vw, 5rem);
+    line-height: 0.9;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .hero-number sup {
+    font-size: 0.42em;
+    vertical-align: super;
+  }
+
+  .hero-context {
+    font-size: 1rem;
+    line-height: 1.4;
+    color: var(--ink-2);
+    max-width: 30ch;
+  }
+
+  .hero-context strong { color: var(--ink); }
+
+  /* ---- Method box ---- */
+  .method-box {
+    background: var(--info-soft);
+    border-left: 3px solid var(--info);
+    padding: 1rem 1.25rem;
+    margin-bottom: 2.5rem;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .method-box p {
+    font-size: 0.86rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .method-box strong { color: var(--ink); }
+
+  /* ---- Section headers ---- */
+  h2 {
+    font-family: 'Display', 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    margin-bottom: 0.6rem;
+    text-wrap: balance;
+  }
+
+  .section-intro {
+    font-size: 0.92rem;
+    color: var(--ink-2);
+    margin-bottom: 1.25rem;
+    max-width: 62ch;
+    line-height: 1.55;
+  }
+
+  /* ---- Rankings ---- */
+  .rankings { margin-bottom: 2.5rem; }
+
+  .strip-legend {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 0 0.2rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .rank-card {
+    padding: 1rem 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+    transition: border-color 0.15s;
+  }
+
+  .rank-card:hover { border-color: var(--ink-3); }
+
+  .rank-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .rank-category {
+    font-family: 'Display', 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .trend-tag {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 0.1rem 0.45rem;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .trend-worse { background: var(--accent-soft); color: var(--accent); }
+  .trend-worst { background: var(--accent); color: #fff; }
+  .trend-stable { background: #f5f0e0; color: var(--caution); }
+  .trend-better { background: #edf3e6; color: var(--safe); }
+
+  @media (prefers-color-scheme: dark) {
+    .trend-stable { background: #28241a; }
+    .trend-better { background: #1a2618; }
+  }
+  :root[data-theme="dark"] .trend-stable { background: #28241a; }
+  :root[data-theme="dark"] .trend-better { background: #1a2618; }
+  :root[data-theme="light"] .trend-stable { background: #f5f0e0; }
+  :root[data-theme="light"] .trend-better { background: #edf3e6; }
+
+  .rank-main {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .rank-big {
+    font-family: 'Display', 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    font-size: 1.75rem;
+    line-height: 1;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rank-big sup {
+    font-size: 0.48em;
+    vertical-align: super;
+  }
+
+  .rank-of {
+    font-size: 0.82rem;
+    color: var(--ink-2);
+  }
+
+  .rank-strip {
+    position: relative;
+    height: 5px;
+    background: var(--strip-grad);
+    border-radius: 3px;
+    margin-bottom: 0.55rem;
+  }
+
+  .rank-marker {
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    background: var(--accent);
+    border: 2.5px solid var(--marker-ring);
+    border-radius: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    z-index: 1;
+  }
+
+  .rank-foot {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rank-victims { color: var(--ink); font-weight: 500; }
+
+  .rank-sep {
+    color: var(--ink-3);
+  }
+
+  /* ---- Fatalities bar chart ---- */
+  .fatalities { margin-bottom: 2.5rem; }
+
+  .bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .bar-year {
+    font-family: 'Display', 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--ink-2);
+    width: 2.5rem;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
+  .bar-container {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .bar-fill {
+    display: flex;
+    height: 24px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .bar-ped { background: var(--accent); }
+  .bar-other { background: var(--accent-muted); }
+
+  .bar-count {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink);
+    width: 2rem;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
+  .bar-legend {
+    display: flex;
+    gap: 1.25rem;
+    font-size: 0.72rem;
+    color: var(--ink-2);
+    margin-top: 0.2rem;
+  }
+
+  .swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 0.3rem;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+  }
+
+  .swatch-ped { background: var(--accent); }
+  .swatch-other { background: var(--accent-muted); }
+
+  .ped-note {
+    font-size: 0.88rem;
+    color: var(--ink-2);
+    line-height: 1.55;
+    margin-top: 1rem;
+    max-width: 60ch;
+  }
+
+  .ped-note strong { color: var(--ink); }
+
+  /* ---- Callout ---- */
+  .callout {
+    border-left: 3px solid var(--accent);
+    padding: 1.25rem 1.5rem;
+    background: var(--accent-soft);
+    border-radius: 0 5px 5px 0;
+    margin-bottom: 2.5rem;
+  }
+
+  .callout h2 { margin-bottom: 0.25rem; }
+
+  .callout p {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--ink);
+    max-width: 58ch;
+  }
+
+  .data-point {
+    font-family: 'Display', 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 1.2;
+    color: var(--accent);
+    display: block;
+    margin: 0.3rem 0 0.35rem;
+  }
+
+  /* ---- Gap section ---- */
+  .gap-section { margin-bottom: 2.5rem; }
+
+  .gap-content {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .gap-content p {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--ink-2);
+    max-width: 58ch;
+  }
+
+  .gap-content p + p { margin-top: 0.75rem; }
+
+  .gap-content strong { color: var(--ink); }
+
+  /* ---- Sources ---- */
+  .sources {
+    font-size: 0.78rem;
+    color: var(--ink-2);
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+  }
+
+  .sources h3 {
+    font-family: 'Display', 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    color: var(--ink-2);
+  }
+
+  .sources ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .sources a {
+    color: var(--info);
+    text-decoration: none;
+  }
+
+  .sources a:hover { text-decoration: underline; }
+
+  .data-note {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--ink-3);
+    line-height: 1.5;
+    max-width: 62ch;
+  }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 500px) {
+    .page { padding: 2rem 1rem 3rem; }
+    .hero-stat { flex-direction: column; gap: 0.5rem; }
+    .hero-context { max-width: none; }
+    .rank-card { padding: 0.85rem 1rem; }
+    .rank-head { flex-wrap: wrap; }
+    .gap-content { padding: 1rem 1.15rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <header>
+    <div class="eyebrow">Traffic Safety Report</div>
+    <h1>How Safe Are Oceanside's Streets?</h1>
+    <p class="lede">California ranks every city's traffic safety record against population peers each year. Among 62 cities its size, Oceanside consistently places near the bottom. The trend is getting worse.</p>
+  </header>
+
+  <section class="hero-stat">
+    <span class="hero-number">2<sup>nd</sup></span>
+    <span class="hero-context"><strong>worst composite safety score</strong> among 62 peer California cities, 2023</span>
+  </section>
+
+  <div class="method-box">
+    <p>The California Office of Traffic Safety (OTS) compares cities of similar population using crash data from the Statewide Integrated Traffic Records System (SWITRS). Oceanside falls in Group B: roughly 62 mid-sized cities including Corona, Elk Grove, Lancaster, and Salinas. <strong>City rankings include only crashes on city-controlled streets. Freeways and highways patrolled by CHP are excluded.</strong> What remains is a direct measure of how safe a city has made its own streets. Rank 1 is worst.</p>
+  </div>
+
+  <section class="rankings">
+    <h2>Where Oceanside Ranks</h2>
+    <p class="section-intro">Across six critical crash categories, Oceanside ranks in the worst 15% of its peer group in five. Each strip below represents all 62 peer cities. The dot marks Oceanside.</p>
+
+    <div class="strip-legend">
+      <span>&#8592; Most dangerous</span>
+      <span>Safest &#8594;</span>
+    </div>
+
+    <!-- Composite -->
+    <div class="rank-card">
+      <div class="rank-head">
+        <span class="rank-category">Composite Safety Score</span>
+        <span class="trend-tag trend-worse">Worsening</span>
+      </div>
+      <div class="rank-main">
+        <span class="rank-big">2<sup>nd</sup></span>
+        <span class="rank-of">of 62 cities</span>
+      </div>
+      <div class="rank-strip">
+        <div class="rank-marker" style="left: 1.6%"></div>
+      </div>
+      <div class="rank-foot">
+        <span class="rank-victims">Weighted across all crash categories</span>
+        <span class="rank-sep">&middot;</span>
+        <span>2021: 4th/60</span>
+        <span class="rank-sep">&middot;</span>
+        <span>2022: 5th/61</span>
+      </div>
+    </div>
+
+    <!-- Alcohol -->
+    <div class="rank-card">
+      <div class="rank-head">
+        <span class="rank-category">Alcohol-Involved Crashes</span>
+        <span class="trend-tag trend-worse">Worsening</span>
+      </div>
+      <div class="rank-main">
+        <span class="rank-big">1<sup>st</sup></span>
+        <span class="rank-of">of 62 cities</span>
+      </div>
+      <div class="rank-strip">
+        <div class="rank-marker" style="left: 1%"></div>
+      </div>
+      <div class="rank-foot">
+        <span class="rank-victims">186 victims in 2023</span>
+        <span class="rank-sep">&middot;</span>
+        <span>2021: 6th/60</span>
+        <span class="rank-sep">&middot;</span>
+        <span>2022: 3rd/61</span>
+      </div>
+    </div>
+
+    <!-- Motorcycle -->
+    <div class="rank-card">
+      <div class="rank-head">
+        <span class="rank-category">Motorcycle Collisions</span>
+        <span class="trend-tag trend-worst">Dead Last</span>
+      </div>
+      <div class="rank-main">
+        <span class="rank-big">1<sup>st</sup></span>
+        <span class="rank-of">of 62 cities</span>
+      </div>
+      <div class="rank-strip">
+        <div class="rank-marker" style="left: 1%"></div>
+      </div>
+      <div class="rank-foot">
+        <span class="rank-victims">84 victims in 2023</span>
+        <span class="rank-sep">&middot;</span>
+        <span>2021: 1st/60</span>
+        <span class="rank-sep">&middot;</span>
+        <span>2022: 1st/61</span>
+      </div>
+    </div>
+
+    <!-- Speed -->
+    <div class="rank-card">
+      <div class="rank-head">
+        <span class="rank-category">Speed-Related Collisions</span>
+        <span class="trend-tag trend-better">Improving</span>
+      </div>
+      <div class="rank-main">
+        <span class="rank-big">8<sup>th</sup></span>
+        <span class="rank-of">of 62 cities</span>
+      </div>
+      <div class="rank-strip">
+        <div class="rank-marker" style="left: 11.5%"></div>
+      </div>
+      <div class="rank-foot">
+        <span class="rank-victims">34% of all crashes involve speeding</span>
+        <span class="rank-sep">&middot;</span>
+        <span>2021: 2nd/60</span>
+        <span class="rank-sep">&middot;</span>
+        <span>2022: 3rd/61</span>
+      </div>
+    </div>
+
+    <!-- Bicycle -->
+    <div class="rank-card">
+      <div class="rank-head">
+        <span class="rank-category">Bicyclist Crashes</span>
+        <span class="trend-tag trend-stable">Persistent</span>
+      </div>
+      <div class="rank-main">
+        <span class="rank-big">7<sup>th</sup></span>
+        <span class="rank-of">of 62 cities</span>
+      </div>
+      <div class="rank-strip">
+        <div class="rank-marker" style="left: 9.8%"></div>
+      </div>
+      <div class="rank-foot">
+        <span class="rank-victims">75 victims in 2023</span>
+        <span class="rank-sep">&middot;</span>
+        <span>2021: 5th/60</span>
+        <span class="rank-sep">&middot;</span>
+        <span>2022: 7th/61</span>
+      </div>
+    </div>
+
+    <!-- Child Cyclists -->
+    <div class="rank-card">
+      <div class="rank-head">
+        <span class="rank-category">Child Cyclists (Under 15)</span>
+        <span class="trend-tag trend-worse">Worsening</span>
+      </div>
+      <div class="rank-main">
+        <span class="rank-big">6<sup>th</sup></span>
+        <span class="rank-of">of 62 cities</span>
+      </div>
+      <div class="rank-strip">
+        <div class="rank-marker" style="left: 8.2%"></div>
+      </div>
+      <div class="rank-foot">
+        <span class="rank-victims">12 children injured or killed in 2023</span>
+        <span class="rank-sep">&middot;</span>
+        <span>2021: 19th/60</span>
+        <span class="rank-sep">&middot;</span>
+        <span>2022: 10th/61</span>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="fatalities">
+    <h2>The Trajectory</h2>
+    <p class="section-intro">Total fatalities on Oceanside's city streets, 2020 through 2024. Pedestrian deaths are highlighted.</p>
+
+    <div class="bar-chart">
+      <div class="bar-row">
+        <span class="bar-year">2020</span>
+        <div class="bar-container">
+          <div class="bar-fill" style="width: 75%">
+            <div class="bar-ped" style="width: 46.7%"></div>
+            <div class="bar-other" style="flex: 1"></div>
+          </div>
+        </div>
+        <span class="bar-count">15</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-year">2021</span>
+        <div class="bar-container">
+          <div class="bar-fill" style="width: 80%">
+            <div class="bar-ped" style="width: 37.5%"></div>
+            <div class="bar-other" style="flex: 1"></div>
+          </div>
+        </div>
+        <span class="bar-count">16</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-year">2022</span>
+        <div class="bar-container">
+          <div class="bar-fill" style="width: 50%">
+            <div class="bar-ped" style="width: 50%"></div>
+            <div class="bar-other" style="flex: 1"></div>
+          </div>
+        </div>
+        <span class="bar-count">10</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-year">2023</span>
+        <div class="bar-container">
+          <div class="bar-fill" style="width: 75%">
+            <div class="bar-ped" style="width: 20%"></div>
+            <div class="bar-other" style="flex: 1"></div>
+          </div>
+        </div>
+        <span class="bar-count">15</span>
+      </div>
+      <div class="bar-row">
+        <span class="bar-year">2024</span>
+        <div class="bar-container">
+          <div class="bar-fill" style="width: 100%">
+            <div class="bar-ped" style="width: 55%"></div>
+            <div class="bar-other" style="flex: 1"></div>
+          </div>
+        </div>
+        <span class="bar-count">20</span>
+      </div>
+    </div>
+
+    <div class="bar-legend">
+      <span><span class="swatch swatch-ped"></span>Pedestrian fatalities</span>
+      <span><span class="swatch swatch-other"></span>Other fatalities</span>
+    </div>
+
+    <p class="ped-note"><strong>In 2024, 11 pedestrians died on Oceanside streets.</strong> The year before, it was 3. When the 2024 OTS rankings are published, the pedestrian ranking (32nd in 2023) will move significantly.</p>
+  </section>
+
+  <div class="callout">
+    <h2>Children at Risk</h2>
+    <span class="data-point">12 children</span>
+    <p>under 15 were injured or killed while cycling on Oceanside streets in 2023. Two years earlier, Oceanside ranked 19th out of 60 peer cities for child cyclist safety: unremarkable, mid-pack. By 2023, it had fallen to 6th worst out of 62. The trajectory is accelerating in the wrong direction.</p>
+  </div>
+
+  <section class="gap-section">
+    <h2>No Plan to Fix It</h2>
+    <div class="gap-content">
+      <p>Oceanside has no Vision Zero commitment. No adopted safety action plan. No published map of its highest-injury streets. A federal Safe Streets for All grant was awarded for a Comprehensive Safety Action Plan; it remains in development.</p>
+      <p>The City of San Diego adopted Vision Zero in 2015. SANDAG finalized a regional Vision Zero Action Plan in 2024. <strong>Oceanside has not adopted a local plan or set a target date for reducing traffic deaths on its streets.</strong></p>
+    </div>
+  </section>
+
+  <footer class="sources">
+    <h3>Sources</h3>
+    <ul>
+      <li>California Office of Traffic Safety, <a href="https://www.ots.ca.gov/media-and-research/crash-rankings/">Crash Rankings</a> (2021, 2022, 2023)</li>
+      <li>SWITRS crash data via UC Berkeley <a href="https://tims.berkeley.edu/">TIMS</a></li>
+      <li>SANDAG <a href="https://www.sandag.org/projects-and-programs/regional-initiatives/vision-zero">Vision Zero Action Plan</a> (2024)</li>
+      <li>SANDAG <a href="https://opendata.sandag.org/stories/s/Traffic-Safety-Dashboard/5f7y-nefe/">Traffic Safety Dashboard</a></li>
+    </ul>
+    <p class="data-note">Rankings reflect 2023 OTS data (latest published). Fatality counts from SWITRS through 2024. OTS uses the Empirical Bayesian method, weighting observed crash counts, population, and daily vehicle miles traveled. Group B peer cities have populations comparable to Oceanside's (~173,000).</p>
+  </footer>
+
+</div>
+
+</body>
+</html>
