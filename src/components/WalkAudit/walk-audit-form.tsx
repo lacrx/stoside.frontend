@@ -362,10 +362,6 @@ export default function WalkAuditForm({ auditSlug }: WalkAuditFormProps) {
         <button className={tab === "list" ? s.tabActive : s.tab} onClick={() => setTab("list")}>
           All reports{filtered.length ? ` (${filtered.length})` : ""}
         </button>
-        <div className={s.syncBadge}>
-          <span className={synced ? s.dotConnected : s.dot} />
-          <span>{synced === null ? "Local only" : synced ? "Synced" : "Reconnecting…"}</span>
-        </div>
       </nav>
 
       {tab === "new" && (
