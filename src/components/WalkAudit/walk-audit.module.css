@@ -235,9 +235,9 @@
 
 .card {
   background: white;
-  border: 1px solid var(--rule);
-  border-radius: 0.375rem;
-  padding: 1.25rem;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  padding: 0 0 1.25rem;
   margin-bottom: 0.75rem;
 }
 
