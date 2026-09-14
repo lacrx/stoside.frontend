@@ -1,5 +1,5 @@
 .content {
-  padding-top: 1rem;
+  padding-top: 1.25rem;
   position: relative;
 
   > :first-child {
@@ -21,7 +21,7 @@
 }
 
 .content:last-of-type {
-  padding-bottom: 1rem;
+  padding-bottom: 1.25rem;
   border-bottom: none;
 
   > :last-child {
