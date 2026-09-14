@@ -10,7 +10,7 @@ export default function About() {
   return (
     <Layout>
       <Hero { ...heroProps } />
-      <Content type="section">
+      <Content type="section" ruled>
         <p>
           We are a network of groups devoted to making North County an affordable,
           equitable, thriving community. Look through our{" "}

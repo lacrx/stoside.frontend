@@ -10,7 +10,7 @@ export default function Walk() {
         title="Report a Condition"
         description="Help us identify and document unsafe conditions on Oceanside streets."
       />
-      <Content type="section">
+      <Content type="section" ruled>
         <WalkAuditForm auditSlug="oceanside" />
       </Content>
     </Layout>

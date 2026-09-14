@@ -35,7 +35,7 @@ export default function WalkAudit({ pageContext }: WalkAuditPageProps) {
         title={`Walk Audit: ${title}`}
         description={`${formatDate(date)}${description ? ` · ${description}` : ""}`}
       />
-      <Content type="section">
+      <Content type="section" ruled>
         <div className={results}>
           {mapUrl && (
             <p>
