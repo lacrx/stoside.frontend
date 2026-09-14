@@ -3,10 +3,12 @@
   align-items: start;
   gap: 1.25rem;
   min-height: 9.375rem;
-  padding: 0.75rem 0;
+  padding: 1.25rem 0;
   overflow: hidden;
 
-
+  &:last-child {
+    padding-bottom: 0;
+  }
 
   > :first-child {
     flex: 1;

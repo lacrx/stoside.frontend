@@ -1,5 +1,4 @@
 .content {
-  padding-top: 0.75rem;
   position: relative;
 }
 
@@ -7,16 +6,13 @@
   border-top: 1px solid var(--rule);
 }
 
-.content + .content:has(> :global(h2)) {
-  border-top: none;
-}
-
 .ruled {
   border-top: 1px solid var(--rule);
 }
 
 .content:last-of-type {
-  padding-bottom: 2.25rem;
+  padding-bottom: 3rem;
+  border-bottom: none;
 
   > :last-child {
     margin-bottom: 0;
@@ -25,22 +21,17 @@
 }
 
 .content > :global(h2) {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--bg);
-  margin: 0;
-  z-index: 1;
+  margin: 0 0 -0.75rem;
+  padding: 0;
   font-family: var(--sans);
-  font-weight: 600;
+  font-weight: 500;
   font-size: 0.75rem;
+  line-height: 1;
   letter-spacing: .05em;
-  color: var(--text);
+  transform: translateY(-50%);
 }
 
 .content > :global(h2)::after {

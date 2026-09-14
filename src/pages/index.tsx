@@ -84,13 +84,13 @@ export default function Home() {
             publishedAt={article.publishedAt}
           />
         )}
+        {event && (
+          <>
+            <h2>Next Event</h2>
+            <EventCard e={event} />
+          </>
+        )}
       </Content>
-      {event && (
-        <Content type="section">
-          <h2>Next Event</h2>
-          <EventCard e={event} />
-        </Content>
-      )}
     </Layout>
   );
 }
