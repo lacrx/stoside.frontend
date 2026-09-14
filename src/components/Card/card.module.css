@@ -6,6 +6,10 @@
   padding: 1.25rem 0;
   overflow: hidden;
 
+  &:first-child {
+    padding-top: 0;
+  }
+
   &:last-child {
     padding-bottom: 0;
   }
