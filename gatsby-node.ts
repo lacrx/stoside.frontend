@@ -394,19 +394,19 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
         const fileNode = getNodesByType('File').find(
           (n: Record<string, unknown>) => n.base === fallbackBase
         );
-        return fileNode?.id as string | undefined;
+        return { id: fileNode?.id as string | undefined, fallback: true };
       }
-      return undefined;
+      return { id: undefined, fallback: false };
     }
     const coverUrl = article.cover.url.startsWith('http')
       ? article.cover.url
       : `${strapiUrl}${article.cover.url}`;
-    return (await createRemoteFileNode({
+    return { id: (await createRemoteFileNode({
       url: coverUrl,
       createNode,
       createNodeId,
       getCache,
-    })).id;
+    })).id, fallback: false };
   }));
   articles.forEach(({ title, description, slug, blocks, authors, publishedAt }, i) => {
     const structuredBlocks: ArticleBlock[] = blocks.map(block => {
@@ -429,7 +429,8 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
       title,
       description,
       slug,
-      image: images[i],
+      image: images[i].id,
+      coverIsFallback: images[i].fallback,
       authorName: authors?.length ? authors.map(a => a.name).join(' & ') : null,
       blocks: structuredBlocks,
       publishedAt
@@ -546,6 +547,7 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions: { create
           title
           description
           slug
+          coverIsFallback
           image {
             childImageSharp {
               gatsbyImageData(
@@ -623,6 +625,7 @@ export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] 
     }
     type GatsbyArticle implements Node {
       image: File @link(by: "id")
+      coverIsFallback: Boolean
       title: String!
       description: String
       slug: String

@@ -13,6 +13,7 @@ type GatsbyArticle = {
   description: string
   slug: string
   image: IGatsbyImageData
+  coverIsFallback: boolean
   blocks: ArticleBlock[]
   authorName: string | null
   publishedAt: string | Date | null
@@ -21,8 +22,8 @@ interface ArticlePageProps extends PageProps {
   pageContext: GatsbyArticle
 }
 
-export default function Article({ pageContext: { title, description, image, blocks, authorName, publishedAt }}: ArticlePageProps) {
-  const img = getImage(image);
+export default function Article({ pageContext: { title, description, image, coverIsFallback, blocks, authorName, publishedAt }}: ArticlePageProps) {
+  const img = coverIsFallback ? null : getImage(image);
 
   return (
     <Layout>
