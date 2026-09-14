@@ -234,7 +234,7 @@
 }
 
 .card {
-  padding: 1.25rem 0 0.75rem;
+  padding: 1rem 0 0.75rem;
 }
 
 .card + .card {
@@ -774,7 +774,7 @@
 /* Listing page */
 
 .auditCard {
-  padding: 1.25rem 0;
+  padding: 1rem 0;
 }
 
 .auditCard + .auditCard {

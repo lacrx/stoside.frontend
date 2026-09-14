@@ -1,6 +1,10 @@
 .content {
-  padding-top: 0.75rem;
+  padding-top: 1rem;
   position: relative;
+
+  > :first-child {
+    margin-top: 0;
+  }
 }
 
 .content + .content {
@@ -17,11 +21,12 @@
 }
 
 .content:last-of-type {
-  padding-bottom: 3rem;
+  padding-bottom: 2rem;
   border-bottom: none;
 
   > :last-child {
     margin-bottom: 0;
+    padding-bottom: 0;
     border-bottom: none;
   }
 }
