@@ -27,7 +27,7 @@ export default function Article({ pageContext: { title, description, image, bloc
   return (
     <Layout>
       <Hero title={title} description={description} style={{ paddingBottom: 0 }} />
-      <Content type="section" ruled>
+      <Content type="section">
         <Byline author={authorName} publishedAt={publishedAt} />
         {img && <GatsbyImage image={img} alt={title} className={cover} />}
         <ArticleBlocks blocks={blocks} />
