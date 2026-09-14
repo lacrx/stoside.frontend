@@ -14,7 +14,7 @@ export default function Layout({ children }: PropsWithChildren) {
       <div>
         <section className={signup}>
           <p>Stay in the loop on what's happening in Oceanside.</p>
-          <SignupForm placeholder="Your email" buttonText="Subscribe" />
+          <SignupForm actionUrl="https://uz6kxsrese.execute-api.us-east-1.amazonaws.com/subscribe" placeholder="Your email" buttonText="Subscribe" listId="stoside" />
         </section>
         <Footer />
       </div>

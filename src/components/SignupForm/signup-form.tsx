@@ -3,6 +3,7 @@ import { form, input, button, message, success, error } from "./signup-form.modu
 
 type SignupFormProps = {
   actionUrl?: string;
+  listId?: string;
   placeholder?: string;
   buttonText?: string;
   successText?: string;
@@ -10,6 +11,7 @@ type SignupFormProps = {
 
 export default function SignupForm({
   actionUrl,
+  listId,
   placeholder = "Your email address",
   buttonText = "Sign up",
   successText = "You're in! We'll be in touch.",
@@ -30,7 +32,7 @@ export default function SignupForm({
       const res = await fetch(actionUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, list_id: listId }),
       });
       if (!res.ok) throw new Error(`${res.status}`);
       setStatus("success");
