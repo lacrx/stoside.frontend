@@ -234,11 +234,12 @@
 }
 
 .card {
-  padding: 1.25rem 0;
+  padding: 1.25rem 0 0.75rem;
 }
 
 .card + .card {
   border-top: 1px solid var(--rule);
+  padding-top: 1.5rem;
 }
 
 .card:last-child {
