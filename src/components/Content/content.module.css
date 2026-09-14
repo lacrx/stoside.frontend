@@ -18,7 +18,8 @@
 
 .content + .content:has(> :global(h2)) {
   border-top: none;
-  margin-top: 1.5rem;
+  margin-top: 2rem;
+  padding-top: 0;
 }
 
 .ruled {
