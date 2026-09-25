@@ -385,6 +385,7 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
 
   const COVER_FALLBACKS: Record<string, string> = {
     'our-wealth-is-downtown': 'oceanside-wealth-poster-desktop.jpg',
+    'san-clemente-wealth-is-downtown': 'san-clemente-wealth-poster-desktop.jpg',
   };
 
   const images = articles.length === 0 ? [] : await Promise.all(articles.map( async (article) => {
