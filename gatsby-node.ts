@@ -476,7 +476,7 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
         const artifact = JSON.parse(fs.readFileSync(artifactPath, "utf-8"));
         createNode({
           ...artifact,
-          id: createNodeId(`viz-${artifact.id}`),
+          id: createNodeId(`viz-${artifact.vizId}`),
           internal: {
             type: "GatsbyVisualization",
             contentDigest: createContentDigest(artifact)
