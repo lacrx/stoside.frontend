@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { navigate } from "gatsby";
 import Layout from "@/components/Layout/layout";
 import { useAuth } from "@/components/Auth/auth-context";
@@ -11,6 +11,10 @@ export default function SignIn() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (isAdmin) navigate("/", { replace: true });
+  }, [isAdmin]);
+
   if (isAdmin) {
     return (
       <Layout>
@@ -19,7 +23,7 @@ export default function SignIn() {
             <h1 className={s.title}>Signed in</h1>
             <p className={s.subtitle}>You're signed in as <strong>{userName}</strong>.</p>
             <button className={s.btnPrimary} onClick={() => { logout(); navigate("/"); }}>Sign out</button>
-            <button className={s.btnSecondary} onClick={() => navigate(-1)}>Go back</button>
+            <button className={s.btnSecondary} onClick={() => navigate("/")}>Go back</button>
           </div>
         </div>
       </Layout>
