@@ -5,6 +5,7 @@
   "source": "OC Treasurer-Tax Collector",
   "featuresTiles": "sc-parcels",
   "tilesLayer": "parcels",
+  "posterFrame": "sc-poster-desktop",
   "basemap": "san-clemente.pmtiles",
   "camera": {
     "center": [-117.670, 33.434],
