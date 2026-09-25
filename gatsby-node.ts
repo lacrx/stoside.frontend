@@ -642,6 +642,7 @@ export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] 
       featuresTilesFile: File @link(by: "name", from: "featuresTiles")
       posterFile: File @link(by: "name", from: "posterFrame")
       posterFileMobile: File @link(by: "name", from: "posterFrameMobile")
+      basemap: String
       tilesLayer: String
       camera: GatsbyVizCamera
       color: GatsbyVizColor

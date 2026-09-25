@@ -1,0 +1,37 @@
+{
+  "vizId": "san-clemente-vpa-3d",
+  "type": "choropleth-3d-maplibre",
+  "title": "Value per acre of San Clemente parcels, 2025",
+  "source": "OC Treasurer-Tax Collector",
+  "features": "analysis",
+  "basemap": "san-clemente.pmtiles",
+  "camera": {
+    "center": [-117.618, 33.437],
+    "zoom": 12.2,
+    "pitch": 57.5,
+    "bearing": -30
+  },
+  "color": {
+    "field": "vpa",
+    "domain": [0, 1000000, 2000000, 3000000, 4000000, 5000000, 6000000, 7000000, 8000000, 10000000, 20000000, 30000000],
+    "range": [
+      "#9c9c9c",
+      "#2e673e",
+      "#489757",
+      "#7abc6c",
+      "#b4d67c",
+      "#dfef98",
+      "#feffca",
+      "#f8e197",
+      "#f2b06d",
+      "#e4744e",
+      "#c73d33",
+      "#971f29",
+      "#9b1de0"
+    ]
+  },
+  "elevation": {
+    "field": "vpa",
+    "divisor": 10000
+  }
+}

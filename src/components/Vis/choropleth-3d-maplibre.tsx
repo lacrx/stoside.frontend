@@ -12,6 +12,7 @@ type Artifact = {
   vizId: string;
   featuresFile: { publicURL: string | null } | null;
   featuresTilesFile: { publicURL: string | null } | null;
+  basemap: string | null;
   tilesLayer: string | null;
   camera: { center: number[]; zoom: number | null; pitch: number | null; bearing: number | null } | null;
   color: { field: string; domain: number[]; range: string[] } | null;
@@ -21,12 +22,14 @@ type Artifact = {
 
 type Props = { artifact: Artifact };
 
-// Self-hosted Protomaps PMTiles extract for the Oceanside area. Served
-// from the same origin as the frontend (CloudFront), so no CORS handshake
-// and the service worker caches it via the /tiles/* CacheFirst rule.
-// See frontend/static/tiles/README.md for how to regenerate.
-const BASEMAP_PMTILES_URL =
-  process.env.GATSBY_BASEMAP_PMTILES_URL || "/tiles/oceanside.pmtiles";
+const DEFAULT_BASEMAP = "/tiles/oceanside.pmtiles";
+
+function resolveBasemapUrl(basemap: string | null | undefined): string {
+  if (process.env.GATSBY_BASEMAP_PMTILES_URL) return process.env.GATSBY_BASEMAP_PMTILES_URL;
+  if (!basemap) return DEFAULT_BASEMAP;
+  if (basemap.startsWith("/") || basemap.startsWith("http")) return basemap;
+  return `/tiles/${basemap}`;
+}
 
 function hexToRgb(hex: string): [number, number, number] {
   const h = hex.replace("#", "");
@@ -162,10 +165,11 @@ export default function Choropleth3DMaplibre({ artifact }: Props) {
     // planetiler. If the file is missing (e.g. first boot before the
     // extract has been uploaded), MapLibre logs 404s and the extrusions
     // still render on the white background layer below.
+    const basemapUrl = resolveBasemapUrl(artifact.basemap);
     const absoluteBasemapUrl =
-      typeof window !== "undefined" && BASEMAP_PMTILES_URL.startsWith("/")
-        ? `${window.location.origin}${BASEMAP_PMTILES_URL}`
-        : BASEMAP_PMTILES_URL;
+      typeof window !== "undefined" && basemapUrl.startsWith("/")
+        ? `${window.location.origin}${basemapUrl}`
+        : basemapUrl;
 
     const map = new maplibregl.Map({
       container: containerRef.current,

@@ -26,6 +26,7 @@ export type GatsbyVisualization = {
   featuresTilesFile: { publicURL: string | null } | null;
   posterFile: { publicURL: string | null } | null;
   posterFileMobile: { publicURL: string | null } | null;
+  basemap: string | null;
   tilesLayer: string | null;
   camera: { center: number[]; zoom: number | null; pitch: number | null; bearing: number | null } | null;
   color: { field: string; domain: number[]; range: string[] } | null;
@@ -50,6 +51,7 @@ export default function VisualizationBlock({ vizId, caption, height, align }: Vi
           featuresTilesFile { publicURL }
           posterFile { publicURL }
           posterFileMobile { publicURL }
+          basemap
           tilesLayer
           camera { center zoom pitch bearing }
           color { field domain range }
