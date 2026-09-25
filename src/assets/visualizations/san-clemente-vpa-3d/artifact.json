@@ -3,7 +3,8 @@
   "type": "choropleth-3d-maplibre",
   "title": "Value per acre of San Clemente parcels, 2025",
   "source": "OC Treasurer-Tax Collector",
-  "features": "analysis",
+  "featuresTiles": "parcels",
+  "tilesLayer": "parcels",
   "basemap": "san-clemente.pmtiles",
   "camera": {
     "center": [-117.618, 33.437],
