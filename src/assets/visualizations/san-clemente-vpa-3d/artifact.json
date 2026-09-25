@@ -7,10 +7,10 @@
   "tilesLayer": "parcels",
   "basemap": "san-clemente.pmtiles",
   "camera": {
-    "center": [-117.618, 33.437],
-    "zoom": 12.2,
+    "center": [-117.624, 33.435],
+    "zoom": 11.5,
     "pitch": 57.5,
-    "bearing": -30
+    "bearing": -81.9
   },
   "color": {
     "field": "vpa",
