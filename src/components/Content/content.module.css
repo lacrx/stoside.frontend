@@ -79,9 +79,9 @@
 }
 
 .content > :global(ul) {
-  list-style: disc;
+  list-style: none;
 }
 
 .content > :global(ol) {
-  list-style: decimal;
+  list-style: none;
 }
