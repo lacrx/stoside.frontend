@@ -23,7 +23,6 @@
   line-height: 1.75;
 }
 
-.richText :global(ul),
 .richText :global(ol) {
   font-family: var(--serif);
   font-size: 1rem;
@@ -31,13 +30,6 @@
   color: var(--grey);
   margin: 1.25em 0;
   padding-left: 1.5em;
-}
-
-.richText :global(ul) {
-  list-style: none;
-}
-
-.richText :global(ol) {
   list-style: none;
 }
 

@@ -22,6 +22,21 @@ function addResponsiveSrcset(html: string): string {
 }
 
 
+// Render unordered list items as plain body-text paragraphs.
+marked.use({
+  renderer: {
+    list(token) {
+      if (token.ordered) return false;
+      return token.items
+        .map(item => {
+          const inner = this.parser.parse(item.tokens).replace(/^<p>|<\/p>\s*$/g, '').trim();
+          return `<p>${inner}</p>\n`;
+        })
+        .join('');
+    },
+  },
+});
+
 export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
   actions,
 }) => {
