@@ -26,3 +26,13 @@ export type GatsbyWalkAudit = {
   date: string;
   description: string | null;
 };
+
+export type GatsbyDataPage = {
+  title: string;
+  description: string | null;
+  slug: string;
+  dashboardType: string;
+  image: IGatsbyImageData | null;
+  dataUpdatedAt: string | null;
+  sortOrder: number;
+};

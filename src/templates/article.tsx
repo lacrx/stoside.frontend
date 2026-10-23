@@ -30,7 +30,7 @@ export default function Article({ pageContext: { title, description, image, cove
       <Hero title={title} description={description} style={{ paddingBottom: 0 }} />
       <Content type="section">
         <Byline author={authorName} publishedAt={publishedAt} />
-        {img && <GatsbyImage image={img} alt={title} className={cover} />}
+        {img && blocks[0]?.kind !== "visualization" && <GatsbyImage image={img} alt={title} className={cover} />}
         <ArticleBlocks blocks={blocks} />
       </Content>
     </Layout>

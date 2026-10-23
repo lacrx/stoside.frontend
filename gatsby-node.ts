@@ -103,6 +103,36 @@ const getAllStrapiWalkAudits = `
   }
 `;
 
+const getAllStrapiDataPages = `
+  query GetAllStrapiDataPages {
+    dataPages(sort: ["sortOrder:asc"], pagination: { pageSize: 100 }) {
+      documentId
+      title
+      description
+      slug
+      dashboardType
+      cover {
+        url
+      }
+      blocks {
+        __typename
+        ...on ComponentSharedRichText {
+          body
+        }
+        ...on ComponentSharedVisualization {
+          vizId
+          caption
+          height
+          align
+        }
+      }
+      methodology
+      dataUpdatedAt
+      sortOrder
+    }
+  }
+`;
+
 const getAllMeetupEvents = `
   query GetAllMeetupEvents {
     proNetworkByUrlname(urlname: "strong-towns-oceanside") {
@@ -173,6 +203,38 @@ type GatsbyArticle = {
 interface GatsbyArticles {
   allGatsbyArticle: {
     nodes: [GatsbyArticle]
+  }
+}
+
+type DataPage = {
+  documentId: string
+  title: string
+  description: string | null
+  slug: string
+  dashboardType: string
+  cover: UploadFile | null
+  blocks: StrapiBlock[]
+  methodology: string | null
+  dataUpdatedAt: string | null
+  sortOrder: number
+};
+interface DataPageResponse {
+  dataPages: DataPage[]
+}
+type GatsbyDataPage = {
+  title: string
+  description: string | null
+  slug: string
+  dashboardType: string
+  image: string | undefined
+  blocks: ArticleBlock[]
+  methodologyHtml: string | null
+  dataUpdatedAt: string | null
+  sortOrder: number
+};
+interface GatsbyDataPages {
+  allGatsbyDataPage: {
+    nodes: GatsbyDataPage[]
   }
 }
 
@@ -483,6 +545,70 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
     console.warn(`[gatsby-node] Skipping Strapi walk audits: ${(err as Error).message}`);
   }
 
+  let dataPages: DataPage[] = [];
+  try {
+    const dataPageResult = await strapiGraphqlClient.request<DataPageResponse>(getAllStrapiDataPages);
+    dataPages = dataPageResult.dataPages;
+  } catch (err) {
+    console.warn(`[gatsby-node] Skipping Strapi data pages: ${(err as Error).message}`);
+  }
+
+  const dataPageImages = dataPages.length === 0 ? [] : await Promise.all(dataPages.map(async (dp) => {
+    if (!dp?.cover?.url) return undefined;
+    const coverUrl = dp.cover.url.startsWith('http')
+      ? dp.cover.url
+      : `${strapiUrl}${dp.cover.url}`;
+    return (await createRemoteFileNode({
+      url: coverUrl,
+      createNode,
+      createNodeId,
+      getCache,
+    })).id;
+  }));
+
+  dataPages.forEach((dp, i) => {
+    const structuredBlocks: ArticleBlock[] = dp.blocks.map(block => {
+      if (block.__typename === "ComponentSharedRichText") {
+        return {
+          kind: "rich-text",
+          html: sanitize(marked.parse(block.body) as string)
+        };
+      }
+      return {
+        kind: "visualization",
+        vizId: block.vizId,
+        caption: block.caption,
+        height: block.height,
+        align: block.align
+      };
+    });
+
+    const methodologyHtml = dp.methodology
+      ? sanitize(marked.parse(dp.methodology) as string)
+      : null;
+
+    const gatsbyDataPage: GatsbyDataPage = {
+      title: dp.title,
+      description: dp.description,
+      slug: dp.slug,
+      dashboardType: dp.dashboardType,
+      image: dataPageImages[i],
+      blocks: structuredBlocks,
+      methodologyHtml,
+      dataUpdatedAt: dp.dataUpdatedAt,
+      sortOrder: dp.sortOrder,
+    };
+
+    createNode({
+      ...gatsbyDataPage,
+      id: createNodeId(`data-page-${dp.slug}`),
+      internal: {
+        type: "GatsbyDataPage",
+        contentDigest: createContentDigest(gatsbyDataPage),
+      },
+    });
+  });
+
   const visualizationsDir = path.resolve(__dirname, "src/assets/visualizations");
   if (fs.existsSync(visualizationsDir)) {
     for (const vizDir of fs.readdirSync(visualizationsDir)) {
@@ -554,6 +680,7 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async ({
 
 const articleTemplate = path.resolve("./src/templates/article.tsx");
 const walkAuditTemplate = path.resolve("./src/templates/walk-audit.tsx");
+const dataPageTemplate = path.resolve("./src/templates/data-page.tsx");
 
 export const createPages: GatsbyNode["createPages"] = async ({ actions: { createPage }, graphql }) => {
   const allGatsbyArticle = await graphql<GatsbyArticles>(`
@@ -627,6 +754,50 @@ export const createPages: GatsbyNode["createPages"] = async ({ actions: { create
         context: audit,
       });
     });
+
+  const allGatsbyDataPage = await graphql<GatsbyDataPages>(`
+    query AllGatsbyDataPage {
+      allGatsbyDataPage(sort: { sortOrder: ASC }) {
+        nodes {
+          title
+          description
+          slug
+          dashboardType
+          image {
+            childImageSharp {
+              gatsbyImageData(
+                width: 1050
+                height: 600
+                layout: CONSTRAINED
+                placeholder: BLURRED
+                formats: [AUTO, WEBP, AVIF]
+                transformOptions: { fit: COVER, cropFocus: CENTER }
+              )
+            }
+          }
+          blocks {
+            kind
+            html
+            vizId
+            caption
+            height
+            align
+          }
+          methodologyHtml
+          dataUpdatedAt
+          sortOrder
+        }
+      }
+    }
+  `);
+
+  allGatsbyDataPage?.data?.allGatsbyDataPage?.nodes?.forEach(dataPage => {
+    createPage({
+      path: `/data/${dataPage.slug}`,
+      component: dataPageTemplate,
+      context: dataPage,
+    });
+  });
 };
 
 export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] = ({ actions: { createTypes } }) =>
@@ -654,6 +825,8 @@ export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] 
       type: String!
       title: String
       source: String
+      data: JSON
+      config: JSON
       featuresFile: File @link(by: "name", from: "features")
       featuresTilesFile: File @link(by: "name", from: "featuresTiles")
       posterFile: File @link(by: "name", from: "posterFrame")
@@ -699,6 +872,17 @@ export const createSchemaCustomization: GatsbyNode[`createSchemaCustomization`] 
     }
     type GatsbyWalkAuditSegment {
       name: String!
+    }
+    type GatsbyDataPage implements Node {
+      image: File @link(by: "id")
+      title: String!
+      description: String
+      slug: String!
+      dashboardType: String!
+      blocks: [GatsbyArticleBlock!]!
+      methodologyHtml: String
+      dataUpdatedAt: Date @dateformat
+      sortOrder: Int
     }
     type GatsbyWalkAudit implements Node {
       title: String!

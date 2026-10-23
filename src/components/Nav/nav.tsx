@@ -58,6 +58,11 @@ export default function Nav() {
         </Link>
       </li>
       <li>
+        <Link to="/data">
+          <span>Data</span>
+        </Link>
+      </li>
+      <li>
         <Link to="/events">
           <span>Events</span>
         </Link>

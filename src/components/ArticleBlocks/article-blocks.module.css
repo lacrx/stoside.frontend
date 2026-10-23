@@ -3,6 +3,9 @@
   margin-bottom: 1.5rem;
 }
 
+.richText {
+}
+
 .richText :global(h2),
 .richText :global(h3) {
   margin-top: 1.75em;
@@ -23,6 +26,7 @@
   line-height: 1.75;
 }
 
+.richText :global(ul),
 .richText :global(ol) {
   font-family: var(--serif);
   font-size: 1rem;
@@ -30,7 +34,14 @@
   color: var(--grey);
   margin: 1.25em 0;
   padding-left: 1.5em;
-  list-style: none;
+}
+
+.richText :global(ul) {
+  list-style: disc;
+}
+
+.richText :global(ol) {
+  list-style: decimal;
 }
 
 .richText :global(li) {
@@ -67,6 +78,58 @@
   color: var(--black);
 }
 
+.richText :global(table) {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--serif);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  margin: 1.5em 0;
+}
+
+.richText :global(th) {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  padding: 0.6rem 0.75rem;
+  border-bottom: 2px solid var(--rule);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.richText :global(td) {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--rule);
+  color: var(--text);
+  vertical-align: top;
+}
+
+.richText :global(tbody tr:last-child td) {
+  border-bottom: none;
+}
+
+.richText :global(tbody tr:nth-child(even)) {
+  background: color-mix(in srgb, var(--rule) 15%, transparent);
+}
+
+@media (max-width: 600px) {
+  .richText :global(table) {
+    font-size: 0.78rem;
+  }
+
+  .richText :global(th),
+  .richText :global(td) {
+    padding: 0.4rem 0.5rem;
+  }
+}
+
 .richText:last-child {
   padding-bottom: 0;
 
@@ -77,10 +140,11 @@
 
 .vizFigure {
   margin: 2.5rem 0;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .vizFigure.inline {
-  max-width: 100%;
 }
 
 .vizFigure.wide {

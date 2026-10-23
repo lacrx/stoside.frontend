@@ -10,6 +10,10 @@ const RENDERERS: Record<string, React.LazyExoticComponent<React.ComponentType<an
   "choropleth-3d-maplibre": Choropleth3DMaplibre,
 };
 
+const NEEDS_STAGE: Record<string, boolean> = {
+  "choropleth-3d-maplibre": true,
+};
+
 type VisualizationBlockProps = {
   vizId: string;
   caption?: string | null;
@@ -22,6 +26,8 @@ export type GatsbyVisualization = {
   type: string;
   title: string | null;
   source: string | null;
+  data: unknown;
+  config: unknown;
   featuresFile: { publicURL: string | null } | null;
   featuresTilesFile: { publicURL: string | null } | null;
   posterFile: { publicURL: string | null } | null;
@@ -47,6 +53,8 @@ export default function VisualizationBlock({ vizId, caption, height, align }: Vi
           type
           title
           source
+          data
+          config
           featuresFile { publicURL }
           featuresTilesFile { publicURL }
           posterFile { publicURL }
@@ -74,44 +82,62 @@ export default function VisualizationBlock({ vizId, caption, height, align }: Vi
     );
   }
 
-  const Renderer = RENDERERS[artifact.type];
+  const normalizedType = artifact.type.replace(/_/g, "-");
+  const Renderer = RENDERERS[normalizedType];
   if (!Renderer) {
     return (
       <figure className={`${styles.vizFigure} ${alignClass}`}>
         <div className={styles.vizMissing}>
-          No renderer registered for type <code>{artifact.type}</code> (viz <code>{vizId}</code>)
+          No renderer registered for type <code>{normalizedType}</code> (viz <code>{vizId}</code>)
         </div>
       </figure>
     );
   }
 
-  const posterUrl = artifact.posterFile?.publicURL ?? null;
-  const posterUrlMobile = artifact.posterFileMobile?.publicURL ?? null;
+  if (NEEDS_STAGE[normalizedType]) {
+    const posterUrl = artifact.posterFile?.publicURL ?? null;
+    const posterUrlMobile = artifact.posterFileMobile?.publicURL ?? null;
+
+    return (
+      <figure className={`${styles.vizFigure} ${alignClass}`}>
+        <div className={styles.vizStage} style={{ height }}>
+          {posterUrl && (
+            <picture className={styles.vizPoster}>
+              {posterUrlMobile && (
+                <source media="(max-width: 768px)" srcSet={posterUrlMobile} />
+              )}
+              <img
+                src={posterUrl}
+                alt={artifact.title ?? artifact.vizId}
+                className={styles.vizPoster}
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
+          )}
+          <Suspense fallback={<div className={styles.vizPosterFill} />}>
+            <Renderer artifact={artifact} height={height} />
+          </Suspense>
+          <div className={styles.vizLoader} aria-hidden="true">
+            <span>&bull;</span><span>&bull;</span><span>&bull;</span>
+          </div>
+        </div>
+        {(caption || artifact.source) && (
+          <figcaption className={styles.vizCaption}>
+            {caption && <span>{caption}</span>}
+            {caption && artifact.source && <span> &middot; </span>}
+            {artifact.source && <span>Source: {artifact.source}</span>}
+          </figcaption>
+        )}
+      </figure>
+    );
+  }
 
   return (
     <figure className={`${styles.vizFigure} ${alignClass}`}>
-      <div className={styles.vizStage} style={{ height }}>
-        {posterUrl && (
-          <picture className={styles.vizPoster}>
-            {posterUrlMobile && (
-              <source media="(max-width: 768px)" srcSet={posterUrlMobile} />
-            )}
-            <img
-              src={posterUrl}
-              alt={artifact.title ?? artifact.vizId}
-              className={styles.vizPoster}
-              loading="lazy"
-              decoding="async"
-            />
-          </picture>
-        )}
-        <Suspense fallback={<div className={styles.vizPosterFill} />}>
-          <Renderer artifact={artifact} height={height} />
-        </Suspense>
-        <div className={styles.vizLoader} aria-hidden="true">
-          <span>&bull;</span><span>&bull;</span><span>&bull;</span>
-        </div>
-      </div>
+      <Suspense fallback={null}>
+        <Renderer artifact={artifact} height={height} />
+      </Suspense>
       {(caption || artifact.source) && (
         <figcaption className={styles.vizCaption}>
           {caption && <span>{caption}</span>}
