@@ -10,8 +10,11 @@ import { cover } from "@/components/ArticleBlocks/article-blocks.module.css";
 
 const DASHBOARDS: Record<string, React.LazyExoticComponent<React.ComponentType>> = {
   "permitted-units": lazy(() => import("@/components/Dashboard/PermittedUnitsDashboard")),
+  "permitted_units": lazy(() => import("@/components/Dashboard/PermittedUnitsDashboard")),
   "affordable-units": lazy(() => import("@/components/Dashboard/AffordableUnitsDashboard")),
+  "affordable_units": lazy(() => import("@/components/Dashboard/AffordableUnitsDashboard")),
   "affordability-map": lazy(() => import("@/components/Dashboard/AffordabilityDashboard")),
+  "affordability_map": lazy(() => import("@/components/Dashboard/AffordabilityDashboard")),
 };
 
 type DataPageContext = {
