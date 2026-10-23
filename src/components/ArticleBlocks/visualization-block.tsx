@@ -5,9 +5,21 @@ import * as styles from "./article-blocks.module.css";
 const Choropleth3DMaplibre = lazy(
   () => import("@/components/Vis/choropleth-3d-maplibre")
 );
+const StatTilesRenderer = lazy(
+  () => import("@/components/Dashboard/stat-tiles-renderer")
+);
+const BarChartRenderer = lazy(
+  () => import("@/components/Dashboard/bar-chart-renderer")
+);
+const DataTableRenderer = lazy(
+  () => import("@/components/Dashboard/data-table-renderer")
+);
 
 const RENDERERS: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   "choropleth-3d-maplibre": Choropleth3DMaplibre,
+  "stat-tiles": StatTilesRenderer,
+  "bar-chart": BarChartRenderer,
+  "data-table": DataTableRenderer,
 };
 
 const NEEDS_STAGE: Record<string, boolean> = {
